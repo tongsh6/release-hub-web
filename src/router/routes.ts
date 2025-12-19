@@ -4,6 +4,7 @@ import releaseWindowRoutes from './modules/release-window'
 import branchRuleRoutes from './modules/branch-rules'
 import versionPolicyRoutes from './modules/version-policies'
 import versionOpsRoutes from './modules/version-ops'
+import templateCrudRoutes from './modules/templateCrud'
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
@@ -27,7 +28,8 @@ export const constantRoutes: RouteRecordRaw[] = [
       ...releaseWindowRoutes,
       ...branchRuleRoutes,
       ...versionPolicyRoutes,
-      ...versionOpsRoutes
+      ...versionOpsRoutes,
+      ...templateCrudRoutes
     ]
   },
   {

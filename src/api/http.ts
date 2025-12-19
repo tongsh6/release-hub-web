@@ -38,6 +38,11 @@ export const http: AxiosInstance = axios.create({
 })
 
 http.interceptors.request.use((config) => {
+  // 登录接口不需要携带 token，防止过期 token 导致后端 401 拦截
+  if (config.url?.includes('/auth/login')) {
+    return config
+  }
+
   const token = localStorage.getItem(TOKEN_KEY)
   if (token) {
     config.headers = config.headers ?? {}

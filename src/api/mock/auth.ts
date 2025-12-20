@@ -6,7 +6,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 export const mockAuthApi = {
   async login(payload: LoginPayload): Promise<LoginResult> {
     await delay(500)
-    if (payload.username === 'admin' && payload.password === '123456') {
+    if (payload.username === 'admin' && payload.password === 'admin') {
       return {
         token: 'mock-token-admin-' + Date.now()
       }

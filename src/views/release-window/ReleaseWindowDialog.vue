@@ -10,29 +10,36 @@
       ref="formRef"
       :model="form"
       :rules="rules"
-      label-width="100px"
+      label-width="120px"
       v-loading="loading"
       :disabled="mode === 'view'"
     >
-      <el-form-item :label="t('releaseWindow.name')" prop="name">
+      <el-form-item :label="t('releaseWindow.windowKey')" prop="windowKey" v-if="mode === 'create'">
+        <el-input v-model="form.windowKey" :placeholder="t('releaseWindow.placeholder.enterWindowKey')" />
+      </el-form-item>
+
+      <el-form-item :label="t('releaseWindow.name')" prop="name" v-if="mode === 'create'">
         <el-input v-model="form.name" :placeholder="t('releaseWindow.placeholder.enterName')" />
       </el-form-item>
       
-      <el-form-item :label="t('releaseWindow.description')" prop="description">
-        <el-input 
-          v-model="form.description" 
-          type="textarea" 
-          :placeholder="t('releaseWindow.placeholder.enterDesc')" 
-          :rows="3" 
-        />
+      <el-form-item :label="t('releaseWindow.startAt')" prop="startAt" v-if="mode === 'edit'">
+         <el-date-picker
+            v-model="form.startAt"
+            type="datetime"
+            placeholder="Select date and time"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+          />
       </el-form-item>
 
-      <el-form-item :label="t('releaseWindow.status')" prop="status" v-if="mode !== 'create'">
-        <el-radio-group v-model="form.status">
-          <el-radio value="active">{{ t('releaseWindow.active') }}</el-radio>
-          <el-radio value="frozen">{{ t('releaseWindow.frozen') }}</el-radio>
-        </el-radio-group>
+      <el-form-item :label="t('releaseWindow.endAt')" prop="endAt" v-if="mode === 'edit'">
+         <el-date-picker
+            v-model="form.endAt"
+            type="datetime"
+            placeholder="Select date and time"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+          />
       </el-form-item>
+
     </el-form>
 
     <template #footer>
@@ -55,7 +62,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDialogForm } from '@/composables/crud/useDialogForm'
-import { releaseWindowApi, type ReleaseWindow } from '@/api/releaseWindowApi'
+import { releaseWindowApi, type ReleaseWindow } from '@/api/modules/releaseWindow'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const { t } = useI18n()
@@ -66,16 +73,45 @@ const emit = defineEmits<{
 
 const formRef = ref<FormInstance>()
 
-const { visible, mode, loading, saving, form, open, close, submit, onSuccess } = useDialogForm<ReleaseWindow>({
-  fetchById: releaseWindowApi.get,
-  create: releaseWindowApi.create,
-  update: releaseWindowApi.update,
+// Define a local interface that covers all fields we might edit
+interface DialogFormState {
+  id: string
+  windowKey: string
+  name: string
+  startAt: string
+  endAt: string
+}
+
+const { visible, mode, loading, saving, form, open, close, submit, onSuccess } = useDialogForm<DialogFormState>({
+  fetchById: async (id) => {
+    const res = await releaseWindowApi.get(String(id))
+    return {
+      id: res.id,
+      windowKey: res.windowKey,
+      name: res.name,
+      startAt: res.startAt || '',
+      endAt: res.endAt || ''
+    }
+  },
+  create: async (data) => {
+    return releaseWindowApi.create({
+      windowKey: data.windowKey,
+      name: data.name
+    })
+  },
+  update: async (id, data) => {
+    // In edit mode, we are configuring the window time
+    return releaseWindowApi.configure(String(id), {
+      startAt: data.startAt,
+      endAt: data.endAt
+    })
+  },
   defaultForm: {
     id: '',
+    windowKey: '',
     name: '',
-    status: 'active',
-    createdAt: '',
-    description: ''
+    startAt: '',
+    endAt: ''
   }
 })
 
@@ -87,27 +123,43 @@ onSuccess((payload) => {
 const title = computed(() => {
   const map: Record<string, string> = {
     create: t('releaseWindow.create'),
-    edit: t('releaseWindow.editTitle'),
+    edit: t('releaseWindow.configureTime'), // Changed title for edit mode
     view: t('releaseWindow.details')
   }
   return map[mode.value]
 })
 
-const rules = computed<FormRules>(() => ({
-  name: [
-    { required: true, message: t('releaseWindow.validation.nameRequired'), trigger: 'blur' },
-    { min: 3, max: 50, message: t('releaseWindow.validation.nameLength'), trigger: 'blur' }
-  ],
-  status: [
-    { required: true, message: t('releaseWindow.validation.statusRequired'), trigger: 'change' }
-  ]
-}))
+const rules = computed<FormRules>(() => {
+  if (mode.value === 'create') {
+    return {
+      windowKey: [
+        { required: true, message: t('releaseWindow.validation.required'), trigger: 'blur' }
+      ],
+      name: [
+        { required: true, message: t('releaseWindow.validation.required'), trigger: 'blur' }
+      ]
+    }
+  }
+  if (mode.value === 'edit') {
+     return {
+      startAt: [
+        { required: true, message: t('releaseWindow.validation.required'), trigger: 'change' }
+      ],
+      endAt: [
+        { required: true, message: t('releaseWindow.validation.required'), trigger: 'change' }
+      ]
+    }
+  }
+  return {}
+})
 
 const handleSubmit = async () => {
   if (!formRef.value) return
   await formRef.value.validate(async (valid) => {
     if (valid) {
       await submit()
+      // onSuccess is handled inside useDialogForm submit logic, 
+      // but if we want to ensure emit happens only on success and then close
     }
   })
 }

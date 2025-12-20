@@ -4,12 +4,6 @@
       <el-form-item :label="t('releaseWindow.name')">
         <el-input v-model="query.name" :placeholder="t('releaseWindow.placeholder.name')" clearable />
       </el-form-item>
-      <el-form-item :label="t('releaseWindow.status')">
-        <el-select v-model="query.status" :placeholder="t('releaseWindow.placeholder.status')" clearable style="width: 180px">
-          <el-option :label="t('releaseWindow.active')" value="active" />
-          <el-option :label="t('releaseWindow.frozen')" value="frozen" />
-        </el-select>
-      </el-form-item>
     </SearchForm>
 
     <div class="mb-4">
@@ -25,30 +19,62 @@
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
-      <el-table-column prop="id" :label="t('releaseWindow.id')" width="80" />
+      <el-table-column prop="windowKey" label="Key" width="150" />
       <el-table-column prop="name" :label="t('releaseWindow.name')" min-width="150" />
       <el-table-column prop="status" :label="t('releaseWindow.status')" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.status === 'active' ? 'success' : 'info'">
-            {{ row.status === 'active' ? t('releaseWindow.active') : t('releaseWindow.frozen') }}
+          <el-tag :type="getStatusType(row.status)">
+            {{ row.status }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createdAt" :label="t('releaseWindow.createdAt')" width="180">
+      <el-table-column :label="t('releaseWindow.createdAt')" width="180">
         <template #default="{ row }">
           {{ new Date(row.createdAt).toLocaleString() }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('releaseWindow.actions')" width="220" fixed="right">
+      <el-table-column :label="t('releaseWindow.actions')" width="280" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="handleView(row)">{{ t('releaseWindow.view') }}</el-button>
-          <el-button link type="primary" @click="handleEdit(row)">{{ t('common.edit') }}</el-button>
+          
+          <template v-if="row.status === 'INIT' || row.status === 'OPEN'">
+             <el-button link type="primary" @click="handleEdit(row)">{{ t('common.edit') }}</el-button>
+          </template>
+
           <el-button 
+            v-if="row.status !== 'FROZEN' && row.status !== 'CLOSED'"
             link 
-            :type="row.status === 'active' ? 'danger' : 'warning'" 
+            type="warning"
             @click="handleFreeze(row)"
           >
-            {{ row.status === 'active' ? t('releaseWindow.freeze') : t('releaseWindow.unfreeze') }}
+            {{ t('releaseWindow.freeze') }}
+          </el-button>
+          
+          <el-button 
+            v-if="row.status === 'FROZEN'"
+            link 
+            type="success"
+            @click="handleUnfreeze(row)"
+          >
+            {{ t('releaseWindow.unfreeze') }}
+          </el-button>
+
+           <el-button 
+            v-if="row.status === 'FROZEN'"
+            link 
+            type="primary"
+            @click="handlePublish(row)"
+          >
+            {{ t('releaseWindow.publish') }}
+          </el-button>
+          
+           <el-button 
+            v-if="row.status === 'PUBLISHED' || row.status === 'FROZEN'"
+            link 
+            type="danger"
+            @click="handleClose(row)"
+          >
+            {{ t('releaseWindow.close') }}
           </el-button>
         </template>
       </el-table-column>
@@ -66,14 +92,35 @@ import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
 import ReleaseWindowDialog from './ReleaseWindowDialog.vue'
-import { releaseWindowApi, type ReleaseWindow } from '@/api/releaseWindowApi'
+import { releaseWindowApi, type ReleaseWindow, type ReleaseWindowStatus } from '@/api/modules/releaseWindow'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const { t } = useI18n()
 const router = useRouter()
 const dialogRef = ref<InstanceType<typeof ReleaseWindowDialog>>()
 
+// Since backend returns all items, we handle pagination client-side or just show all for now
+// The useListPage hook assumes server-side pagination usually, but let's adapt it.
+// Current backend API list() returns Array, useListPage expects PageResult.
+// We need a wrapper.
+const listFetcher = async (q: any) => {
+  const data = await releaseWindowApi.list(q)
+  // Ensure data is an array before filtering
+  const arrayData = Array.isArray(data) ? data : []
+  
+  // Client-side filtering if needed
+  let filtered = arrayData
+  if (q.name) {
+    filtered = arrayData.filter(item => item.name.toLowerCase().includes(q.name.toLowerCase()))
+  }
+  return {
+    list: filtered,
+    total: filtered.length
+  }
+}
+
 const { query, loading, list, total, fetch, search, reset, onPageChange, onPageSizeChange } = useListPage({
-  fetcher: releaseWindowApi.list,
+  fetcher: listFetcher,
   defaultQuery: {
     name: '',
     status: ''
@@ -89,15 +136,67 @@ const handleEdit = (row: ReleaseWindow) => {
 }
 
 const handleView = (row: ReleaseWindow) => {
-  dialogRef.value?.open({ id: row.id, mode: 'view' })
+  router.push({ name: 'ReleaseWindowDetail', params: { id: row.id } })
 }
 
 const handleFreeze = async (row: ReleaseWindow) => {
   try {
+    await ElMessageBox.confirm(t('releaseWindow.confirmFreeze'), t('common.warning'), {
+      type: 'warning'
+    })
     await releaseWindowApi.freeze(row.id)
+    ElMessage.success(t('common.success'))
+    fetch()
+  } catch (error) {
+    if (error !== 'cancel') console.error(error)
+  }
+}
+
+const handleUnfreeze = async (row: ReleaseWindow) => {
+  try {
+    await releaseWindowApi.unfreeze(row.id)
+    ElMessage.success(t('common.success'))
     fetch()
   } catch (error) {
     console.error(error)
+  }
+}
+
+const handlePublish = async (row: ReleaseWindow) => {
+   try {
+    await ElMessageBox.confirm(t('releaseWindow.confirmPublish'), t('common.warning'), {
+      type: 'warning'
+    })
+    await releaseWindowApi.publish(row.id)
+    ElMessage.success(t('common.success'))
+    fetch()
+  } catch (error) {
+    if (error !== 'cancel') console.error(error)
+  }
+}
+
+const handleClose = async (row: ReleaseWindow) => {
+   try {
+    await ElMessageBox.confirm(t('releaseWindow.confirmClose'), t('common.warning'), {
+      type: 'warning'
+    })
+    await releaseWindowApi.close(row.id)
+    ElMessage.success(t('common.success'))
+    fetch()
+  } catch (error) {
+    if (error !== 'cancel') console.error(error)
+  }
+}
+
+const getStatusType = (status: ReleaseWindowStatus) => {
+  switch (status) {
+    case 'DRAFT': return 'info'
+    case 'INIT': return 'info'
+    case 'OPEN': return 'primary'
+    case 'FROZEN': return 'warning'
+    case 'CLOSED': return 'success'
+    case 'PUBLISHED': return 'success'
+    default: return 'info'
   }
 }
 </script>

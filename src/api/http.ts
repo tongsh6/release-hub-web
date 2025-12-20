@@ -55,7 +55,7 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (resp: AxiosResponse) => {
     const body = resp.data
-    if (isApiResponse(body) && body.code !== '0') {
+    if (isApiResponse(body) && body.code !== '0' && body.code !== 'OK') {
       throw new ApiError({
         code: body.code,
         message: body.message || i18n.global.t('common.businessError'),

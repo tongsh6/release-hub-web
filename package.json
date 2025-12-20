@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:local": "vite --mode local",
+    "dev:test": "vite --mode test",
     "build": "vite build",
+    "build:prd": "vite build --mode prd",
+    "build:test": "vite build --mode test",
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",

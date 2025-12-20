@@ -40,19 +40,22 @@
         </template>
       </el-table-column>
     </DataTable>
+
+    <RunDrawer ref="drawerRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
+import RunDrawer from './RunDrawer.vue'
 import { runApi } from '@/api/runApi'
 
-const router = useRouter()
 const { t } = useI18n()
+const drawerRef = ref<InstanceType<typeof RunDrawer>>()
 
 const { query, loading, list, total, search, reset, onPageChange, onPageSizeChange } = useListPage({
   fetcher: runApi.list,
@@ -65,7 +68,10 @@ const { query, loading, list, total, search, reset, onPageChange, onPageSizeChan
 })
 
 function canRetry(row: any) { return ['FAILED', 'MERGE_BLOCKED'].includes(row.status) }
-function openDetail(row: any) { router.push(`/runs/${row.id}`) }
+
+function openDetail(row: any) {
+  drawerRef.value?.open(row.id)
+}
 </script>
 
 <style scoped>

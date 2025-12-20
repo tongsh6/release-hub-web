@@ -33,22 +33,25 @@
         </template>
       </el-table-column>
     </DataTable>
+
+    <RepositoryDrawer ref="drawerRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useI18n } from 'vue-i18n'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
+import RepositoryDrawer from './RepositoryDrawer.vue'
 import { repositoryApi } from '@/api/repositoryApi'
 
-const router = useRouter()
 const userStore = useUserStore()
 const canWrite = userStore.hasPermission('repository:write')
 const { t } = useI18n()
+const drawerRef = ref<InstanceType<typeof RepositoryDrawer>>()
 
 const { query, loading, list, total, search, reset, onPageChange, onPageSizeChange } = useListPage({
   fetcher: repositoryApi.list,
@@ -58,7 +61,7 @@ const { query, loading, list, total, search, reset, onPageChange, onPageSizeChan
 })
 
 function openDetail(row: any) {
-  router.push(`/repositories/${encodeURIComponent(row.repo)}`)
+  drawerRef.value?.open(row.repo)
 }
 </script>
 

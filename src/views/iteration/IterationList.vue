@@ -33,22 +33,25 @@
         </template>
       </el-table-column>
     </DataTable>
+
+    <IterationDrawer ref="drawerRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/user'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
+import IterationDrawer from './IterationDrawer.vue'
 import { iterationApi } from '@/api/iterationApi'
 
-const router = useRouter()
 const { t } = useI18n()
 const userStore = useUserStore()
 const canWrite = userStore.hasPermission('iteration:write')
+const drawerRef = ref<InstanceType<typeof IterationDrawer>>()
 
 const { query, loading, list, total, search, reset, onPageChange, onPageSizeChange } = useListPage({
   fetcher: iterationApi.list,
@@ -58,7 +61,7 @@ const { query, loading, list, total, search, reset, onPageChange, onPageSizeChan
 })
 
 function openDetail(row: any) {
-  router.push(`/iterations/${row.iterationKey}`)
+  drawerRef.value?.open(row.iterationKey)
 }
 </script>
 

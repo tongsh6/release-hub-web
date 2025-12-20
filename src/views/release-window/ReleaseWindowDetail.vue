@@ -1,16 +1,16 @@
 <template>
   <div class="release-window-detail-page" v-loading="loading">
     <div class="page-header">
-      <h2></h2>
+      <h2>{{ title }}</h2>
       <div class="actions">
-        <el-button @click="goBack">Back</el-button>
+        <el-button @click="goBack">{{ t('common.back') }}</el-button>
         <el-button 
           v-if="mode !== 'view'" 
           type="primary" 
           :loading="saving" 
           @click="handleSubmit"
         >
-          Save
+          {{ t('common.save') }}
         </el-button>
       </div>
     </div>
@@ -24,27 +24,27 @@
         :disabled="mode === 'view'"
         class="detail-form"
       >
-        <el-form-item label="Name" prop="name">
-          <el-input v-model="form.name" placeholder="Enter name" />
+        <el-form-item :label="t('releaseWindow.name')" prop="name">
+          <el-input v-model="form.name" :placeholder="t('releaseWindow.placeholder.enterName')" />
         </el-form-item>
 
-        <el-form-item label="Description" prop="description">
+        <el-form-item :label="t('releaseWindow.description')" prop="description">
           <el-input 
             v-model="form.description" 
             type="textarea" 
-            placeholder="Enter description" 
+            :placeholder="t('releaseWindow.placeholder.enterDesc')" 
             :rows="4" 
           />
         </el-form-item>
 
-        <el-form-item label="Status" prop="status" v-if="mode !== 'create'">
+        <el-form-item :label="t('releaseWindow.status')" prop="status" v-if="mode !== 'create'">
           <el-radio-group v-model="form.status">
-            <el-radio value="active">Active</el-radio>
-            <el-radio value="frozen">Frozen</el-radio>
+            <el-radio value="active">{{ t('releaseWindow.active') }}</el-radio>
+            <el-radio value="frozen">{{ t('releaseWindow.frozen') }}</el-radio>
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="Created At" v-if="mode !== 'create'">
+        <el-form-item :label="t('releaseWindow.createdAt')" v-if="mode !== 'create'">
           <span>{{ form.createdAt ? new Date(form.createdAt).toLocaleString() : '-' }}</span>
         </el-form-item>
       </el-form>
@@ -55,6 +55,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useDetailForm } from '@/composables/crud/useDetailForm'
 import { releaseWindowApi, type ReleaseWindow } from '@/api/releaseWindowApi'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -88,22 +89,23 @@ onMounted(() => {
   }
 })
 
+const { t } = useI18n()
 const title = computed(() => {
   const map = {
-    create: 'Create ReleaseWindow',
-    edit: 'Edit ReleaseWindow',
-    view: 'ReleaseWindow Details'
+    create: t('releaseWindow.create'),
+    edit: t('releaseWindow.editTitle'),
+    view: t('releaseWindow.details')
   }
   return map[mode.value]
 })
 
 const rules: FormRules = {
   name: [
-    { required: true, message: 'Please enter name', trigger: 'blur' },
-    { min: 3, max: 50, message: 'Length should be 3 to 50', trigger: 'blur' }
+    { required: true, message: t('releaseWindow.validation.nameRequired'), trigger: 'blur' },
+    { min: 3, max: 50, message: t('releaseWindow.validation.nameLength'), trigger: 'blur' }
   ],
   status: [
-    { required: true, message: 'Please select status', trigger: 'change' }
+    { required: true, message: t('releaseWindow.validation.statusRequired'), trigger: 'change' }
   ]
 }
 

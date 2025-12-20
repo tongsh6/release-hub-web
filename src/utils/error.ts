@@ -1,5 +1,6 @@
 import { ElMessage } from 'element-plus'
 import { ApiError } from '@/api/http'
+import { i18n } from '@/i18n'
 
 let lastKey = ''
 let lastAt = 0
@@ -14,10 +15,10 @@ export function handleError(err: unknown) {
   let traceId = ''
 
   if (err instanceof ApiError) {
-    message = err.message || '请求失败'
+    message = err.message || i18n.global.t('common.requestFailed')
     traceId = err.traceId || ''
   } else {
-    message = (err as any)?.message || '未知错误'
+    message = (err as any)?.message || i18n.global.t('common.unknownError')
   }
 
   const key = `${message}|${traceId}`

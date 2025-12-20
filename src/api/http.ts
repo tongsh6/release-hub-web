@@ -1,6 +1,7 @@
 // src/api/http.ts
 import axios, { type AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import type { ApiResponse } from '@/types/dto'
+import { i18n } from '@/i18n'
 
 const TOKEN_KEY = 'RH_TOKEN'
 
@@ -57,7 +58,7 @@ http.interceptors.response.use(
     if (isApiResponse(body) && body.code !== '0') {
       throw new ApiError({
         code: body.code,
-        message: body.message || '业务异常',
+        message: body.message || i18n.global.t('common.businessError'),
         traceId: body.traceId,
         httpStatus: resp.status,
         details: body.data
@@ -76,7 +77,7 @@ http.interceptors.response.use(
         return Promise.reject(
           new ApiError({
             code: 'AUTH_FAILED',
-            message: 'Incorrect username or password',
+            message: i18n.global.t('login.message.authFailed'),
             httpStatus: status,
             details: data
           })
@@ -100,7 +101,7 @@ http.interceptors.response.use(
       return Promise.reject(
         new ApiError({
           code: data.code || 'HTTP_ERROR',
-          message: data.message || '请求失败',
+          message: data.message || i18n.global.t('common.requestFailed'),
           traceId: data.traceId,
           httpStatus: status,
           details: data.data
@@ -111,7 +112,7 @@ http.interceptors.response.use(
     return Promise.reject(
       new ApiError({
         code: 'NETWORK_ERROR',
-        message: err.message || '网络异常',
+        message: err.message || i18n.global.t('common.networkError'),
         httpStatus: status,
         details: data
       })

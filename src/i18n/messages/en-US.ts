@@ -3,7 +3,7 @@ export default {
     title: 'ReleaseHub',
   },
   lang: {
-    zh: '中文',
+    zh: 'Chinese',
     en: 'English',
     switch: 'Language',
   },
@@ -15,6 +15,11 @@ export default {
     versionPolicies: 'Version Policies',
     versionOps: 'Version Ops',
     login: 'Login',
+    iterations: 'Iterations',
+    repositories: 'Repositories',
+    runs: 'Runs',
+    blockBoard: 'Blocks',
+    settings: 'Settings',
   },
   common: {
     search: 'Search',
@@ -24,9 +29,12 @@ export default {
     confirm: 'Confirm',
     save: 'Save',
     cancel: 'Cancel',
+    back: 'Back',
+    logout: 'Logout',
     refresh: 'Refresh',
     delete: 'Delete',
     noData: 'No Data',
+    todo: 'TODO',
     pleaseEnter: 'Please enter ',
     pleaseSelect: 'Please select ',
     startDate: 'Start Date',
@@ -34,6 +42,17 @@ export default {
     startTime: 'Start Time',
     endTime: 'End Time',
     to: 'To',
+    actions: 'Actions',
+    detail: 'Detail',
+    export: 'Export',
+    copy: 'Copy',
+    yes: 'Yes',
+    no: 'No',
+    keyword: 'Keyword',
+    requestFailed: 'Request failed',
+    unknownError: 'Unknown error',
+    networkError: 'Network error',
+    businessError: 'Business error'
   },
   dashboard: {
     totalProjects: 'Total Projects',
@@ -138,4 +157,113 @@ export default {
       failed: 'Login failed',
     }
   },
+  iteration: {
+    new: 'New Iteration',
+    columns: {
+      key: 'Iteration Key',
+      repos: 'Repos',
+      mountedWindows: 'Mounted Windows',
+      attachAt: 'Latest Mount Time'
+    },
+    detail: {
+      associatedRepos: 'Associated Repositories',
+      mountedWindows: 'Mounted Windows',
+      attachToWindow: 'Attach to Window',
+      orchestrateThisIteration: 'Orchestrate (this iteration)'
+    }
+  },
+  repository: {
+    addOrSync: 'Add / Sync Repo',
+    columns: {
+      repo: 'Repository',
+      projectId: 'Project ID',
+      defaultBranch: 'Default Branch',
+      writable: 'Writable?'
+    },
+    openGitLab: 'Open in GitLab',
+    gateSummary: 'Gate Summary',
+    branchesMrSummary: 'Branches & MR Summary'
+  },
+  run: {
+    filters: {
+      windowKey: 'Window Key',
+      repo: 'Repository',
+      iterationKey: 'Iteration Key',
+      status: 'Status'
+    },
+    columns: {
+      runId: 'Run ID',
+      type: 'Type',
+      status: 'Status',
+      start: 'Start',
+      end: 'End'
+    },
+    actions: {
+      detail: 'Detail',
+      retry: 'Retry',
+      export: 'Export'
+    },
+    detail: {
+      title: 'Run',
+      triplesTitle: 'Triples (executedOrder)',
+      exportJson: 'Export JSON'
+    }
+  },
+  audit: {
+    retrySelected: 'Retry Selected',
+    reasons: {
+      conflict: 'CONFLICT',
+      pipelineFailed: 'PIPELINE_FAILED',
+      approvalRequired: 'APPROVAL_REQUIRED',
+      protectedBranch: 'PROTECTED_BRANCH',
+      permissionDenied: 'PERMISSION_DENIED',
+      unknown: 'UNKNOWN'
+    }
+  },
+  settings: {
+    tabs: {
+      gitlab: 'GitLab',
+      naming: 'Naming Strategy',
+      refs: 'Baseline Refs',
+      blockPolicy: 'Block Policy',
+      display: 'Display'
+    },
+    labels: {
+      baseUrl: 'Base URL',
+      token: 'Token'
+    },
+    buttons: {
+      testConnection: 'Test Connection'
+    },
+    policy: {
+      failFast: 'FAIL_FAST (default)',
+      continueOnBlock: 'CONTINUE_ON_BLOCK (explicit)'
+    }
+  },
+  evidence: {
+    projectId: 'projectId',
+    mrIid: 'MR iid',
+    source: 'source',
+    target: 'target',
+    mrUrl: 'MR url',
+    blockReason: 'blockReason'
+  },
+  timeline: {
+    steps: {
+      ensureFeature: 'ENSURE_FEATURE',
+      ensureRelease: 'ENSURE_RELEASE',
+      ensureMR: 'ENSURE_MR',
+      tryMerge: 'TRY_MERGE'
+    },
+    desc: {
+      ensureFeature: 'ensure feature/{iterationKey}',
+      ensureRelease: 'ensure release/{windowKey}',
+      ensureMR: 'reuse or create MR',
+      tryMerge: 'try merge to release/{windowKey}'
+    }
+  }
+  ,
+  header: {
+    title: 'ReleaseHub'
+  }
 }

@@ -15,6 +15,11 @@ export default {
     versionPolicies: '版本策略',
     versionOps: '版本操作',
     login: '登录',
+    iterations: '迭代',
+    repositories: '仓库',
+    runs: '执行记录',
+    blockBoard: '阻塞看板',
+    settings: '配置',
   },
   common: {
     search: '查询',
@@ -24,9 +29,12 @@ export default {
     confirm: '确认',
     save: '保存',
     cancel: '取消',
+    back: '返回',
+    logout: '退出登录',
     refresh: '刷新',
     delete: '删除',
     noData: '暂无数据',
+    todo: '待完善',
     pleaseEnter: '请输入',
     pleaseSelect: '请选择',
     startDate: '开始日期',
@@ -34,6 +42,17 @@ export default {
     startTime: '开始时间',
     endTime: '结束时间',
     to: '至',
+    actions: '操作',
+    detail: '详情',
+    export: '导出',
+    copy: '复制',
+    yes: '是',
+    no: '否',
+    keyword: '关键字',
+    requestFailed: '请求失败',
+    unknownError: '未知错误',
+    networkError: '网络异常',
+    businessError: '业务异常'
   },
   dashboard: {
     totalProjects: '项目总数',
@@ -138,4 +157,113 @@ export default {
       failed: '登录失败',
     }
   },
+  iteration: {
+    new: '新建迭代',
+    columns: {
+      key: '迭代标识',
+      repos: '仓库数',
+      mountedWindows: '挂载窗口数',
+      attachAt: '最近挂载时间'
+    },
+    detail: {
+      associatedRepos: '关联仓库',
+      mountedWindows: '挂载窗口',
+      attachToWindow: '挂载到窗口',
+      orchestrateThisIteration: '编排（此迭代）'
+    }
+  },
+  repository: {
+    addOrSync: '新增/同步仓库',
+    columns: {
+      repo: '仓库',
+      projectId: '项目ID',
+      defaultBranch: '默认分支',
+      writable: '可写？'
+    },
+    openGitLab: '打开 GitLab',
+    gateSummary: '门禁摘要',
+    branchesMrSummary: '分支与 MR 摘要'
+  },
+  run: {
+    filters: {
+      windowKey: '发布窗口标识',
+      repo: '仓库',
+      iterationKey: '迭代标识',
+      status: '状态'
+    },
+    columns: {
+      runId: '运行ID',
+      type: '类型',
+      status: '状态',
+      start: '开始时间',
+      end: '结束时间'
+    },
+    actions: {
+      detail: '详情',
+      retry: '重试',
+      export: '导出'
+    },
+    detail: {
+      title: '运行',
+      triplesTitle: '三元组（executedOrder）',
+      exportJson: '导出 JSON'
+    }
+  },
+  audit: {
+    retrySelected: '批量重试',
+    reasons: {
+      conflict: '冲突',
+      pipelineFailed: '流水线失败',
+      approvalRequired: '需要审批',
+      protectedBranch: '受保护分支',
+      permissionDenied: '权限不足',
+      unknown: '未知'
+    }
+  },
+  settings: {
+    tabs: {
+      gitlab: 'GitLab',
+      naming: '命名策略',
+      refs: '基线 Ref',
+      blockPolicy: '阻塞策略',
+      display: '显示偏好'
+    },
+    labels: {
+      baseUrl: '基础 URL',
+      token: '令牌'
+    },
+    buttons: {
+      testConnection: '测试连接'
+    },
+    policy: {
+      failFast: 'FAIL_FAST（默认）',
+      continueOnBlock: 'CONTINUE_ON_BLOCK（显式选择）'
+    }
+  },
+  evidence: {
+    projectId: 'projectId',
+    mrIid: 'MR iid',
+    source: 'source',
+    target: 'target',
+    mrUrl: 'MR url',
+    blockReason: 'blockReason'
+  },
+  timeline: {
+    steps: {
+      ensureFeature: 'ENSURE_FEATURE',
+      ensureRelease: 'ENSURE_RELEASE',
+      ensureMR: 'ENSURE_MR',
+      tryMerge: 'TRY_MERGE'
+    },
+    desc: {
+      ensureFeature: '确保 feature/{iterationKey}',
+      ensureRelease: '确保 release/{windowKey}',
+      ensureMR: '复用或创建 MR',
+      tryMerge: '尝试合并到 release/{windowKey}'
+    }
+  }
+  ,
+  header: {
+    title: 'ReleaseHub'
+  }
 }

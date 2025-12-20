@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:local": "vite --mode local",
+    "dev:local": "vite",
     "dev:test": "vite --mode test",
     "build": "vite build",
     "build:prd": "vite build --mode prd",
@@ -17,7 +17,8 @@
     "gen:api": "openapi-typescript http://localhost:8080/v3/api-docs -o src/api/schema.d.ts",
     "gen:crud": "plop --plopfile plop/plopfile.cjs crud",
     "gen:crud:dry": "plop --plopfile plop/plopfile.cjs crud --dryRun",
-    "gen:crud:force": "plop --plopfile plop/plopfile.cjs crud --force"
+    "gen:crud:force": "plop --plopfile plop/plopfile.cjs crud --force",
+    "i18n:lint": "node scripts/i18n-check.js"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",

@@ -20,6 +20,7 @@ export default {
     runs: '执行记录',
     blockBoard: '阻塞看板',
     settings: '配置',
+    groups: '分组设置'
   },
   common: {
     search: '查询',
@@ -265,5 +266,28 @@ export default {
   ,
   header: {
     title: 'ReleaseHub'
+  }
+  ,
+  group: {
+    title: '分组设置',
+    name: '名称',
+    code: '编码',
+    parentCode: '父级编码',
+    searchPlaceholder: '按分组名称筛选',
+    create: '新增分组',
+    createTop: '新增顶层分组',
+    createChild: '新增下级分组',
+    detail: '分组详情',
+    notFound: '未找到分组',
+    empty: '暂无分组',
+    createSuccess: '创建成功',
+    createFailed: '创建失败',
+    edit: '编辑分组',
+    delete: '删除分组',
+    confirmDelete: '确认删除该分组？此操作不可恢复',
+    updateSuccess: '更新成功',
+    updateFailed: '更新失败'
+    ,
+    deleteSuccess: '删除成功'
   }
 }

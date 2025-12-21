@@ -9,6 +9,7 @@ import repositoriesRoutes from './modules/repositories'
 import runsRoutes from './modules/runs'
 import settingsRoutes from './modules/settings'
 import templateCrudRoutes from './modules/templateCrud'
+import groupsRoutes from './modules/groups'
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
@@ -37,7 +38,8 @@ export const constantRoutes: RouteRecordRaw[] = [
       ...repositoriesRoutes,
       ...runsRoutes,
       ...settingsRoutes,
-      ...templateCrudRoutes
+      ...templateCrudRoutes,
+      ...groupsRoutes
     ]
   },
   {

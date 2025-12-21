@@ -20,6 +20,7 @@ export default {
     runs: 'Runs',
     blockBoard: 'Blocks',
     settings: 'Settings',
+    groups: 'Groups'
   },
   common: {
     search: 'Search',
@@ -265,5 +266,28 @@ export default {
   ,
   header: {
     title: 'ReleaseHub'
+  }
+  ,
+  group: {
+    title: 'Groups',
+    name: 'Name',
+    code: 'Code',
+    parentCode: 'Parent Code',
+    searchPlaceholder: 'Filter by group name',
+    create: 'Create Group',
+    createTop: 'Create Top-Level Group',
+    createChild: 'Create Child Group',
+    detail: 'Group Detail',
+    notFound: 'Group Not Found',
+    empty: 'No Groups',
+    createSuccess: 'Created successfully',
+    createFailed: 'Creation failed',
+    edit: 'Edit Group',
+    delete: 'Delete Group',
+    confirmDelete: 'Confirm delete this group? This action cannot be undone.',
+    updateSuccess: 'Updated successfully',
+    updateFailed: 'Update failed'
+    ,
+    deleteSuccess: 'Deleted successfully'
   }
 }

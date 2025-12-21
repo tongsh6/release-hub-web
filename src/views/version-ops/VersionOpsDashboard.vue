@@ -5,7 +5,7 @@
         <template #header>
           <div class="card-header">
             <span>{{ t('versionOps.scanConfig') }}</span>
-            <el-button type="primary" @click="handleRunScan">{{ t('versionOps.runScan') }}</el-button>
+            <el-button v-perm.disable="'version-ops:write'" type="primary" @click="handleRunScan">{{ t('versionOps.runScan') }}</el-button>
           </div>
         </template>
         <el-form :inline="true" :model="scanForm">
@@ -52,6 +52,8 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { hasPerm } from '@/utils/perm'
+import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -77,6 +79,10 @@ const tableData = ref([
 ])
 
 const handleRunScan = () => {
+  if (!hasPerm('version-ops:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
   console.log('Run scan', scanForm)
 }
 

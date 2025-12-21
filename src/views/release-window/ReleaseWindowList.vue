@@ -7,7 +7,7 @@
     </SearchForm>
 
     <div class="mb-4">
-      <el-button type="primary" @click="handleCreate">{{ t('releaseWindow.create') }}</el-button>
+      <el-button v-perm.disable="'release-window:write'" type="primary" @click="handleCreate">{{ t('releaseWindow.create') }}</el-button>
     </div>
 
     <DataTable
@@ -19,12 +19,12 @@
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
-      <el-table-column prop="windowKey" label="Key" width="150" />
+      <el-table-column prop="windowKey" :label="t('releaseWindow.windowKey')" width="150" />
       <el-table-column prop="name" :label="t('releaseWindow.name')" min-width="150" />
       <el-table-column prop="status" :label="t('releaseWindow.status')" width="100">
         <template #default="{ row }">
           <el-tag :type="getStatusType(row.status)">
-            {{ row.status }}
+            {{ t(`releaseWindow.statusText.${row.status}`) }}
           </el-tag>
         </template>
       </el-table-column>
@@ -33,15 +33,23 @@
           {{ new Date(row.createdAt).toLocaleString() }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('releaseWindow.actions')" width="280" fixed="right">
+      <el-table-column :label="t('releaseWindow.actions')" width="360" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="handleView(row)">{{ t('releaseWindow.view') }}</el-button>
           
-          <template v-if="row.status === 'INIT' || row.status === 'OPEN'">
-             <el-button link type="primary" @click="handleEdit(row)">{{ t('common.edit') }}</el-button>
-          </template>
+          <el-button v-perm.disable="'release-window:write'" link type="primary" @click="handleEdit(row)">{{ t('common.edit') }}</el-button>
 
           <el-button 
+            v-perm.disable="'release-window:write'"
+            link 
+            type="primary"
+            @click="openAttachIterations(row)"
+          >
+            {{ t('iteration.detail.attachToWindow') }}
+          </el-button>
+          
+          <el-button 
+            v-perm.disable="'release-window:write'"
             v-if="row.status !== 'FROZEN' && row.status !== 'CLOSED'"
             link 
             type="warning"
@@ -51,6 +59,7 @@
           </el-button>
           
           <el-button 
+            v-perm.disable="'release-window:write'"
             v-if="row.status === 'FROZEN'"
             link 
             type="success"
@@ -60,6 +69,7 @@
           </el-button>
 
            <el-button 
+            v-perm.disable="'release-window:write'"
             v-if="row.status === 'FROZEN'"
             link 
             type="primary"
@@ -69,6 +79,7 @@
           </el-button>
           
            <el-button 
+            v-perm.disable="'release-window:write'"
             v-if="row.status === 'PUBLISHED' || row.status === 'FROZEN'"
             link 
             type="danger"
@@ -81,6 +92,7 @@
     </DataTable>
 
     <ReleaseWindowDialog ref="dialogRef" @success="fetch" />
+    <AttachIterationsDialog ref="attachDialogRef" @success="fetch" />
   </div>
 </template>
 
@@ -92,12 +104,15 @@ import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
 import ReleaseWindowDialog from './ReleaseWindowDialog.vue'
+import AttachIterationsDialog from './AttachIterationsDialog.vue'
 import { releaseWindowApi, type ReleaseWindow, type ReleaseWindowStatus } from '@/api/modules/releaseWindow'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { hasPerm } from '@/utils/perm'
 
 const { t } = useI18n()
 const router = useRouter()
 const dialogRef = ref<InstanceType<typeof ReleaseWindowDialog>>()
+const attachDialogRef = ref<InstanceType<typeof AttachIterationsDialog>>()
 
 // Since backend returns all items, we handle pagination client-side or just show all for now
 // The useListPage hook assumes server-side pagination usually, but let's adapt it.
@@ -132,6 +147,10 @@ const handleCreate = () => {
 }
 
 const handleEdit = (row: ReleaseWindow) => {
+  if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
   dialogRef.value?.open({ id: row.id, mode: 'edit' })
 }
 
@@ -140,6 +159,10 @@ const handleView = (row: ReleaseWindow) => {
 }
 
 const handleFreeze = async (row: ReleaseWindow) => {
+if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
   try {
     await ElMessageBox.confirm(t('releaseWindow.confirmFreeze'), t('common.warning'), {
       type: 'warning'
@@ -153,6 +176,10 @@ const handleFreeze = async (row: ReleaseWindow) => {
 }
 
 const handleUnfreeze = async (row: ReleaseWindow) => {
+if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
   try {
     await releaseWindowApi.unfreeze(row.id)
     ElMessage.success(t('common.success'))
@@ -163,7 +190,11 @@ const handleUnfreeze = async (row: ReleaseWindow) => {
 }
 
 const handlePublish = async (row: ReleaseWindow) => {
-   try {
+if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  try {
     await ElMessageBox.confirm(t('releaseWindow.confirmPublish'), t('common.warning'), {
       type: 'warning'
     })
@@ -176,6 +207,10 @@ const handlePublish = async (row: ReleaseWindow) => {
 }
 
 const handleClose = async (row: ReleaseWindow) => {
+if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
    try {
     await ElMessageBox.confirm(t('releaseWindow.confirmClose'), t('common.warning'), {
       type: 'warning'
@@ -188,6 +223,13 @@ const handleClose = async (row: ReleaseWindow) => {
   }
 }
 
+const openAttachIterations = (row: ReleaseWindow) => {
+if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  attachDialogRef.value?.open(row.id)
+}
 const getStatusType = (status: ReleaseWindowStatus) => {
   switch (status) {
     case 'DRAFT': return 'info'

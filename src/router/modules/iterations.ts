@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     path: 'iterations/:iterationKey',
     name: 'IterationDetail',
     component: () => import('@/views/iteration/IterationDetail.vue'),
-    meta: { title: 'Iteration Detail', requiresAuth: true, permission: 'iteration:read', hidden: true }
+    meta: { titleKey: 'menu.iterations', requiresAuth: true, permission: 'iteration:read', hidden: true }
   }
 ]
 

@@ -1,4 +1,4 @@
-import { get, post, put, del } from '@/api/http'
+import { apiGet, apiPost, apiPut, apiDel } from '@/api/http'
 import type { components } from '@/api/schema'
 
 const BASE = '/v1'
@@ -9,28 +9,28 @@ export type CreateGroupReq = components['schemas']['CreateGroupRequest']
 export type GroupNode = GroupNodeView & { children?: GroupNode[] }
 
 export async function list(): Promise<GroupView[]> {
-  return get<GroupView[]>(`${BASE}/groups`)
+  return apiGet<GroupView[]>(`${BASE}/groups`)
 }
 
 export async function listTree(): Promise<GroupNode[]> {
-  return get<GroupNode[]>(`${BASE}/groups/tree`)
+  return apiGet<GroupNode[]>(`${BASE}/groups/tree`)
 }
 
 export async function create(req: CreateGroupReq): Promise<string> {
-  return post<string>(`${BASE}/groups`, req)
+  return apiPost<string>(`${BASE}/groups`, req)
 }
 
 // 以下接口暂未在 OpenAPI 中声明，先通过 http 封装保持可用；待后端补充后切换到 apiClient
 export function getById(id: string): Promise<GroupView> {
-  return get<GroupView>(`${BASE}/groups/${encodeURIComponent(id)}`)
+  return apiGet<GroupView>(`${BASE}/groups/${encodeURIComponent(id)}`)
 }
 
 export function update(id: string, req: Partial<CreateGroupReq>): Promise<GroupView> {
-  return put<GroupView>(`${BASE}/groups/${encodeURIComponent(id)}`, req)
+  return apiPut<GroupView>(`${BASE}/groups/${encodeURIComponent(id)}`, req)
 }
 
 export function remove(id: string): Promise<void> {
-  return del<void>(`${BASE}/groups/${encodeURIComponent(id)}`)
+  return apiDel<void>(`${BASE}/groups/${encodeURIComponent(id)}`)
 }
 
 export const groupApi = {

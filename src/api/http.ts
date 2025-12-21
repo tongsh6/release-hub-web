@@ -32,6 +32,8 @@ function getBaseURL(): string {
   return (env?.VITE_API_BASE_URL as string) || 'http://localhost:8080'
 }
 
+export type ApiPath = `/v1/${string}`
+
 export const http: AxiosInstance = axios.create({
   baseURL: getBaseURL(),
   timeout: 20_000,
@@ -142,6 +144,18 @@ export function del<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   return request<T>({ ...(config || {}), url, method: 'DELETE' })
 }
 
+export function apiGet<T>(path: ApiPath, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'GET' })
+}
+export function apiPost<T>(path: ApiPath, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'POST', data })
+}
+export function apiPut<T>(path: ApiPath, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'PUT', data })
+}
+export function apiDel<T>(path: ApiPath, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'DELETE' })
+}
 export default {
   get,
   post,

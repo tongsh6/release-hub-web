@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     path: 'repositories/:repo',
     name: 'RepositoryDetail',
     component: () => import('@/views/repository/RepositoryDetail.vue'),
-    meta: { title: 'Repository Detail', requiresAuth: true, permission: 'repository:read', hidden: true }
+    meta: { titleKey: 'menu.repositories', requiresAuth: true, permission: 'repository:read', hidden: true }
   }
 ]
 

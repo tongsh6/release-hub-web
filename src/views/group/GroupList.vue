@@ -5,7 +5,7 @@
         <el-input v-model="keyword" :placeholder="t('group.searchPlaceholder')" clearable />
       </el-form-item>
       <template #extra-actions>
-        <el-button v-if="hasPerm('group:write')" type="primary" @click="handleCreateTop">{{ t('group.createTop') }}</el-button>
+        <el-button v-perm.disable="'group:write'" type="primary" @click="handleCreateTop">{{ t('group.createTop') }}</el-button>
       </template>
     </SearchForm>
 
@@ -28,7 +28,7 @@
               <div class="node-actions">
                 <el-button link type="primary" @click.stop="handleView(data)">{{ t('common.detail') }}</el-button>
                 <el-button 
-                  v-if="hasPerm('group:write')" 
+                  v-perm.disable="'group:write'" 
                   link 
                   type="primary" 
                   @click.stop="handleEdit(data)"
@@ -36,7 +36,7 @@
                   {{ t('common.edit') }}
                 </el-button>
                 <el-button 
-                  v-if="hasPerm('group:write')" 
+                  v-perm.disable="'group:write'" 
                   link 
                   type="success" 
                   @click.stop="handleCreateChild(data)"
@@ -44,7 +44,7 @@
                   {{ t('group.createChild') }}
                 </el-button>
                 <el-button 
-                  v-if="hasPerm('group:delete')" 
+                  v-perm.disable="'group:delete'" 
                   link 
                   type="danger" 
                   @click.stop="handleDelete(data)"
@@ -64,9 +64,9 @@
               <span>{{ t('group.detail') }}</span>
               <div>
                 <el-button type="primary" @click="handleView(selected!)">{{ t('common.detail') }}</el-button>
-                <el-button v-if="hasPerm('group:write')" @click="handleEdit(selected!)">{{ t('common.edit') }}</el-button>
-                <el-button v-if="hasPerm('group:write')" type="success" @click="handleCreateChild(selected!)">{{ t('group.createChild') }}</el-button>
-                <el-button v-if="hasPerm('group:delete')" type="danger" @click="handleDelete(selected!)">{{ t('common.delete') }}</el-button>
+                <el-button v-perm.disable="'group:write'" @click="handleEdit(selected!)">{{ t('common.edit') }}</el-button>
+                <el-button v-perm.disable="'group:write'" type="success" @click="handleCreateChild(selected!)">{{ t('group.createChild') }}</el-button>
+                <el-button v-perm.disable="'group:delete'" type="danger" @click="handleDelete(selected!)">{{ t('common.delete') }}</el-button>
               </div>
             </div>
           </template>
@@ -147,7 +147,7 @@ const handleView = (node: GroupNode) => {
 
 const handleCreateTop = () => {
   if (!hasPerm('group:write')) {
-    ElMessage.warning(t('common.permissionDenied') || '无权限')
+    ElMessage.warning(t('common.permissionDenied'))
     return
   }
   dialogRef.value?.open()
@@ -155,7 +155,7 @@ const handleCreateTop = () => {
 
 const handleCreateChild = (parent: GroupNode) => {
   if (!hasPerm('group:write')) {
-    ElMessage.warning(t('common.permissionDenied') || '无权限')
+    ElMessage.warning(t('common.permissionDenied'))
     return
   }
   dialogRef.value?.open({ parentCode: parent.code, parentName: parent.name })
@@ -163,7 +163,7 @@ const handleCreateChild = (parent: GroupNode) => {
 
 const handleEdit = (node: GroupNode) => {
   if (!hasPerm('group:write')) {
-    ElMessage.warning(t('common.permissionDenied') || '无权限')
+    ElMessage.warning(t('common.permissionDenied'))
     return
   }
   dialogRef.value?.openEdit(node.id!)
@@ -171,7 +171,7 @@ const handleEdit = (node: GroupNode) => {
 
 const handleDelete = async (node: GroupNode) => {
   if (!hasPerm('group:delete')) {
-    ElMessage.warning(t('common.permissionDenied') || '无权限')
+    ElMessage.warning(t('common.permissionDenied'))
     return
   }
   await ElMessageBox.confirm(t('group.confirmDelete'), t('common.warning'), { type: 'warning' })

@@ -7,7 +7,7 @@
     </SearchForm>
 
     <div class="mb-4">
-      <el-button type="primary" :disabled="!canWrite">{{ t('repository.addOrSync') }}</el-button>
+      <el-button v-perm.disable="'repository:write'" type="primary">{{ t('repository.addOrSync') }}</el-button>
     </div>
 
     <DataTable
@@ -47,9 +47,9 @@ import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
 import RepositoryDrawer from './RepositoryDrawer.vue'
 import { repositoryApi } from '@/api/repositoryApi'
+import { hasPerm } from '@/utils/perm'
 
 const userStore = useUserStore()
-const canWrite = userStore.hasPermission('repository:write')
 const { t } = useI18n()
 const drawerRef = ref<InstanceType<typeof RepositoryDrawer>>()
 

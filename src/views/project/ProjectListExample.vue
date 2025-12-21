@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/user'
+import { hasPerm } from '@/utils/perm'
 import SearchForm from '@/components/common/SearchForm.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import type { SearchSchema, TableColumn } from '@/types/ui'
@@ -135,7 +136,7 @@ onMounted(() => {
       >
         <template #top-right>
           <el-button 
-            v-if="userStore.hasPermission('project:create')" 
+            v-perm="'project:create'" 
             type="primary"
           >
             {{ t('project.create') }}

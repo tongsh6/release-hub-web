@@ -53,7 +53,13 @@ export default {
     requestFailed: '请求失败',
     unknownError: '未知错误',
     networkError: '网络异常',
-    businessError: '业务异常'
+    businessError: '业务异常',
+    basicInfo: '基本信息',
+    selectDateTime: '请选择日期时间',
+    success: '操作成功',
+    warning: '警告',
+    permissionDenied: '权限不足',
+    partialSuccess: '部分成功'
   },
   dashboard: {
     totalProjects: '项目总数',
@@ -78,11 +84,20 @@ export default {
     unfreeze: '解冻',
     active: '活跃',
     frozen: '已冻结',
+    windowKey: '发布窗口标识',
+    startAt: '开始时间',
+    endAt: '结束时间',
+    updatedAt: '更新时间',
+    publishedAt: '发布时间',
+    publish: '发布',
+    close: '关闭',
+    configureTime: '配置时间',
     placeholder: {
       name: '按名称搜索',
       status: '选择状态',
       enterName: '请输入名称',
       enterDesc: '请输入描述',
+      enterWindowKey: '请输入窗口标识'
     },
     description: '描述',
     details: '发布窗口详情',
@@ -91,6 +106,15 @@ export default {
       nameRequired: '请输入名称',
       nameLength: '长度应在 3 到 50 个字符之间',
       statusRequired: '请选择状态',
+      required: '该字段为必填项'
+    },
+    statusText: {
+      DRAFT: '草稿',
+      INIT: '初始化',
+      OPEN: '开启',
+      FROZEN: '已冻结',
+      CLOSED: '已关闭',
+      PUBLISHED: '已发布'
     }
   },
   project: {

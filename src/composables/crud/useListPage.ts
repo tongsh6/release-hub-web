@@ -1,5 +1,6 @@
 import { reactive, ref, toRaw, onMounted } from 'vue'
 import type { PageQuery, PageResult } from '@/types/crud'
+import { handleError } from '@/utils/error'
 
 interface UseListPageOptions<T, Q extends PageQuery> {
   fetcher: (query: Q) => Promise<PageResult<T>>
@@ -37,8 +38,7 @@ export function useListPage<T, Q extends PageQuery>(options: UseListPageOptions<
         afterFetch(list.value)
       }
     } catch (error) {
-      console.error('Failed to fetch list:', error)
-      // Ideally use a message library here, but keeping it simple/generic
+      handleError(error)
     } finally {
       loading.value = false
     }

@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { i18n } from '@/i18n'
 import { groupApi, type GroupNode } from '@/api/modules/group'
 
 export function useGroupTree() {
@@ -13,7 +14,7 @@ export function useGroupTree() {
       const data = await groupApi.listTree()
       treeData.value = Array.isArray(data) ? data : []
     } catch {
-      ElMessage.error('加载分组失败')
+      ElMessage.error(i18n.global.t('common.requestFailed'))
     } finally {
       loading.value = false
     }

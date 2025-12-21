@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     path: 'runs/:runId',
     name: 'RunDetail',
     component: () => import('@/views/run/RunDetail.vue'),
-    meta: { title: 'Run Detail', requiresAuth: true, permission: 'run:read', hidden: true }
+    meta: { titleKey: 'run.detail.title', requiresAuth: true, permission: 'run:read', hidden: true }
   },
   {
     path: 'audit/blocks',

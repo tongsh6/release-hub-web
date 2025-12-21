@@ -1,4 +1,4 @@
-import { get, post, put } from '@/api/http'
+import { apiGet, apiPost, apiPut } from '@/api/http'
 import type { PageQuery, PageResult } from '@/types/dto'
 
 const BASE = '/v1'
@@ -47,36 +47,56 @@ export function list(query: PageQuery): Promise<ReleaseWindowView[]> {
   // The backend currently returns List<ReleaseWindowView> directly, not PageResult
   // If it supports pagination later, we might need to adjust.
   // For now, assuming it returns array based on schema.d.ts: ApiResponseListReleaseWindowView
-  return get<ReleaseWindowView[]>(`${BASE}/release-windows`)
+  return apiGet<ReleaseWindowView[]>(`${BASE}/release-windows`)
 }
 
 export function getById(id: string): Promise<ReleaseWindowView> {
-  return get<ReleaseWindowView>(`${BASE}/release-windows/${id}`)
+  return apiGet<ReleaseWindowView>(`${BASE}/release-windows/${id}`)
 }
 
 export function create(req: CreateReleaseWindowReq): Promise<ReleaseWindowView> {
-  return post<ReleaseWindowView>(`${BASE}/release-windows`, req)
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows`, req)
 }
 
 // Note: Backend uses PUT /release-windows/{id}/window for configuration (startAt, endAt)
 export function configure(id: string, req: ConfigureReleaseWindowReq): Promise<ReleaseWindowView> {
-  return put<ReleaseWindowView>(`${BASE}/release-windows/${id}/window`, req)
+  return apiPut<ReleaseWindowView>(`${BASE}/release-windows/${id}/window`, req)
 }
 
 export function freeze(id: string): Promise<ReleaseWindowView> {
-  return post<ReleaseWindowView>(`${BASE}/release-windows/${id}/freeze`, {})
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/freeze`, {})
 }
 
 export function unfreeze(id: string): Promise<ReleaseWindowView> {
-  return post<ReleaseWindowView>(`${BASE}/release-windows/${id}/unfreeze`, {})
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/unfreeze`, {})
 }
 
 export function publish(id: string): Promise<ReleaseWindowView> {
-  return post<ReleaseWindowView>(`${BASE}/release-windows/${id}/publish`, {})
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/publish`, {})
 }
 
 export function closeWindow(id: string): Promise<ReleaseWindowView> {
-  return post<ReleaseWindowView>(`${BASE}/release-windows/${id}/close`, {})
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/close`, {})
+}
+
+export function attach(id: string, iterationKey: string): Promise<ReleaseWindowView> {
+  return apiPost<ReleaseWindowView>(`${BASE}/windows/${id}/attach`, { iterationKey })
+}
+
+export function detach(id: string): Promise<ReleaseWindowView> {
+  return apiPost<ReleaseWindowView>(`${BASE}/windows/${id}/detach`, {})
+}
+
+export function orchestrate(id: string): Promise<any> {
+  return apiPost<any>(`${BASE}/windows/${id}/orchestrate`, {})
+}
+
+export function getPlan(id: string): Promise<any> {
+  return apiGet<any>(`${BASE}/windows/${id}/plan`)
+}
+
+export function getDryPlan(id: string): Promise<any> {
+  return apiGet<any>(`${BASE}/windows/${id}/dry-plan`)
 }
 
 // Alias for compatibility if needed, or prefer using explicit names above
@@ -88,6 +108,10 @@ export const releaseWindowApi = {
   freeze,
   unfreeze,
   publish,
-  close: closeWindow
+  close: closeWindow,
+  attach,
+  detach,
+  orchestrate,
+  getPlan,
+  getDryPlan
 }
-

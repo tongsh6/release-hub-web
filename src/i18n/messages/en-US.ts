@@ -53,7 +53,13 @@ export default {
     requestFailed: 'Request failed',
     unknownError: 'Unknown error',
     networkError: 'Network error',
-    businessError: 'Business error'
+    businessError: 'Business error',
+    basicInfo: 'Basic Info',
+    selectDateTime: 'Select date and time',
+    success: 'Success',
+    warning: 'Warning',
+    permissionDenied: 'Permission denied',
+    partialSuccess: 'Partial success'
   },
   dashboard: {
     totalProjects: 'Total Projects',
@@ -78,11 +84,20 @@ export default {
     unfreeze: 'Unfreeze',
     active: 'Active',
     frozen: 'Frozen',
+    windowKey: 'Window Key',
+    startAt: 'Start At',
+    endAt: 'End At',
+    updatedAt: 'Updated At',
+    publishedAt: 'Published At',
+    publish: 'Publish',
+    close: 'Close',
+    configureTime: 'Configure Time',
     placeholder: {
       name: 'Search by name',
       status: 'Select status',
       enterName: 'Enter name',
       enterDesc: 'Enter description',
+      enterWindowKey: 'Enter window key',
     },
     description: 'Description',
     details: 'ReleaseWindow Details',
@@ -91,6 +106,15 @@ export default {
       nameRequired: 'Please enter name',
       nameLength: 'Length should be 3 to 50',
       statusRequired: 'Please select status',
+      required: 'This field is required'
+    },
+    statusText: {
+      DRAFT: 'Draft',
+      INIT: 'Init',
+      OPEN: 'Open',
+      FROZEN: 'Frozen',
+      CLOSED: 'Closed',
+      PUBLISHED: 'Published'
     }
   },
   project: {

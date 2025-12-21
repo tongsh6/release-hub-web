@@ -26,7 +26,7 @@
          <el-date-picker
             v-model="form.startAt"
             type="datetime"
-            placeholder="Select date and time"
+            :placeholder="t('common.selectDateTime')"
             value-format="YYYY-MM-DDTHH:mm:ss"
           />
       </el-form-item>
@@ -35,7 +35,7 @@
          <el-date-picker
             v-model="form.endAt"
             type="datetime"
-            placeholder="Select date and time"
+            :placeholder="t('common.selectDateTime')"
             value-format="YYYY-MM-DDTHH:mm:ss"
           />
       </el-form-item>

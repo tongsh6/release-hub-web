@@ -4,18 +4,25 @@
       <h2>{{ title }}</h2>
       <div class="actions">
         <el-button @click="goBack">{{ t('common.back') }}</el-button>
+        <el-button
+          v-perm.disable="'release-window:write'"
+          type="primary"
+          @click="goAttach"
+        >
+          {{ t('iteration.detail.attachToWindow') }}
+        </el-button>
       </div>
     </div>
 
     <el-card v-if="form.id">
-      <el-descriptions border :column="2" title="Basic Info">
+      <el-descriptions border :column="2" :title="t('common.basicInfo')">
         <el-descriptions-item :label="t('releaseWindow.windowKey')">{{ form.windowKey }}</el-descriptions-item>
         <el-descriptions-item :label="t('releaseWindow.name')">{{ form.name }}</el-descriptions-item>
         <el-descriptions-item :label="t('releaseWindow.status')">
-          <el-tag>{{ form.status }}</el-tag>
+          <el-tag>{{ form.status ? t(`releaseWindow.statusText.${form.status}`) : '-' }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="t('releaseWindow.frozen')">
-          <el-tag :type="form.frozen ? 'danger' : 'success'">{{ form.frozen ? 'Yes' : 'No' }}</el-tag>
+          <el-tag :type="form.frozen ? 'danger' : 'success'">{{ form.frozen ? t('common.yes') : t('common.no') }}</el-tag>
         </el-descriptions-item>
         
         <el-descriptions-item :label="t('releaseWindow.startAt')">{{ form.startAt || '-' }}</el-descriptions-item>
@@ -42,6 +49,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { releaseWindowApi, type ReleaseWindow } from '@/api/modules/releaseWindow'
 import { handleError } from '@/utils/error'
+import { hasPerm } from '@/utils/perm'
+import { ElMessage } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
@@ -72,6 +81,15 @@ const title = computed(() => form.value.name || t('releaseWindow.details'))
 
 const goBack = () => {
   router.back()
+}
+
+const goAttach = () => {
+  if (!form.value?.id) return
+  if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  router.push({ name: 'ReleaseWindowAttach', params: { id: form.value.id } })
 }
 </script>
 

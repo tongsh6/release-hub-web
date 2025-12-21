@@ -35,8 +35,25 @@
       <el-table-column :label="t('common.actions')" width="220" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="openDetail(row)">{{ t('run.actions.detail') }}</el-button>
-          <el-button link type="warning" size="small" :disabled="!canRetry(row)">{{ t('run.actions.retry') }}</el-button>
-          <el-button link type="primary" size="small">{{ t('run.actions.export') }}</el-button>
+          <el-button 
+            v-perm.disable="'run:write'" 
+            link 
+            type="warning" 
+            size="small" 
+            :disabled="!canRetry(row)"
+            @click="handleRetry(row)"
+          >
+            {{ t('run.actions.retry') }}
+          </el-button>
+          <el-button 
+            v-perm.disable="'run:write'" 
+            link 
+            type="primary" 
+            size="small"
+            @click="handleExport(row)"
+          >
+            {{ t('run.actions.export') }}
+          </el-button>
         </template>
       </el-table-column>
     </DataTable>
@@ -53,6 +70,8 @@ import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
 import RunDrawer from './RunDrawer.vue'
 import { runApi } from '@/api/runApi'
+import { hasPerm } from '@/utils/perm'
+import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
 const drawerRef = ref<InstanceType<typeof RunDrawer>>()
@@ -71,6 +90,22 @@ function canRetry(row: any) { return ['FAILED', 'MERGE_BLOCKED'].includes(row.st
 
 function openDetail(row: any) {
   drawerRef.value?.open(row.id)
+}
+
+function handleRetry(row: any) {
+  if (!hasPerm('run:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  // TODO: call retry API
+}
+
+function handleExport(row: any) {
+  if (!hasPerm('run:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  // TODO: export logic
 }
 </script>
 

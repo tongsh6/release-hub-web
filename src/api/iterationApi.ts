@@ -1,6 +1,6 @@
-import type { PageResult, PageQuery, Id } from '@/types/crud'
+import type { PageResult, PageQuery } from '@/types/crud'
+import { apiGet, apiPost } from '@/api/http'
 
-// Types
 export interface Iteration {
   iterationKey: string
   repoCount: number
@@ -8,39 +8,33 @@ export interface Iteration {
   attachAt: string
 }
 
-// Mock In-memory DB
-const data: Iteration[] = Array.from({ length: 25 }).map((_, i) => ({
-  iterationKey: `it-2025-${String(i + 1).padStart(2, '0')}-01`,
-  repoCount: Math.floor(Math.random() * 10),
-  mountedWindows: Math.floor(Math.random() * 5),
-  attachAt: new Date(Date.now() - i * 86400000).toISOString()
-}))
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+export interface CreateIterationRequest {
+  iterationKey: string
+}
 
 export const iterationApi = {
   async list(query: PageQuery & { keyword?: string }): Promise<PageResult<Iteration>> {
-    await delay(500)
-    let list = [...data]
-
-    if (query.keyword) {
-      list = list.filter(p => p.iterationKey.toLowerCase().includes(query.keyword!.toLowerCase()))
+    const params = {
+      page: query.page,
+      pageSize: query.pageSize,
+      keyword: query.keyword || ''
     }
-
-    const start = (query.page - 1) * query.pageSize
-    const end = start + query.pageSize
-    const pageList = list.slice(start, end)
-
-    return {
-      list: pageList,
-      total: list.length
+    const resp = await apiGet<any>('/v1/iterations', { params })
+    if (resp && Array.isArray(resp)) {
+      return { list: resp as Iteration[], total: resp.length }
     }
+    if (resp && typeof resp === 'object' && 'list' in resp && 'total' in resp) {
+      return resp as PageResult<Iteration>
+    }
+    // Fallback: empty result
+    return { list: [], total: 0 }
   },
 
   async get(key: string): Promise<Iteration> {
-    await delay(300)
-    const item = data.find(p => p.iterationKey === key)
-    if (!item) throw new Error('Iteration not found')
-    return { ...item }
+    return await apiGet<Iteration>(`/v1/iterations/${encodeURIComponent(key)}`)
+  },
+
+  async create(payload: CreateIterationRequest): Promise<Iteration> {
+    return await apiPost<Iteration>('/v1/iterations', payload)
   }
 }

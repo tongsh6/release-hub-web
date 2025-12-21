@@ -1,5 +1,6 @@
-import http from '@/api/http'
+import { apiGet } from '@/api/http'
+import { API_BASE } from './_shared'
 
 export const getVersionPolicies = (params?: any) => {
-  return http.get('/version-policies', { params })
+  return apiGet(`${API_BASE}/version-policies`, { params })
 }

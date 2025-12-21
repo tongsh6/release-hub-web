@@ -32,7 +32,14 @@ export const mockUserApi = {
       id: '1',
       username: 'admin',
       displayName: 'Administrator',
-      permissions: ['project:create', 'project:edit', 'project:delete']
+      permissions: [
+        'project:create',
+        'project:edit',
+        'project:delete',
+        'iteration:read',
+        'iteration:write',
+        'run:read'
+      ]
     }
   }
 }

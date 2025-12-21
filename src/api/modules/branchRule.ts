@@ -1,4 +1,4 @@
-import { get, post, put } from '@/api/http'
+import { apiGet, apiPost, apiPut } from '@/api/http'
 import { API_BASE, toQuery } from './_shared'
 import type { PageQuery, PageResult, Status, BranchRuleScopeDTO, BranchRuleScopeReq } from '@/types/dto'
 
@@ -51,25 +51,25 @@ export interface BranchRuleTestResp {
 const MODULE_PATH = `${API_BASE}/branch-rules`
 
 export function pageBranchRules(query: PageQuery): Promise<PageResult<BranchRuleDTO>> {
-  return get<PageResult<BranchRuleDTO>>(MODULE_PATH, { params: toQuery(query) })
+  return apiGet<PageResult<BranchRuleDTO>>(MODULE_PATH, { params: toQuery(query) })
 }
 
 export function createBranchRule(data: CreateBranchRuleReq): Promise<BranchRuleDTO> {
-  return post<BranchRuleDTO>(MODULE_PATH, data)
+  return apiPost<BranchRuleDTO>(MODULE_PATH, data)
 }
 
 export function updateBranchRule(id: string, data: UpdateBranchRuleReq): Promise<BranchRuleDTO> {
-  return put<BranchRuleDTO>(`${MODULE_PATH}/${id}`, data)
+  return apiPut<BranchRuleDTO>(`${MODULE_PATH}/${id}`, data)
 }
 
 export function enableBranchRule(id: string): Promise<void> {
-  return post<void>(`${MODULE_PATH}/${id}/enable`)
+  return apiPost<void>(`${MODULE_PATH}/${id}/enable`)
 }
 
 export function disableBranchRule(id: string): Promise<void> {
-  return post<void>(`${MODULE_PATH}/${id}/disable`)
+  return apiPost<void>(`${MODULE_PATH}/${id}/disable`)
 }
 
 export function testBranchRule(data: BranchRuleTestReq): Promise<BranchRuleTestResp> {
-  return post<BranchRuleTestResp>(`${MODULE_PATH}/test`, data)
+  return apiPost<BranchRuleTestResp>(`${MODULE_PATH}/test`, data)
 }

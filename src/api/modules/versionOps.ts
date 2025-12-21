@@ -1,4 +1,4 @@
-import { get, post } from '@/api/http'
+import { apiGet, apiPost } from '@/api/http'
 import { API_BASE, toQuery } from './_shared'
 import type { BuildTool, PageQuery, PageResult, RunStatus, YesNo } from '@/types/dto'
 
@@ -98,21 +98,21 @@ export interface RunLogsResp {
 const MODULE_PATH = `${API_BASE}/version-ops`
 
 export function scan(data: VersionScanReq): Promise<VersionScanResp> {
-  return post<VersionScanResp>(`${MODULE_PATH}/scan`, data)
+  return apiPost<VersionScanResp>(`${MODULE_PATH}/scan`, data)
 }
 
 export function update(data: VersionUpdateReq): Promise<VersionUpdateResp> {
-  return post<VersionUpdateResp>(`${MODULE_PATH}/update`, data)
+  return apiPost<VersionUpdateResp>(`${MODULE_PATH}/update`, data)
 }
 
 export function pageRuns(query: PageQuery & RunListFilter): Promise<PageResult<VersionRunSummaryDTO>> {
-  return get<PageResult<VersionRunSummaryDTO>>(`${MODULE_PATH}/runs`, { params: toQuery(query) })
+  return apiGet<PageResult<VersionRunSummaryDTO>>(`${MODULE_PATH}/runs`, { params: toQuery(query) })
 }
 
 export function getRunDetail(runId: string): Promise<VersionRunDetailDTO> {
-  return get<VersionRunDetailDTO>(`${MODULE_PATH}/runs/${runId}`)
+  return apiGet<VersionRunDetailDTO>(`${MODULE_PATH}/runs/${runId}`)
 }
 
 export function getRunLogs(runId: string): Promise<RunLogsResp> {
-  return get<RunLogsResp>(`${MODULE_PATH}/runs/${runId}/logs`)
+  return apiGet<RunLogsResp>(`${MODULE_PATH}/runs/${runId}/logs`)
 }

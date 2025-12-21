@@ -1,4 +1,4 @@
-import { get, post, put } from '@/api/http'
+import { apiGet, apiPost, apiPut } from '@/api/http'
 import type { ApiResponse } from '@/types/dto'
 import type { Status, BuildTool } from '@/types/dto'
 
@@ -69,25 +69,25 @@ export interface UpsertRepoBindingReq {
 const BASE = '/v1'
 
 export function getProjectTree(): Promise<ProjectTreeNode[]> {
-  return get(`${BASE}/projects/tree`)
+  return apiGet(`${BASE}/projects/tree`)
 }
 
 export function createProject(req: CreateProjectReq): Promise<ProjectDTO> {
-  return post(`${BASE}/projects`, req)
+  return apiPost(`${BASE}/projects`, req)
 }
 
 export function updateProject(projectId: string, req: UpdateProjectReq): Promise<ProjectDTO> {
-  return put(`${BASE}/projects/${projectId}`, req)
+  return apiPut(`${BASE}/projects/${projectId}`, req)
 }
 
 export function createSubProject(projectId: string, req: CreateSubProjectReq): Promise<ProjectDTO> {
-  return post(`${BASE}/projects/${projectId}/sub-projects`, req)
+  return apiPost(`${BASE}/projects/${projectId}/sub-projects`, req)
 }
 
 export function updateSubProject(subProjectId: string, req: UpdateSubProjectReq): Promise<ProjectDTO> {
-  return put(`${BASE}/sub-projects/${subProjectId}`, req)
+  return apiPut(`${BASE}/sub-projects/${subProjectId}`, req)
 }
 
 export function upsertRepoBinding(subProjectId: string, req: UpsertRepoBindingReq): Promise<RepoBindingDTO> {
-  return put(`${BASE}/sub-projects/${subProjectId}/repo-binding`, req)
+  return apiPut(`${BASE}/sub-projects/${subProjectId}/repo-binding`, req)
 }

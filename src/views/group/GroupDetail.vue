@@ -7,8 +7,8 @@
           <span>{{ detail?.name || t('group.title') }}</span>
           <div>
             <el-button type="primary" @click="handleBack">{{ t('common.back') }}</el-button>
-            <el-button v-if="hasPerm('group:write')" @click="openEdit()">{{ t('common.edit') }}</el-button>
-            <el-button v-if="hasPerm('group:delete')" type="danger" @click="handleDelete()">{{ t('common.delete') }}</el-button>
+            <el-button v-perm.disable="'group:write'" @click="openEdit()">{{ t('common.edit') }}</el-button>
+            <el-button v-perm.disable="'group:delete'" type="danger" @click="handleDelete()">{{ t('common.delete') }}</el-button>
           </div>
         </div>
       </template>

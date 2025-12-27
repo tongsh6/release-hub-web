@@ -1,8 +1,8 @@
 <template>
   <el-dialog
     v-model="visible"
-    :title="t('repository.addOrSync')"
-    width="500px"
+    :title="mode === 'edit' ? t('common.edit') : t('repository.addOrSync')"
+    width="520px"
     destroy-on-close
     :close-on-click-modal="false"
   >
@@ -14,16 +14,19 @@
       status-icon
     >
       <el-form-item :label="t('repository.columns.projectId')" prop="projectId">
-        <el-input v-model="form.projectId" placeholder="e.g. 12345" />
+        <el-input v-model="form.projectId" :placeholder="t('repository.placeholders.projectId')" :disabled="mode === 'edit'" />
       </el-form-item>
       <el-form-item :label="t('repository.columns.repo')" prop="name">
-        <el-input v-model="form.name" placeholder="e.g. backend-service" />
+        <el-input v-model="form.name" :placeholder="t('repository.placeholders.name')" />
+      </el-form-item>
+      <el-form-item :label="t('repository.columns.gitlabProjectId')" prop="gitlabProjectId">
+        <el-input v-model.number="form.gitlabProjectId" :placeholder="t('repository.placeholders.gitlabProjectId')" type="number" />
       </el-form-item>
       <el-form-item :label="t('repository.columns.cloneUrl')" prop="cloneUrl">
-        <el-input v-model="form.cloneUrl" placeholder="git@gitlab.com:group/project.git" />
+        <el-input v-model="form.cloneUrl" :placeholder="t('repository.placeholders.cloneUrl')" />
       </el-form-item>
       <el-form-item :label="t('repository.columns.defaultBranch')" prop="defaultBranch">
-        <el-input v-model="form.defaultBranch" placeholder="master or main" />
+        <el-input v-model="form.defaultBranch" :placeholder="t('repository.placeholders.defaultBranch')" />
       </el-form-item>
       <el-form-item :label="t('repository.columns.monoRepo')" prop="monoRepo">
         <el-switch v-model="form.monoRepo" />
@@ -52,9 +55,12 @@ const { t } = useI18n()
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
+const mode = ref<'create' | 'edit'>('create')
+const currentId = ref<string | null>(null)
 
 const form = reactive<CreateRepoReq>({
   projectId: '',
+  gitlabProjectId: undefined as unknown as number,
   name: '',
   cloneUrl: '',
   defaultBranch: 'master',
@@ -62,19 +68,35 @@ const form = reactive<CreateRepoReq>({
 })
 
 const rules = {
-  projectId: [{ required: true, message: t('common.pleaseEnter') + t('repository.columns.projectId'), trigger: 'blur' }],
-  name: [{ required: true, message: t('common.pleaseEnter') + t('repository.columns.repo'), trigger: 'blur' }],
-  cloneUrl: [{ required: true, message: t('common.pleaseEnter') + t('repository.columns.cloneUrl'), trigger: 'blur' }],
-  defaultBranch: [{ required: true, message: t('common.pleaseEnter') + t('repository.columns.defaultBranch'), trigger: 'blur' }]
+  projectId: [
+    { required: true, message: t('common.pleaseEnter') + t('repository.columns.projectId'), trigger: 'blur' },
+    { max: 36, message: t('repository.validation.projectId'), trigger: 'blur' }
+  ],
+  gitlabProjectId: [{ required: true, message: t('repository.validation.gitlabId'), trigger: 'blur', type: 'number' }],
+  name: [
+    { required: true, message: t('common.pleaseEnter') + t('repository.columns.repo'), trigger: 'blur' },
+    { max: 128, message: t('repository.validation.name'), trigger: 'blur' }
+  ],
+  cloneUrl: [
+    { required: true, message: t('common.pleaseEnter') + t('repository.columns.cloneUrl'), trigger: 'blur' },
+    { max: 512, message: t('repository.validation.cloneUrl'), trigger: 'blur' }
+  ],
+  defaultBranch: [
+    { required: true, message: t('common.pleaseEnter') + t('repository.columns.defaultBranch'), trigger: 'blur' },
+    { max: 128, message: t('repository.validation.defaultBranch'), trigger: 'blur' }
+  ]
 }
 
-const open = () => {
+const open = (repo?: any) => {
   visible.value = true
-  form.projectId = ''
-  form.name = ''
-  form.cloneUrl = ''
-  form.defaultBranch = 'master'
-  form.monoRepo = false
+  form.projectId = repo?.projectId || ''
+  form.gitlabProjectId = (repo?.gitlabProjectId as number | undefined) ?? (undefined as unknown as number)
+  form.name = repo?.name || ''
+  form.cloneUrl = repo?.cloneUrl || ''
+  form.defaultBranch = repo?.defaultBranch || 'master'
+  form.monoRepo = repo?.monoRepo ?? false
+  mode.value = repo ? 'edit' : 'create'
+  currentId.value = repo?.id || null
 }
 
 const submit = async () => {
@@ -83,7 +105,17 @@ const submit = async () => {
     if (valid) {
       loading.value = true
       try {
-        await repositoryApi.create(form)
+        if (mode.value === 'edit' && currentId.value) {
+          await repositoryApi.update(currentId.value, {
+            gitlabProjectId: form.gitlabProjectId!,
+            name: form.name,
+            cloneUrl: form.cloneUrl,
+            defaultBranch: form.defaultBranch,
+            monoRepo: form.monoRepo
+          })
+        } else {
+          await repositoryApi.create(form)
+        }
         ElMessage.success(t('common.success'))
         visible.value = false
         emit('success')

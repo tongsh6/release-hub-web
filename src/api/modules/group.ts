@@ -6,6 +6,7 @@ const BASE = '/v1'
 export type GroupView = components['schemas']['GroupView']
 export type GroupNodeView = components['schemas']['GroupNodeView']
 export type CreateGroupReq = components['schemas']['CreateGroupRequest']
+export type UpdateGroupReq = { name: string; parentCode?: string }
 export type GroupNode = GroupNodeView & { children?: GroupNode[] }
 
 export async function list(): Promise<GroupView[]> {
@@ -25,7 +26,7 @@ export function getById(id: string): Promise<GroupView> {
   return apiGet<GroupView>(`${BASE}/groups/${encodeURIComponent(id)}`)
 }
 
-export function update(id: string, req: Partial<CreateGroupReq>): Promise<GroupView> {
+export function update(id: string, req: UpdateGroupReq): Promise<GroupView> {
   return apiPut<GroupView>(`${BASE}/groups/${encodeURIComponent(id)}`, req)
 }
 

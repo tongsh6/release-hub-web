@@ -4,7 +4,7 @@
     :title="mode === 'edit' ? t('group.edit') : t('group.create')"
     :confirm-text="t('common.confirm')"
     :cancel-text="t('common.cancel')"
-    @confirm="submit"
+    @confirm="submitWithValidation"
     @opened="onOpened"
   >
     <template #default>
@@ -13,10 +13,21 @@
           <el-input v-model="form.name" :placeholder="t('common.pleaseEnter') + t('group.name')" />
         </el-form-item>
         <el-form-item :label="t('group.code')" prop="code">
-          <el-input v-model="form.code" :placeholder="t('common.pleaseEnter') + t('group.code')" />
+          <el-input
+            v-model="form.code"
+            :placeholder="t('common.pleaseEnter') + t('group.code')"
+            :disabled="mode === 'edit'"
+          />
         </el-form-item>
-        <el-form-item v-if="form.parentCode" :label="t('group.parentCode')">
-          <el-tag type="info">{{ presetParentName }}</el-tag>
+        <el-form-item :label="t('group.parentCode')" prop="parentCode">
+          <el-input
+            v-model="form.parentCode"
+            clearable
+            :placeholder="t('common.pleaseEnter') + t('group.parentCode')"
+          />
+          <div v-if="presetParentName" class="preset-tip">
+            <el-tag type="info">{{ presetParentName }}</el-tag>
+          </div>
         </el-form-item>
       </el-form>
     </template>
@@ -58,21 +69,30 @@ const {
     return { name: res.name!, code: res.code!, parentCode: res.parentCode }
   },
   create: async (payload: GroupForm) => {
-    await groupApi.create({
-      name: payload.name!,
-      code: payload.code!,
-      parentCode: payload.parentCode
-    })
-    ElMessage.success(t('group.createSuccess'))
+    try {
+      await groupApi.create({
+        name: payload.name!,
+        code: payload.code!,
+        parentCode: payload.parentCode
+      })
+      ElMessage.success(t('group.createSuccess'))
+    } catch (error) {
+      ElMessage.error(t('group.createFailed'))
+      throw error
+    }
   },
   update: async (id, payload: GroupForm) => {
     const code = String(id)
-    await groupApi.update(code, {
-      name: payload.name!,
-      code: payload.code!,
-      parentCode: payload.parentCode
-    })
-    ElMessage.success(t('group.updateSuccess'))
+    try {
+      await groupApi.update(code, {
+        name: payload.name!,
+        parentCode: payload.parentCode
+      })
+      ElMessage.success(t('group.updateSuccess'))
+    } catch (error) {
+      ElMessage.error(t('group.updateFailed'))
+      throw error
+    }
   },
   defaultForm: {
     name: '',
@@ -82,14 +102,19 @@ const {
 })
 
 onSuccess(() => emit('success'))
-onSuccess(() => {
-  entityRef.value?.close()
-  emit('success')
-})
 
 const rules: FormRules = {
-  name: [{ required: true, message: t('common.pleaseEnter') + t('group.name'), trigger: 'blur' }],
-  code: [{ required: true, message: t('common.pleaseEnter') + t('group.code'), trigger: 'blur' }]
+  name: [
+    { required: true, message: t('group.validation.nameRequired'), trigger: 'blur' },
+    { max: 128, message: t('group.validation.nameLength'), trigger: 'blur' }
+  ],
+  code: [
+    { required: true, message: t('group.validation.codeRequired'), trigger: 'blur' },
+    { max: 64, message: t('group.validation.codeLength'), trigger: 'blur' }
+  ],
+  parentCode: [
+    { max: 64, message: t('group.validation.parentLength'), trigger: 'blur' }
+  ]
 }
 
 const openWithPreset = (opts?: { parentCode?: string; parentName?: string }) => {
@@ -99,8 +124,19 @@ const openWithPreset = (opts?: { parentCode?: string; parentName?: string }) => 
 }
 
 const openEdit = (code: string) => {
+  presetParentName.value = undefined
   open({ mode: 'edit', id: code })
   entityRef.value?.open()
+}
+
+const submitWithValidation = async () => {
+  if (!formRef.value) {
+    await submit()
+    return
+  }
+  const valid = await formRef.value.validate().catch(() => false)
+  if (!valid) return
+  await submit()
 }
 
 const onOpened = () => {
@@ -111,4 +147,7 @@ defineExpose({ open: openWithPreset, openEdit })
 </script>
 
 <style scoped>
+.preset-tip {
+  margin-top: 6px;
+}
 </style>

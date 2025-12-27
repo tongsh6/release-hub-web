@@ -200,15 +200,54 @@ export default {
   },
   repository: {
     addOrSync: '新增/同步仓库',
+    searchPlaceholder: '按名称/URL/项目/GitLab ID 搜索',
+    sync: '同步',
+    healthLabel: '健康',
     columns: {
       repo: '仓库',
       projectId: '项目ID',
+      gitlabProjectId: 'GitLab 项目ID',
+      cloneUrl: '仓库地址',
       defaultBranch: '默认分支',
+      monoRepo: '单仓',
       writable: '可写？'
     },
     openGitLab: '打开 GitLab',
     gateSummary: '门禁摘要',
-    branchesMrSummary: '分支与 MR 摘要'
+    branchesMrSummary: '分支与 MR 摘要',
+    placeholders: {
+      projectId: '例如 12345',
+      name: '例如 backend-service',
+      gitlabProjectId: '例如 123456',
+      cloneUrl: 'git@gitlab.com:group/project.git',
+      defaultBranch: 'master 或 main'
+    },
+    gateSummaryLabels: {
+      protectedBranch: '保护分支',
+      approvalRequired: '需要审批',
+      pipelineGate: '流水线门禁',
+      permissionDenied: '权限不足'
+    },
+    branchSummary: {
+      totalBranches: '分支总数',
+      activeBranches: '活跃分支',
+      nonCompliant: '不合规',
+      activeMrs: '活跃 MR',
+      mergedMrs: '已合并 MR',
+      closedMrs: '已关闭 MR'
+    },
+    gitlabMissing: '请先在系统设置中配置 GitLab',
+    health: {
+      healthy: '健康',
+      risk: '风险'
+    },
+    validation: {
+      projectId: '项目ID 最长 36 个字符',
+      gitlabId: '请输入 GitLab 项目ID',
+      name: '名称最长 128 个字符',
+      cloneUrl: '仓库地址最长 512 个字符',
+      defaultBranch: '默认分支最长 128 个字符'
+    }
   },
   run: {
     filters: {
@@ -298,7 +337,8 @@ export default {
     name: '名称',
     code: '编码',
     parentCode: '父级编码',
-    searchPlaceholder: '按分组名称筛选',
+    searchPlaceholder: '按名称或编码筛选',
+    emptyFiltered: '没有匹配的分组',
     create: '新增分组',
     createTop: '新增顶层分组',
     createChild: '新增下级分组',
@@ -311,8 +351,16 @@ export default {
     delete: '删除分组',
     confirmDelete: '确认删除该分组？此操作不可恢复',
     updateSuccess: '更新成功',
-    updateFailed: '更新失败'
-    ,
-    deleteSuccess: '删除成功'
+    updateFailed: '更新失败',
+    deleteSuccess: '删除成功',
+    deleteBlocked: '存在子分组，无法删除',
+    validation: {
+      nameRequired: '请输入名称',
+      codeRequired: '请输入编码',
+      nameLength: '名称最长 128 个字符',
+      codeLength: '编码最长 64 个字符',
+      parentLength: '父级编码最长 64 个字符',
+      codeImmutable: '编码不可修改'
+    }
   }
 }

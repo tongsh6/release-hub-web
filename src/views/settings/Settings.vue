@@ -106,7 +106,9 @@ const loadNaming = async () => {
   try {
     const data = await settingsApi.getNaming()
     if (data) namingForm.value = data
-  } catch (e) {}
+  } catch (e) {
+    /* ignore */
+  }
 }
 
 const saveNaming = async () => {
@@ -123,7 +125,9 @@ const loadBlocking = async () => {
   try {
     const data = await settingsApi.getBlocking()
     if (data) blockingForm.value = data
-  } catch (e) {}
+  } catch (e) {
+    /* ignore */
+  }
 }
 
 const saveBlocking = async () => {

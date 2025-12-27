@@ -200,15 +200,54 @@ export default {
   },
   repository: {
     addOrSync: 'Add / Sync Repo',
+    searchPlaceholder: 'Search by name/URL/project/GitLab ID',
+    sync: 'Sync',
+    healthLabel: 'Health',
     columns: {
       repo: 'Repository',
       projectId: 'Project ID',
+      gitlabProjectId: 'GitLab Project ID',
+      cloneUrl: 'Clone URL',
       defaultBranch: 'Default Branch',
+      monoRepo: 'Mono Repo',
       writable: 'Writable?'
     },
     openGitLab: 'Open in GitLab',
     gateSummary: 'Gate Summary',
-    branchesMrSummary: 'Branches & MR Summary'
+    branchesMrSummary: 'Branches & MR Summary',
+    placeholders: {
+      projectId: 'e.g. 12345',
+      name: 'e.g. backend-service',
+      gitlabProjectId: 'e.g. 123456',
+      cloneUrl: 'git@gitlab.com:group/project.git',
+      defaultBranch: 'master or main'
+    },
+    gateSummaryLabels: {
+      protectedBranch: 'Protected Branch',
+      approvalRequired: 'Approval Required',
+      pipelineGate: 'Pipeline Gate',
+      permissionDenied: 'Permission Denied'
+    },
+    branchSummary: {
+      totalBranches: 'Total Branches',
+      activeBranches: 'Active Branches',
+      nonCompliant: 'Non-Compliant',
+      activeMrs: 'Active MRs',
+      mergedMrs: 'Merged MRs',
+      closedMrs: 'Closed MRs'
+    },
+    gitlabMissing: 'Configure GitLab settings first',
+    health: {
+      healthy: 'Healthy',
+      risk: 'Risk'
+    },
+    validation: {
+      projectId: 'Project ID max 36 chars',
+      gitlabId: 'GitLab project ID is required',
+      name: 'Name max 128 chars',
+      cloneUrl: 'Clone URL max 512 chars',
+      defaultBranch: 'Default branch max 128 chars'
+    }
   },
   run: {
     filters: {
@@ -298,7 +337,8 @@ export default {
     name: 'Name',
     code: 'Code',
     parentCode: 'Parent Code',
-    searchPlaceholder: 'Filter by group name',
+    searchPlaceholder: 'Filter by name or code',
+    emptyFiltered: 'No matching groups',
     create: 'Create Group',
     createTop: 'Create Top-Level Group',
     createChild: 'Create Child Group',
@@ -311,8 +351,16 @@ export default {
     delete: 'Delete Group',
     confirmDelete: 'Confirm delete this group? This action cannot be undone.',
     updateSuccess: 'Updated successfully',
-    updateFailed: 'Update failed'
-    ,
-    deleteSuccess: 'Deleted successfully'
+    updateFailed: 'Update failed',
+    deleteSuccess: 'Deleted successfully',
+    deleteBlocked: 'Cannot delete group with children',
+    validation: {
+      nameRequired: 'Please enter name',
+      codeRequired: 'Please enter code',
+      nameLength: 'Name must be at most 128 characters',
+      codeLength: 'Code must be at most 64 characters',
+      parentLength: 'Parent code must be at most 64 characters',
+      codeImmutable: 'Code cannot be changed'
+    }
   }
 }

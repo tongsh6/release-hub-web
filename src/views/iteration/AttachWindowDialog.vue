@@ -7,7 +7,7 @@
     @confirm="submit"
     @opened="onOpened"
   >
-    <template #default="{ payload }">
+    <template #default>
       <el-form :model="form" ref="formRef" label-width="120px">
         <el-form-item :label="t('releaseWindow.name')">
           <el-select v-model="form.windowId" :placeholder="t('common.pleaseSelect') + t('releaseWindow.name')">

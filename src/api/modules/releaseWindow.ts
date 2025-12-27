@@ -33,13 +33,9 @@ export interface ConfigureReleaseWindowReq {
   endAt: string
 }
 
-export interface PublishReleaseWindowReq {
-  // empty
-}
+export type PublishReleaseWindowReq = Record<string, never>
 
-export interface FreezeReleaseWindowReq {
-  // empty
-}
+export type FreezeReleaseWindowReq = Record<string, never>
 
 // --- API Functions ---
 

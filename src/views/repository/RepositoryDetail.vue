@@ -13,16 +13,16 @@
       </template>
       <div class="mb-2">{{ t('repository.gateSummary') }}</div>
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="Protected Branch">
+        <el-descriptions-item :label="t('repository.gateSummaryLabels.protectedBranch')">
           <el-tag :type="gateSummary?.protectedBranch ? 'success' : 'danger'">{{ gateSummary?.protectedBranch ? t('common.yes') : t('common.no') }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Approval Required">
+        <el-descriptions-item :label="t('repository.gateSummaryLabels.approvalRequired')">
           <el-tag :type="gateSummary?.approvalRequired ? 'success' : 'warning'">{{ gateSummary?.approvalRequired ? t('common.yes') : t('common.no') }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Pipeline Gate">
+        <el-descriptions-item :label="t('repository.gateSummaryLabels.pipelineGate')">
           <el-tag :type="gateSummary?.pipelineGate ? 'success' : 'warning'">{{ gateSummary?.pipelineGate ? t('common.yes') : t('common.no') }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Permission Denied">
+        <el-descriptions-item :label="t('repository.gateSummaryLabels.permissionDenied')">
           <el-tag :type="gateSummary?.permissionDenied ? 'danger' : 'success'">{{ gateSummary?.permissionDenied ? t('common.yes') : t('common.no') }}</el-tag>
         </el-descriptions-item>
       </el-descriptions>
@@ -36,24 +36,24 @@
       </template>
       <el-row :gutter="20" style="margin-bottom: 20px;">
         <el-col :span="8">
-          <el-statistic title="Total Branches" :value="branchSummary?.totalBranches || 0" />
+          <el-statistic :title="t('repository.branchSummary.totalBranches')" :value="branchSummary?.totalBranches || 0" />
         </el-col>
         <el-col :span="8">
-          <el-statistic title="Active Branches" :value="branchSummary?.activeBranches || 0" />
+          <el-statistic :title="t('repository.branchSummary.activeBranches')" :value="branchSummary?.activeBranches || 0" />
         </el-col>
         <el-col :span="8">
-          <el-statistic title="Non-Compliant" :value="branchSummary?.nonCompliantBranches || 0" :value-style="branchSummary?.nonCompliantBranches ? { color: 'var(--el-color-danger)' } : {}" />
+          <el-statistic :title="t('repository.branchSummary.nonCompliant')" :value="branchSummary?.nonCompliantBranches || 0" :value-style="branchSummary?.nonCompliantBranches ? { color: 'var(--el-color-danger)' } : {}" />
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-statistic title="Active MRs" :value="branchSummary?.activeMrs || 0" />
+          <el-statistic :title="t('repository.branchSummary.activeMrs')" :value="branchSummary?.activeMrs || 0" />
         </el-col>
         <el-col :span="8">
-          <el-statistic title="Merged MRs" :value="branchSummary?.mergedMrs || 0" />
+          <el-statistic :title="t('repository.branchSummary.mergedMrs')" :value="branchSummary?.mergedMrs || 0" />
         </el-col>
         <el-col :span="8">
-          <el-statistic title="Closed MRs" :value="branchSummary?.closedMrs || 0" />
+          <el-statistic :title="t('repository.branchSummary.closedMrs')" :value="branchSummary?.closedMrs || 0" />
         </el-col>
       </el-row>
     </el-card>

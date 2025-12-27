@@ -47,6 +47,14 @@ export interface CreateRepoReq {
   monoRepo: boolean
 }
 
+export interface UpdateRepoReq {
+  gitlabProjectId: number
+  name: string
+  cloneUrl: string
+  defaultBranch: string
+  monoRepo: boolean
+}
+
 export interface ApiPageResponse<T> {
   code: string
   message: string
@@ -59,11 +67,13 @@ export interface ApiPageResponse<T> {
 }
 
 export const repositoryApi = {
-  async list(query: PageQuery & { keyword?: string }): Promise<PageResult<Repository>> {
+  async list(query: PageQuery & { keyword?: string; projectId?: string; gitlabProjectId?: number | string }): Promise<PageResult<Repository>> {
     const params = {
       page: query.page - 1,
       size: query.pageSize,
-      keyword: query.keyword
+      keyword: query.keyword,
+      projectId: query.projectId,
+      gitlabProjectId: query.gitlabProjectId
     }
     const res = await http.get<ApiPageResponse<Repository[]>>('/v1/repositories/paged', { params })
     return {
@@ -79,6 +89,11 @@ export const repositoryApi = {
 
   async create(data: CreateRepoReq): Promise<Repository> {
     const res = await http.post<ApiResponse<Repository>>('/v1/repositories', data)
+    return res.data.data
+  },
+
+  async update(id: Id, data: UpdateRepoReq): Promise<Repository> {
+    const res = await http.put<ApiResponse<Repository>>(`/v1/repositories/${id}`, data)
     return res.data.data
   },
 

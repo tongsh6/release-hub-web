@@ -13,7 +13,7 @@
           v-model="keyword"
           :placeholder="t('common.keyword')"
           clearable
-          @keyup.enter.native="doSearch"
+          @keyup.enter="doSearch"
           style="width: 240px"
         />
         <el-button class="ml-8" type="primary" @click="doSearch">{{ t('common.search') }}</el-button>

@@ -1,3 +1,5 @@
+/* global module, require, process */
+
 module.exports = function (plop) {
   // Helper registration
   plop.setHelper('upper', (txt) => txt.toUpperCase());
@@ -6,6 +8,7 @@ module.exports = function (plop) {
   // Let's check standard plop helpers. Usually `camelCase`, `pascalCase` etc are available.
   // I will register shortcuts for my templates: camel, pascal, kebab
   
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { camelCase, pascalCase, kebabCase } = require('change-case');
 
   plop.setHelper('camel', (txt) => camelCase(txt));

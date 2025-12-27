@@ -12,6 +12,7 @@
     <el-container class="content">
       <el-aside width="320px" class="tree-aside" v-loading="loading">
         <el-tree
+          v-if="hasTreeData"
           ref="treeRef"
           :data="filteredTree"
           node-key="code"
@@ -55,7 +56,7 @@
             </div>
           </template>
         </el-tree>
-        <el-empty v-if="!loading && treeData.length === 0" :description="t('group.empty')" />
+        <el-empty v-else-if="!loading" :description="emptyDescription" />
       </el-aside>
       <el-main>
         <el-card v-if="selected" class="detail-card">
@@ -106,7 +107,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 
 const { t } = useI18n()
 const router = useRouter()
-const { loading, treeData, selected, loadTree, onNodeClick } = useGroupTree()
+const { loading, treeData, selected, selectedCode, loadTree, onNodeClick } = useGroupTree()
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const treeProps = { children: 'children', label: 'name' }
 const dialogRef = ref<InstanceType<typeof GroupDialog>>()
@@ -134,8 +135,17 @@ watch(keyword, (val) => {
 
 const filterNode = (value: string, data: GroupNode) => {
   if (!value) return true
-  return data.name?.toLowerCase().includes(value.toLowerCase())
+  const lower = value.toLowerCase()
+  return data.name?.toLowerCase().includes(lower) || data.code?.toLowerCase().includes(lower)
 }
+
+const hasTreeData = computed(() => filteredTree.value.length > 0)
+const emptyDescription = computed(() => keyword.value ? t('group.emptyFiltered') : t('group.empty'))
+
+watch(selectedCode, (code) => {
+  if (!code) return
+  treeRef.value?.setCurrentKey(code)
+})
 
 const handleNodeClick = (node: GroupNode) => {
   onNodeClick(node)
@@ -174,10 +184,17 @@ const handleDelete = async (node: GroupNode) => {
     ElMessage.warning(t('common.permissionDenied'))
     return
   }
-  await ElMessageBox.confirm(t('group.confirmDelete'), t('common.warning'), { type: 'warning' })
-  await groupApi.remove(node.id!)
-  ElMessage.success(t('group.deleteSuccess'))
-  await loadTree()
+  try {
+    await ElMessageBox.confirm(t('group.confirmDelete'), t('common.warning'), { type: 'warning' })
+    await groupApi.remove(node.id!)
+    ElMessage.success(t('group.deleteSuccess'))
+    await loadTree()
+  } catch (error: any) {
+    if (error === 'cancel') return
+    const message = (error?.code === 'GROUP_DELETE_HAS_CHILDREN') ? t('group.deleteBlocked') : t('common.requestFailed')
+    ElMessage.error(message)
+    console.error(error)
+  }
 }
 
 const search = () => {

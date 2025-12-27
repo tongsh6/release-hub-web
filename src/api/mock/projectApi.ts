@@ -10,7 +10,7 @@ export interface Project {
 }
 
 // In-memory DB
-let projects: Project[] = Array.from({ length: 25 }).map((_, i) => ({
+const projects: Project[] = Array.from({ length: 25 }).map((_, i) => ({
   id: String(i + 1),
   name: `Project Demo ${i + 1}`,
   status: i % 3 === 0 ? 'frozen' : 'active',

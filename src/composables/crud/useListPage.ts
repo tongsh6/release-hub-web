@@ -52,7 +52,7 @@ export function useListPage<T, Q extends PageQuery>(options: UseListPageOptions<
   const reset = () => {
     // Reset query fields to default, keeping pagination reset
     Object.keys(defaultQuery).forEach(key => {
-      // @ts-ignore
+      // @ts-expect-error allow dynamic index assignment
       query[key] = defaultQuery[key]
     })
     query.page = 1

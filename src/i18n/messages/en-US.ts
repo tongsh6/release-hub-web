@@ -59,7 +59,8 @@ export default {
     success: 'Success',
     warning: 'Warning',
     permissionDenied: 'Permission denied',
-    partialSuccess: 'Partial success'
+    partialSuccess: 'Partial success',
+    sync: 'Sync'
   },
   dashboard: {
     totalProjects: 'Total Projects',

@@ -59,7 +59,8 @@ export default {
     success: '操作成功',
     warning: '警告',
     permissionDenied: '权限不足',
-    partialSuccess: '部分成功'
+    partialSuccess: '部分成功',
+    sync: '同步'
   },
   dashboard: {
     totalProjects: '项目总数',

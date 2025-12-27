@@ -1,4 +1,4 @@
-import { post } from './http'
+import { post } from '@/api/http'
 import { mockAuthApi } from './mock/auth'
 
 export interface LoginPayload {

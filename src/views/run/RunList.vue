@@ -28,10 +28,10 @@
       @page-size-change="onPageSizeChange"
     >
       <el-table-column prop="id" :label="t('run.columns.runId')" width="120" />
-      <el-table-column prop="type" :label="t('run.columns.type')" width="220" />
+      <el-table-column prop="runType" :label="t('run.columns.type')" width="220" />
       <el-table-column prop="status" :label="t('run.columns.status')" width="120" />
       <el-table-column prop="startedAt" :label="t('run.columns.start')" width="180" />
-      <el-table-column prop="endedAt" :label="t('run.columns.end')" width="180" />
+      <el-table-column prop="finishedAt" :label="t('run.columns.end')" width="180" />
       <el-table-column :label="t('common.actions')" width="220" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="openDetail(row)">{{ t('run.actions.detail') }}</el-button>
@@ -71,8 +71,10 @@ import DataTable from '@/components/crud/DataTable.vue'
 import RunDrawer from './RunDrawer.vue'
 import { runApi } from '@/api/runApi'
 import { hasPerm } from '@/utils/perm'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 
+const userStore = useUserStore()
 const { t } = useI18n()
 const drawerRef = ref<InstanceType<typeof RunDrawer>>()
 
@@ -92,12 +94,39 @@ function openDetail(row: any) {
   drawerRef.value?.open(row.id)
 }
 
-function handleRetry(row: any) {
+async function handleRetry(row: any) {
   if (!hasPerm('run:write')) {
     ElMessage.warning(t('common.permissionDenied'))
     return
   }
-  // TODO: call retry API
+
+  try {
+    await ElMessageBox.confirm(t('run.retryConfirm'), t('common.warning'), {
+      type: 'warning'
+    })
+
+    const detail = await runApi.getRunById(row.id)
+    const failedItems = detail.items
+      .filter(item => ['FAILED', 'MERGE_BLOCKED'].includes(item.finalResult))
+      .map(item => `${item.windowKey}::${item.repo}::${item.iterationKey}`)
+
+    if (failedItems.length === 0) {
+      ElMessage.info(t('run.noFailedItems'))
+      return
+    }
+
+    if (!userStore.profile?.username) {
+      ElMessage.warning(t('common.loginRequired'))
+      return
+    }
+    await runApi.retry(row.id, failedItems, userStore.profile.username)
+    ElMessage.success(t('run.retrySuccess'))
+    search()
+  } catch (e) {
+    if (e !== 'cancel') {
+      console.error(e)
+    }
+  }
 }
 
 function handleExport(row: any) {
@@ -105,7 +134,7 @@ function handleExport(row: any) {
     ElMessage.warning(t('common.permissionDenied'))
     return
   }
-  // TODO: export logic
+  window.open(`/api/v1/runs/${row.id}/export.csv`, '_blank')
 }
 </script>
 

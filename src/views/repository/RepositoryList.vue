@@ -7,7 +7,7 @@
     </SearchForm>
 
     <div class="mb-4">
-      <el-button v-perm.disable="'repository:write'" type="primary">{{ t('repository.addOrSync') }}</el-button>
+      <el-button v-perm.disable="'repository:write'" type="primary" @click="openCreate">{{ t('repository.addOrSync') }}</el-button>
     </div>
 
     <DataTable
@@ -27,6 +27,12 @@
           <el-tag :type="row.writable ? 'success' : 'warning'">{{ row.writable ? t('common.yes') : t('common.no') }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="Health" width="120">
+        <template #default="{ row }">
+          <el-tag v-if="row.nonCompliantBranchCount > 0" type="danger">Risk</el-tag>
+          <el-tag v-else type="success">Healthy</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column :label="t('common.actions')" width="160" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
@@ -35,6 +41,7 @@
     </DataTable>
 
     <RepositoryDrawer ref="drawerRef" />
+    <RepositoryEdit ref="editRef" @success="search" />
   </div>
 </template>
 
@@ -46,12 +53,14 @@ import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
 import RepositoryDrawer from './RepositoryDrawer.vue'
+import RepositoryEdit from './RepositoryEdit.vue'
 import { repositoryApi } from '@/api/repositoryApi'
 import { hasPerm } from '@/utils/perm'
 
 const userStore = useUserStore()
 const { t } = useI18n()
 const drawerRef = ref<InstanceType<typeof RepositoryDrawer>>()
+const editRef = ref<InstanceType<typeof RepositoryEdit>>()
 
 const { query, loading, list, total, search, reset, onPageChange, onPageSizeChange } = useListPage({
   fetcher: repositoryApi.list,
@@ -61,7 +70,11 @@ const { query, loading, list, total, search, reset, onPageChange, onPageSizeChan
 })
 
 function openDetail(row: any) {
-  drawerRef.value?.open(row.repo)
+  drawerRef.value?.open(row.id)
+}
+
+function openCreate() {
+  editRef.value?.open()
 }
 </script>
 

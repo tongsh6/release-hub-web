@@ -10,6 +10,7 @@ import runsRoutes from './modules/runs'
 import settingsRoutes from './modules/settings'
 import templateCrudRoutes from './modules/templateCrud'
 import groupsRoutes from './modules/groups'
+import auditRoutes from './modules/audit'
 
 export const constantRoutes: RouteRecordRaw[] = [
   {

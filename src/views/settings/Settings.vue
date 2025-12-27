@@ -1,35 +1,56 @@
 <template>
   <div class="page-container">
-    <el-tabs v-model="active">
+    <el-tabs v-model="active" @tab-change="handleTabChange">
+      <!-- GitLab Tab -->
       <el-tab-pane :label="t('settings.tabs.gitlab')" name="gitlab">
-        <el-form label-width="140px" class="pane-card">
+        <el-form :model="gitlabForm" label-width="140px" class="pane-card">
           <el-form-item :label="t('settings.labels.baseUrl')">
-            <el-input />
+            <el-input v-model="gitlabForm.baseUrl" placeholder="https://gitlab.com" />
           </el-form-item>
           <el-form-item :label="t('settings.labels.token')">
-            <el-input type="password" />
+            <el-input v-model="gitlabForm.token" type="password" show-password placeholder="Access Token" />
           </el-form-item>
           <el-form-item>
-            <el-button>{{ t('settings.buttons.testConnection') }}</el-button>
-            <el-button type="primary">{{ t('common.save') }}</el-button>
+            <el-button @click="testGitLab" :loading="testing">{{ t('settings.buttons.testConnection') }}</el-button>
+            <el-button type="primary" @click="saveGitLab" :loading="saving">{{ t('common.save') }}</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
+
+      <!-- Naming Tab -->
       <el-tab-pane :label="t('settings.tabs.naming')" name="naming">
-        <el-empty :description="t('common.todo')" />
+        <el-form :model="namingForm" label-width="140px" class="pane-card">
+          <el-form-item label="Feature Template">
+             <el-input v-model="namingForm.featureTemplate" placeholder="feature/{code}-{desc}" />
+          </el-form-item>
+          <el-form-item label="Release Template">
+             <el-input v-model="namingForm.releaseTemplate" placeholder="release/{version}" />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="saveNaming" :loading="saving">{{ t('common.save') }}</el-button>
+          </el-form-item>
+        </el-form>
       </el-tab-pane>
+
+      <!-- Refs Tab (Empty for now) -->
       <el-tab-pane :label="t('settings.tabs.refs')" name="refs">
         <el-empty :description="t('common.todo')" />
       </el-tab-pane>
+
+      <!-- Block Policy Tab -->
       <el-tab-pane :label="t('settings.tabs.blockPolicy')" name="block-policy">
-        <el-radio-group v-model="policy">
-          <el-radio label="FAIL_FAST">{{ t('settings.policy.failFast') }}</el-radio>
-          <el-radio label="CONTINUE_ON_BLOCK">{{ t('settings.policy.continueOnBlock') }}</el-radio>
-        </el-radio-group>
-        <div style="margin-top: 12px;">
-          <el-button type="primary">{{ t('common.save') }}</el-button>
+        <div class="pane-card">
+          <el-radio-group v-model="blockingForm.defaultPolicy">
+            <el-radio label="FAIL_FAST">{{ t('settings.policy.failFast') }}</el-radio>
+            <el-radio label="CONTINUE_ON_BLOCK">{{ t('settings.policy.continueOnBlock') }}</el-radio>
+          </el-radio-group>
+          <div style="margin-top: 20px;">
+            <el-button type="primary" @click="saveBlocking" :loading="saving">{{ t('common.save') }}</el-button>
+          </div>
         </div>
       </el-tab-pane>
+
+      <!-- Display Tab (Empty) -->
       <el-tab-pane :label="t('settings.tabs.display')" name="display">
         <el-empty :description="t('common.todo')" />
       </el-tab-pane>
@@ -38,11 +59,92 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-const active = ref('gitlab')
-const policy = ref('FAIL_FAST')
+import { ElMessage } from 'element-plus'
+import { settingsApi, type GitLabSettings, type NamingSettings, type BlockingSettings } from '@/api/settingsApi'
+
 const { t } = useI18n()
+const active = ref('gitlab')
+const saving = ref(false)
+const testing = ref(false)
+
+const gitlabForm = ref<GitLabSettings>({ baseUrl: '', token: '' })
+const namingForm = ref<NamingSettings>({ featureTemplate: '', releaseTemplate: '' })
+const blockingForm = ref<BlockingSettings>({ defaultPolicy: 'FAIL_FAST' })
+
+const loadGitLab = async () => {
+  try {
+    const data = await settingsApi.getGitLab()
+    if (data) gitlabForm.value = data
+  } catch (e) {
+    // ignore error on load
+  }
+}
+
+const saveGitLab = async () => {
+  saving.value = true
+  try {
+    await settingsApi.saveGitLab(gitlabForm.value)
+    ElMessage.success(t('common.saveSuccess'))
+  } finally {
+    saving.value = false
+  }
+}
+
+const testGitLab = async () => {
+  testing.value = true
+  try {
+    await settingsApi.testGitLab()
+    ElMessage.success(t('common.success'))
+  } finally {
+    testing.value = false
+  }
+}
+
+const loadNaming = async () => {
+  try {
+    const data = await settingsApi.getNaming()
+    if (data) namingForm.value = data
+  } catch (e) {}
+}
+
+const saveNaming = async () => {
+  saving.value = true
+  try {
+    await settingsApi.saveNaming(namingForm.value)
+    ElMessage.success(t('common.saveSuccess'))
+  } finally {
+    saving.value = false
+  }
+}
+
+const loadBlocking = async () => {
+  try {
+    const data = await settingsApi.getBlocking()
+    if (data) blockingForm.value = data
+  } catch (e) {}
+}
+
+const saveBlocking = async () => {
+  saving.value = true
+  try {
+    await settingsApi.saveBlocking(blockingForm.value)
+    ElMessage.success(t('common.saveSuccess'))
+  } finally {
+    saving.value = false
+  }
+}
+
+const handleTabChange = (name: any) => {
+  if (name === 'gitlab') loadGitLab()
+  if (name === 'naming') loadNaming()
+  if (name === 'block-policy') loadBlocking()
+}
+
+onMounted(() => {
+  loadGitLab()
+})
 </script>
 
 <style scoped>

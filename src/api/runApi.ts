@@ -1,36 +1,62 @@
+import { http, apiPost } from '@/api/http'
 import type { PageResult, PageQuery, Id } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 export interface Run {
   id: string
-  type: string
-  status: 'SUCCESS' | 'FAILED' | 'RUNNING' | 'MERGE_BLOCKED'
+  runType: string
+  status: string
   startedAt: string
-  endedAt: string
+  finishedAt: string
+  operator: string
 }
 
-const data: Run[] = Array.from({ length: 25 }).map((_, i) => ({
-  id: `run-${i + 1}`,
-  type: i % 2 === 0 ? 'WINDOW_ORCHESTRATION' : 'SCAN',
-  status: i % 5 === 0 ? 'FAILED' : (i % 7 === 0 ? 'MERGE_BLOCKED' : 'SUCCESS'),
-  startedAt: new Date(Date.now() - i * 3600000).toISOString(),
-  endedAt: new Date(Date.now() - i * 3600000 + 60000).toISOString()
-}))
+export interface RunDetail extends Run {
+  items: RunItem[]
+}
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+export interface RunItem {
+  windowKey: string
+  repo: string
+  iterationKey: string
+  plannedOrder: number
+  executedOrder: number
+  finalResult: string
+  steps: RunStep[]
+}
+
+export interface RunStep {
+  actionType: string
+  result: string
+  startedAt: string
+  finishedAt: string
+  message: string
+}
 
 export const runApi = {
   async list(query: PageQuery & { windowKey?: string; repo?: string; iterationKey?: string; status?: string }): Promise<PageResult<Run>> {
-    await delay(500)
-    let list = [...data]
-    if (query.status) {
-      list = list.filter(item => item.status === query.status)
+    const params = {
+      page: query.page - 1,
+      size: query.pageSize,
+      windowKey: query.windowKey,
+      repo: query.repo,
+      iterationKey: query.iterationKey,
+      status: query.status
     }
-    // other filters ignored for mock
-    const start = (query.page - 1) * query.pageSize
-    const end = start + query.pageSize
+    const res = await http.get<ApiPageResponse<Run[]>>('/v1/runs/paged', { params })
     return {
-      list: list.slice(start, end),
-      total: list.length
+      list: res.data.data,
+      total: res.data.page.total
     }
+  },
+
+  async getRunById(id: Id): Promise<RunDetail> {
+    const res = await http.get<RunDetail>(`/v1/runs/${id}/export.json`)
+    return res.data
+  },
+
+  async retry(id: Id, items: string[], operator: string): Promise<string> {
+    const res = await http.post<string>(`/v1/runs/${id}/retry`, { items, operator })
+    return res.data
   }
 }

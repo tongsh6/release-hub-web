@@ -62,7 +62,13 @@ export default {
     partialSuccess: '部分成功',
     sync: '同步',
     view: '查看',
-    featureComingSoon: '功能开发中'
+    featureComingSoon: '功能开发中',
+    preview: '预览',
+    execute: '执行',
+    plan: '计划',
+    clear: '清空',
+    loginRequired: '请先登录',
+    close: '关闭'
   },
   dashboard: {
     totalProjects: '项目总数',
@@ -95,6 +101,9 @@ export default {
     publish: '发布',
     close: '关闭',
     configureTime: '配置时间',
+    confirmFreeze: '确认冻结此发布窗口？',
+    confirmPublish: '确认发布此发布窗口？',
+    confirmClose: '确认关闭此发布窗口？',
     placeholder: {
       name: '按名称搜索',
       status: '选择状态',
@@ -296,8 +305,12 @@ export default {
       type: '类型',
       status: '状态',
       start: '开始时间',
-      end: '结束时间'
+      end: '结束时间',
+      operator: '操作人'
     },
+    retryConfirm: '确认重试此运行？',
+    noFailedItems: '没有失败的执行项',
+    retrySuccess: '重试已启动',
     actions: {
       detail: '详情',
       retry: '重试',

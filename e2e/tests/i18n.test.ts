@@ -660,7 +660,9 @@ runner.test('迭代详情页国际化验证', async () => {
     
     // 验证详情页字段
     await verifyI18nText(page, '关联仓库', 'Associated Repositories', '关联仓库标题')
-    await verifyI18nText(page, '挂载窗口', 'Mounted Windows', '挂载窗口标题')
+    await verifyI18nText(page, '添加仓库', 'Add Repos', '添加仓库按钮')
+    await verifyI18nText(page, '暂无关联仓库', 'No repositories associated', '无仓库提示')
+    await verifyI18nText(page, '操作', 'Operations', '操作标题')
     await verifyI18nText(page, '挂载到窗口', 'Attach to Window', '挂载到窗口按钮')
     await verifyI18nText(page, '编排', 'Orchestrate', '编排按钮')
     await verifyI18nText(page, '描述', 'Description', '描述字段')
@@ -671,6 +673,156 @@ runner.test('迭代详情页国际化验证', async () => {
   }
   
   await helper.screenshot('i18n-iteration-detail')
+})
+
+// ============================================
+// 测试：迭代编排对话框国际化
+// ============================================
+runner.test('迭代编排对话框国际化验证', async () => {
+  await ensureLoggedIn()
+  
+  const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
+  
+  await helper.navigate('/iterations')
+  await delay(1000)
+  
+  console.log('\n📋 迭代编排对话框国际化验证:')
+  console.log('=' .repeat(50))
+  
+  try {
+    await helper.waitForTableData()
+    
+    // 点击查看按钮进入详情
+    const viewButtons = await page.$$('.el-table .el-button')
+    for (const btn of viewButtons) {
+      const text = await page.evaluate((el: Element) => el.textContent, btn)
+      if (text?.includes('查看') || text?.includes('View')) {
+        await btn.click()
+        break
+      }
+    }
+    
+    await delay(1000)
+    
+    // 点击编排按钮打开对话框
+    const orchestrateBtn = await page.$('button')
+    const allButtons = await page.$$('.el-button')
+    for (const btn of allButtons) {
+      const text = await page.evaluate((el: Element) => el.textContent, btn)
+      if (text?.includes('编排') || text?.includes('Orchestrate')) {
+        await btn.click()
+        break
+      }
+    }
+    
+    await delay(800)
+    
+    // 验证对话框
+    const hasDialog = await helper.elementExists('.el-dialog__body')
+    if (hasDialog) {
+      const lang = await detectLanguage(page)
+      console.log(`当前语言: ${lang}`)
+      
+      // 验证对话框标题
+      const title = await page.$eval('.el-dialog__title', (el: Element) => el.textContent?.trim()).catch(() => '')
+      console.log(`对话框标题: ${title}`)
+      await verifyI18nText(page, '编排', 'Orchestrate', '对话框标题')
+      
+      // 验证表单标签
+      await verifyI18nText(page, '发布窗口名称', 'ReleaseWindow Name', '发布窗口名称标签')
+      
+      // 验证预览按钮 - 这是之前遗漏的
+      await verifyI18nText(page, '预览', 'Preview', '预览按钮')
+      
+      // 验证确认/取消按钮
+      await verifyI18nText(page, '确认', 'Confirm', '确认按钮')
+      await verifyI18nText(page, '取消', 'Cancel', '取消按钮')
+      
+      // 关闭对话框
+      const closeBtn = await page.$('.el-dialog__headerbtn')
+      if (closeBtn) await closeBtn.click()
+    } else {
+      console.log('⚠️ 编排对话框未打开')
+    }
+  } catch (err) {
+    console.log('⚠️ 无法打开编排对话框:', err)
+  }
+  
+  await helper.screenshot('i18n-orchestrate-dialog')
+})
+
+// ============================================
+// 测试：迭代挂载窗口对话框国际化
+// ============================================
+runner.test('迭代挂载窗口对话框国际化验证', async () => {
+  await ensureLoggedIn()
+  
+  const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
+  
+  await helper.navigate('/iterations')
+  await delay(1000)
+  
+  console.log('\n📋 迭代挂载窗口对话框国际化验证:')
+  console.log('=' .repeat(50))
+  
+  try {
+    await helper.waitForTableData()
+    
+    // 点击查看按钮进入详情
+    const viewButtons = await page.$$('.el-table .el-button')
+    for (const btn of viewButtons) {
+      const text = await page.evaluate((el: Element) => el.textContent, btn)
+      if (text?.includes('查看') || text?.includes('View')) {
+        await btn.click()
+        break
+      }
+    }
+    
+    await delay(1000)
+    
+    // 点击挂载到窗口按钮打开对话框
+    const allButtons = await page.$$('.el-button')
+    for (const btn of allButtons) {
+      const text = await page.evaluate((el: Element) => el.textContent, btn)
+      if (text?.includes('挂载到窗口') || text?.includes('Attach to Window')) {
+        await btn.click()
+        break
+      }
+    }
+    
+    await delay(800)
+    
+    // 验证对话框
+    const hasDialog = await helper.elementExists('.el-dialog__body')
+    if (hasDialog) {
+      const lang = await detectLanguage(page)
+      console.log(`当前语言: ${lang}`)
+      
+      // 验证对话框标题
+      const title = await page.$eval('.el-dialog__title', (el: Element) => el.textContent?.trim()).catch(() => '')
+      console.log(`对话框标题: ${title}`)
+      await verifyI18nText(page, '挂载到窗口', 'Attach to Window', '对话框标题')
+      
+      // 验证表单标签
+      await verifyI18nText(page, '发布窗口名称', 'ReleaseWindow Name', '发布窗口名称标签')
+      
+      // 验证确认/取消按钮
+      await verifyI18nText(page, '确认', 'Confirm', '确认按钮')
+      await verifyI18nText(page, '取消', 'Cancel', '取消按钮')
+      
+      // 关闭对话框
+      const closeBtn = await page.$('.el-dialog__headerbtn')
+      if (closeBtn) await closeBtn.click()
+    } else {
+      console.log('⚠️ 挂载窗口对话框未打开')
+    }
+  } catch (err) {
+    console.log('⚠️ 无法打开挂载窗口对话框:', err)
+  }
+  
+  await helper.screenshot('i18n-attach-window-dialog')
 })
 
 // ============================================
@@ -902,7 +1054,8 @@ runner.test('错误消息国际化验证', async () => {
     unknownError: { zh: '未知错误', en: 'Unknown error' },
     networkError: { zh: '网络异常', en: 'Network error' },
     businessError: { zh: '业务异常', en: 'Business error' },
-    permissionDenied: { zh: '权限不足', en: 'Permission denied' }
+    permissionDenied: { zh: '权限不足', en: 'Permission denied' },
+    loginRequired: { zh: '请先登录', en: 'Please login first' }
   }
   
   console.log('错误消息国际化定义检查:')
@@ -911,6 +1064,246 @@ runner.test('错误消息国际化验证', async () => {
   })
   
   await helper.screenshot('i18n-error-messages')
+})
+
+// ============================================
+// 测试：发布窗口操作按钮国际化
+// ============================================
+runner.test('发布窗口操作按钮国际化验证', async () => {
+  await ensureLoggedIn()
+  
+  const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
+  
+  await helper.navigate('/release-windows')
+  await delay(1000)
+  
+  console.log('\n📋 发布窗口操作按钮国际化验证:')
+  console.log('=' .repeat(50))
+  
+  const lang = await detectLanguage(page)
+  console.log(`当前语言: ${lang}`)
+  
+  try {
+    await helper.waitForTableData()
+    
+    // 获取操作按钮
+    const allButtons = await helper.getButtonTexts()
+    console.log('所有按钮:', allButtons.slice(0, 15)) // 只显示前15个
+    
+    // 验证操作按钮
+    await verifyI18nText(page, '查看', 'View', '查看按钮')
+    await verifyI18nText(page, '编辑', 'Edit', '编辑按钮')
+    await verifyI18nText(page, '冻结', 'Freeze', '冻结按钮')
+    await verifyI18nText(page, '解冻', 'Unfreeze', '解冻按钮')
+    await verifyI18nText(page, '发布', 'Publish', '发布按钮')
+    await verifyI18nText(page, '关闭', 'Close', '关闭按钮')
+    await verifyI18nText(page, '挂载到窗口', 'Attach to Window', '挂载到窗口按钮')
+  } catch {
+    console.log('⚠️ 无发布窗口数据可验证')
+  }
+  
+  await helper.screenshot('i18n-release-window-actions')
+})
+
+// ============================================
+// 测试：执行记录操作按钮国际化
+// ============================================
+runner.test('执行记录操作按钮国际化验证', async () => {
+  await ensureLoggedIn()
+  
+  const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
+  
+  await helper.navigate('/runs')
+  await delay(1000)
+  
+  console.log('\n📋 执行记录操作按钮国际化验证:')
+  console.log('=' .repeat(50))
+  
+  const lang = await detectLanguage(page)
+  console.log(`当前语言: ${lang}`)
+  
+  try {
+    await helper.waitForTableData()
+    
+    // 验证操作按钮
+    await verifyI18nText(page, '详情', 'Detail', '详情按钮')
+    await verifyI18nText(page, '重试', 'Retry', '重试按钮')
+    await verifyI18nText(page, '导出', 'Export', '导出按钮')
+    
+    // 验证表头字段
+    await verifyI18nText(page, '运行ID', 'Run ID', '运行ID列')
+    await verifyI18nText(page, '类型', 'Type', '类型列')
+    await verifyI18nText(page, '状态', 'Status', '状态列')
+    await verifyI18nText(page, '开始时间', 'Start', '开始时间列')
+    await verifyI18nText(page, '结束时间', 'End', '结束时间列')
+    await verifyI18nText(page, '操作', 'Actions', '操作列')
+  } catch {
+    console.log('⚠️ 无执行记录数据可验证')
+  }
+  
+  await helper.screenshot('i18n-run-actions')
+})
+
+// ============================================
+// 测试：迭代关联对话框国际化
+// ============================================
+runner.test('迭代关联对话框国际化验证', async () => {
+  await ensureLoggedIn()
+  
+  const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
+  
+  await helper.navigate('/release-windows')
+  await delay(1000)
+  
+  console.log('\n📋 迭代关联对话框国际化验证:')
+  console.log('=' .repeat(50))
+  
+  try {
+    await helper.waitForTableData()
+    
+    // 点击"挂载到窗口"按钮打开对话框
+    const allButtons = await page.$$('.el-table .el-button')
+    for (const btn of allButtons) {
+      const text = await page.evaluate((el: Element) => el.textContent, btn)
+      if (text?.includes('挂载到窗口') || text?.includes('Attach to Window')) {
+        await btn.click()
+        break
+      }
+    }
+    
+    await delay(800)
+    
+    const hasDialog = await helper.elementExists('.el-dialog__body')
+    if (hasDialog) {
+      const lang = await detectLanguage(page)
+      console.log(`当前语言: ${lang}`)
+      
+      // 验证对话框内容
+      await verifyI18nText(page, '关键字', 'Keyword', '关键字标签')
+      await verifyI18nText(page, '查询', 'Search', '查询按钮')
+      await verifyI18nText(page, '清空', 'Clear', '清空按钮')
+      await verifyI18nText(page, '迭代标识', 'Iteration Key', '迭代标识列')
+      await verifyI18nText(page, '仓库数', 'Repos', '仓库数列')
+      await verifyI18nText(page, '确认', 'Confirm', '确认按钮')
+      await verifyI18nText(page, '取消', 'Cancel', '取消按钮')
+      
+      // 关闭对话框
+      const closeBtn = await page.$('.el-dialog__headerbtn')
+      if (closeBtn) await closeBtn.click()
+    } else {
+      console.log('⚠️ 迭代关联对话框未打开')
+    }
+  } catch (err) {
+    console.log('⚠️ 无法打开迭代关联对话框:', err)
+  }
+  
+  await helper.screenshot('i18n-attach-iterations-dialog')
+})
+
+// ============================================
+// 测试：版本更新对话框国际化
+// ============================================
+runner.test('版本更新对话框国际化验证', async () => {
+  await ensureLoggedIn()
+  
+  const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
+  
+  await helper.navigate('/release-windows')
+  await delay(1000)
+  
+  console.log('\n📋 版本更新对话框国际化验证:')
+  console.log('=' .repeat(50))
+  
+  try {
+    await helper.waitForTableData()
+    
+    // 点击查看按钮进入详情页
+    const viewButtons = await page.$$('.el-table .el-button')
+    for (const btn of viewButtons) {
+      const text = await page.evaluate((el: Element) => el.textContent, btn)
+      if (text?.includes('查看') || text?.includes('View')) {
+        await btn.click()
+        break
+      }
+    }
+    
+    await delay(1000)
+    
+    // 在详情页点击"执行版本更新"按钮
+    const allButtons = await page.$$('.el-button')
+    for (const btn of allButtons) {
+      const text = await page.evaluate((el: Element) => el.textContent, btn)
+      if (text?.includes('执行版本更新') || text?.includes('Execute Version Update')) {
+        await btn.click()
+        break
+      }
+    }
+    
+    await delay(800)
+    
+    const hasDialog = await helper.elementExists('.el-dialog__body')
+    if (hasDialog) {
+      const lang = await detectLanguage(page)
+      console.log(`当前语言: ${lang}`)
+      
+      // 验证对话框标题
+      const title = await page.$eval('.el-dialog__title', (el: Element) => el.textContent?.trim()).catch(() => '')
+      console.log(`对话框标题: ${title}`)
+      
+      // 验证表单标签
+      await verifyI18nText(page, '仓库', 'Repository', '仓库标签')
+      await verifyI18nText(page, '构建工具', 'Build Tool', '构建工具标签')
+      await verifyI18nText(page, '目标版本号', 'Target Version', '目标版本号标签')
+      await verifyI18nText(page, '仓库路径', 'Repository Path', '仓库路径标签')
+      
+      // 关闭对话框
+      const closeBtn = await page.$('.el-dialog__headerbtn')
+      if (closeBtn) await closeBtn.click()
+    } else {
+      console.log('⚠️ 版本更新对话框未打开')
+    }
+  } catch (err) {
+    console.log('⚠️ 无法打开版本更新对话框:', err)
+  }
+  
+  await helper.screenshot('i18n-version-update-dialog')
+})
+
+// ============================================
+// 测试：阻塞看板国际化
+// ============================================
+runner.test('阻塞看板页面国际化验证', async () => {
+  await ensureLoggedIn()
+  
+  const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
+  
+  await helper.navigate('/blocks')
+  await delay(1000)
+  
+  console.log('\n📋 阻塞看板页面国际化验证:')
+  console.log('=' .repeat(50))
+  
+  const lang = await detectLanguage(page)
+  console.log(`当前语言: ${lang}`)
+  
+  // 验证刷新按钮
+  await verifyI18nText(page, '刷新', 'Refresh', '刷新按钮')
+  
+  // 验证阻塞原因标签
+  await verifyI18nText(page, '冲突', 'CONFLICT', '冲突原因')
+  await verifyI18nText(page, '流水线失败', 'PIPELINE_FAILED', '流水线失败原因')
+  await verifyI18nText(page, '需要审批', 'APPROVAL_REQUIRED', '需要审批原因')
+  
+  // 验证详情按钮
+  await verifyI18nText(page, '详情', 'Detail', '详情按钮')
+  await verifyI18nText(page, '暂无数据', 'No Data', '暂无数据提示')
+  
+  await helper.screenshot('i18n-block-board')
 })
 
 // ============================================

@@ -62,7 +62,13 @@ export default {
     partialSuccess: 'Partial success',
     sync: 'Sync',
     view: 'View',
-    featureComingSoon: 'Feature coming soon'
+    featureComingSoon: 'Feature coming soon',
+    preview: 'Preview',
+    execute: 'Execute',
+    plan: 'Plan',
+    clear: 'Clear',
+    loginRequired: 'Please login first',
+    close: 'Close'
   },
   dashboard: {
     totalProjects: 'Total Projects',
@@ -95,6 +101,9 @@ export default {
     publish: 'Publish',
     close: 'Close',
     configureTime: 'Configure Time',
+    confirmFreeze: 'Confirm to freeze this release window?',
+    confirmPublish: 'Confirm to publish this release window?',
+    confirmClose: 'Confirm to close this release window?',
     placeholder: {
       name: 'Search by name',
       status: 'Select status',
@@ -296,8 +305,12 @@ export default {
       type: 'Type',
       status: 'Status',
       start: 'Start',
-      end: 'End'
+      end: 'End',
+      operator: 'Operator'
     },
+    retryConfirm: 'Confirm to retry this run?',
+    noFailedItems: 'No failed items',
+    retrySuccess: 'Retry started',
     actions: {
       detail: 'Detail',
       retry: 'Retry',

@@ -6,42 +6,60 @@
     destroy-on-close
   >
     <div class="drawer-content" v-loading="loading">
+      <!-- 基本信息 -->
       <el-card shadow="never" class="mb-4">
         <template #header>
           <div class="card-header">
             <span>{{ t('iteration.columns.key') }}: {{ iterationKey }}</span>
-            <el-button v-perm.disable="'iteration:write'" type="primary" @click="openAttachWindow">{{ t('iteration.detail.attachToWindow') }}</el-button>
+            <el-button v-perm.disable="'iteration:write'" type="primary" size="small" @click="openAttachWindow">{{ t('iteration.detail.attachToWindow') }}</el-button>
           </div>
         </template>
-        <div>{{ t('iteration.detail.associatedRepos') }}</div>
         <div v-if="iteration">
           <el-descriptions :column="2" border>
-            <el-descriptions-item :label="t('iteration.columns.repos')">
-              {{ iteration.repoCount }}
+            <el-descriptions-item :label="t('iteration.columns.key')">
+              {{ iteration.iterationKey }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('iteration.columns.attachAt')">
-              {{ new Date(iteration.attachAt).toLocaleString() }}
+            <el-descriptions-item :label="t('iteration.columns.description')">
+              {{ iteration.description || '-' }}
+            </el-descriptions-item>
+            <el-descriptions-item :label="t('iteration.columns.createdAt')">
+              {{ iteration.createdAt ? new Date(iteration.createdAt).toLocaleString() : '-' }}
+            </el-descriptions-item>
+            <el-descriptions-item :label="t('iteration.columns.updatedAt')">
+              {{ iteration.updatedAt ? new Date(iteration.updatedAt).toLocaleString() : '-' }}
             </el-descriptions-item>
           </el-descriptions>
         </div>
         <el-empty v-else :description="t('common.noData')" />
       </el-card>
 
+      <!-- 关联仓库 -->
+      <el-card shadow="never" class="mb-4">
+        <template #header>
+          <div class="card-header">
+            <span>{{ t('iteration.detail.associatedRepos') }} ({{ iteration?.repoCount || 0 }})</span>
+          </div>
+        </template>
+        <div v-if="iteration && iteration.repoIds && iteration.repoIds.length > 0">
+          <el-tag 
+            v-for="repoId in iteration.repoIds" 
+            :key="repoId" 
+            style="margin: 4px;"
+          >
+            {{ repoId }}
+          </el-tag>
+        </div>
+        <el-empty v-else :description="t('iteration.detail.noRepos')" />
+      </el-card>
+
+      <!-- 操作 -->
       <el-card shadow="never">
         <template #header>
           <div class="card-header">
-            <span>{{ t('iteration.detail.mountedWindows') }}</span>
-            <el-button v-perm.disable="'iteration:write'" type="primary" @click="openOrchestrate">{{ t('iteration.detail.orchestrateThisIteration') }}</el-button>
+            <span>{{ t('iteration.detail.operations') }}</span>
           </div>
         </template>
-        <div v-if="iteration">
-          <el-descriptions :column="1" border>
-            <el-descriptions-item :label="t('iteration.columns.mountedWindows')">
-              {{ iteration.mountedWindows }}
-            </el-descriptions-item>
-          </el-descriptions>
-        </div>
-        <el-empty v-else :description="t('common.noData')" />
+        <el-button v-perm.disable="'iteration:write'" type="primary" @click="openOrchestrate">{{ t('iteration.detail.orchestrateThisIteration') }}</el-button>
       </el-card>
     </div>
     <AttachWindowDialog ref="attachRef" @success="fetchDetail" />

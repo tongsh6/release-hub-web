@@ -19,18 +19,27 @@
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
-      <el-table-column prop="iterationKey" :label="t('iteration.columns.key')" min-width="160" />
-      <el-table-column prop="repoCount" :label="t('iteration.columns.repos')" width="100" />
-      <el-table-column prop="mountedWindows" :label="t('iteration.columns.mountedWindows')" min-width="160" />
-      <el-table-column prop="attachAt" :label="t('iteration.columns.attachAt')" width="180">
+      <el-table-column prop="iterationKey" :label="t('iteration.columns.key')" min-width="200" />
+      <el-table-column prop="description" :label="t('iteration.columns.description')" min-width="200">
         <template #default="{ row }">
-          {{ row.attachAt ? new Date(row.attachAt).toLocaleString() : '-' }}
+          {{ row.description || '-' }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" width="150" fixed="right">
+      <el-table-column prop="repoCount" :label="t('iteration.columns.repos')" width="100">
+        <template #default="{ row }">
+          <el-tag type="info" size="small">{{ row.repoCount }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('iteration.columns.createdAt')" width="180">
+        <template #default="{ row }">
+          {{ row.createdAt ? new Date(row.createdAt).toLocaleString() : '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('common.actions')" width="200" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-          <el-button link type="primary" size="small" @click="goDetailPage(row)">{{ t('common.view') || '查看' }}</el-button>
+          <el-button link type="primary" size="small" @click="goDetailPage(row)">{{ t('common.view') }}</el-button>
+          <el-button v-perm.disable="'iteration:write'" link type="danger" size="small" @click="handleDelete(row)">{{ t('common.delete') }}</el-button>
         </template>
       </el-table-column>
     </DataTable>
@@ -50,9 +59,9 @@ import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
 import IterationDrawer from './IterationDrawer.vue'
 import IterationCreateDialog from './IterationCreateDialog.vue'
-import { iterationApi } from '@/api/iterationApi'
+import { iterationApi, type Iteration } from '@/api/iterationApi'
 import { hasPerm } from '@/utils/perm'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -79,8 +88,32 @@ function openCreate() {
   createRef.value?.open()
 }
 
-function goDetailPage(row: any) {
+function goDetailPage(row: Iteration) {
   router.push({ name: 'IterationDetail', params: { iterationKey: row.iterationKey } })
+}
+
+async function handleDelete(row: Iteration) {
+  if (!hasPerm('iteration:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  
+  try {
+    await ElMessageBox.confirm(
+      t('iteration.confirmDelete', { key: row.iterationKey }),
+      t('common.warning'),
+      { type: 'warning' }
+    )
+    
+    await iterationApi.delete(row.iterationKey)
+    ElMessage.success(t('common.success'))
+    fetch()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error(error)
+      ElMessage.error(t('common.requestFailed'))
+    }
+  }
 }
 </script>
 

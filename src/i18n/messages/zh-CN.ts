@@ -60,7 +60,9 @@ export default {
     warning: '警告',
     permissionDenied: '权限不足',
     partialSuccess: '部分成功',
-    sync: '同步'
+    sync: '同步',
+    view: '查看',
+    featureComingSoon: '功能开发中'
   },
   dashboard: {
     totalProjects: '项目总数',
@@ -210,17 +212,25 @@ export default {
   },
   iteration: {
     new: '新建迭代',
+    confirmDelete: '确认删除迭代 "{key}"？此操作不可恢复',
     columns: {
       key: '迭代标识',
+      description: '描述',
       repos: '仓库数',
       mountedWindows: '挂载窗口数',
-      attachAt: '最近挂载时间'
+      attachAt: '最近挂载时间',
+      createdAt: '创建时间',
+      updatedAt: '更新时间'
     },
     detail: {
       associatedRepos: '关联仓库',
+      noRepos: '暂无关联仓库',
+      addRepos: '添加仓库',
+      confirmRemoveRepo: '确认移除仓库 "{repoId}"？',
       mountedWindows: '挂载窗口',
       attachToWindow: '挂载到窗口',
-      orchestrateThisIteration: '编排（此迭代）'
+      orchestrateThisIteration: '编排（此迭代）',
+      operations: '操作'
     }
   },
   repository: {

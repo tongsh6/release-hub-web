@@ -60,7 +60,9 @@ export default {
     warning: 'Warning',
     permissionDenied: 'Permission denied',
     partialSuccess: 'Partial success',
-    sync: 'Sync'
+    sync: 'Sync',
+    view: 'View',
+    featureComingSoon: 'Feature coming soon'
   },
   dashboard: {
     totalProjects: 'Total Projects',
@@ -210,17 +212,25 @@ export default {
   },
   iteration: {
     new: 'New Iteration',
+    confirmDelete: 'Are you sure to delete iteration "{key}"? This action cannot be undone',
     columns: {
       key: 'Iteration Key',
+      description: 'Description',
       repos: 'Repos',
       mountedWindows: 'Mounted Windows',
-      attachAt: 'Latest Mount Time'
+      attachAt: 'Latest Mount Time',
+      createdAt: 'Created At',
+      updatedAt: 'Updated At'
     },
     detail: {
       associatedRepos: 'Associated Repositories',
+      noRepos: 'No repositories associated',
+      addRepos: 'Add Repos',
+      confirmRemoveRepo: 'Are you sure to remove repository "{repoId}"?',
       mountedWindows: 'Mounted Windows',
       attachToWindow: 'Attach to Window',
-      orchestrateThisIteration: 'Orchestrate (this iteration)'
+      orchestrateThisIteration: 'Orchestrate (this iteration)',
+      operations: 'Operations'
     }
   },
   repository: {

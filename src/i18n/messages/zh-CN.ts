@@ -116,6 +116,31 @@ export default {
       FROZEN: '已冻结',
       CLOSED: '已关闭',
       PUBLISHED: '已发布'
+    },
+    versionUpdate: {
+      title: '执行版本更新',
+      execute: '执行版本更新',
+      repoId: '仓库',
+      buildTool: '构建工具',
+      targetVersion: '目标版本号',
+      repoPath: '仓库路径',
+      pomPath: 'POM 文件路径',
+      gradlePropertiesPath: 'Gradle Properties 路径',
+      selectRepo: '请选择仓库',
+      targetVersionPlaceholder: '例如: 1.2.3',
+      repoPathPlaceholder: '本地仓库路径，例如: /path/to/repo',
+      pomPathPlaceholder: 'POM 文件路径，留空则使用默认 pom.xml',
+      gradlePropertiesPathPlaceholder: 'Gradle Properties 路径，留空则使用默认 gradle.properties',
+      repoIdRequired: '请选择仓库',
+      targetVersionRequired: '请输入目标版本号',
+      buildToolRequired: '请选择构建工具',
+      repoPathRequired: '请输入仓库路径',
+      targetVersionTip: '格式示例：1.2.3（SemVer）或 2024.01.27（日期版本）',
+      repoPathTip: '本地文件系统路径，例如：/path/to/repository 或 C:\\path\\to\\repository',
+      validationFailed: '请检查表单填写是否正确',
+      executing: '正在执行版本更新，请稍候...',
+      success: '版本更新已启动，执行记录 ID: {runId}',
+      failed: '版本更新失败，请查看错误信息'
     }
   },
   project: {
@@ -272,6 +297,11 @@ export default {
       title: '运行',
       triplesTitle: '三元组（executedOrder）',
       exportJson: '导出 JSON'
+    },
+    steps: '执行步骤',
+    diff: {
+      title: '版本更新差异',
+      noDiff: '无差异信息'
     }
   },
   audit: {

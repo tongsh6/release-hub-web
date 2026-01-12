@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPut } from '@/api/http'
-import type { PageQuery, PageResult } from '@/types/dto'
+import type { BuildTool, PageQuery, PageResult } from '@/types/dto'
 
 const BASE = '/v1'
 
@@ -36,6 +36,20 @@ export interface ConfigureReleaseWindowReq {
 export type PublishReleaseWindowReq = Record<string, never>
 
 export type FreezeReleaseWindowReq = Record<string, never>
+
+export interface VersionUpdateRequest {
+  repoId: string
+  targetVersion: string
+  buildTool: BuildTool
+  repoPath: string
+  pomPath?: string
+  gradlePropertiesPath?: string
+}
+
+export interface VersionUpdateResponse {
+  runId: string
+  status: string
+}
 
 // --- API Functions ---
 
@@ -95,6 +109,10 @@ export function getDryPlan(id: string): Promise<any> {
   return apiGet<any>(`${BASE}/windows/${id}/dry-plan`)
 }
 
+export function executeVersionUpdate(id: string, req: VersionUpdateRequest): Promise<VersionUpdateResponse> {
+  return apiPost<VersionUpdateResponse>(`${BASE}/release-windows/${id}/execute/version-update`, req)
+}
+
 // Alias for compatibility if needed, or prefer using explicit names above
 export const releaseWindowApi = {
   list,
@@ -109,5 +127,6 @@ export const releaseWindowApi = {
   detach,
   orchestrate,
   getPlan,
-  getDryPlan
+  getDryPlan,
+  executeVersionUpdate
 }

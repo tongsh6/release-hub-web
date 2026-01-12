@@ -11,6 +11,13 @@
         >
           {{ t('iteration.detail.attachToWindow') }}
         </el-button>
+        <el-button
+          v-perm.disable="'release-window:write'"
+          type="success"
+          @click="openVersionUpdate"
+        >
+          {{ t('releaseWindow.versionUpdate.execute') }}
+        </el-button>
       </div>
     </div>
 
@@ -40,6 +47,8 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-card>
+
+    <VersionUpdateDialog ref="versionUpdateDialogRef" @success="handleVersionUpdateSuccess" />
   </div>
 </template>
 
@@ -51,6 +60,7 @@ import { releaseWindowApi, type ReleaseWindow } from '@/api/modules/releaseWindo
 import { handleError } from '@/utils/error'
 import { hasPerm } from '@/utils/perm'
 import { ElMessage } from 'element-plus'
+import VersionUpdateDialog from './VersionUpdateDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -58,6 +68,7 @@ const { t } = useI18n()
 
 const loading = ref(false)
 const form = ref<Partial<ReleaseWindow>>({})
+const versionUpdateDialogRef = ref<InstanceType<typeof VersionUpdateDialog>>()
 
 const load = async (id: string) => {
   loading.value = true
@@ -90,6 +101,23 @@ const goAttach = () => {
     return
   }
   router.push({ name: 'ReleaseWindowAttach', params: { id: form.value.id } })
+}
+
+const openVersionUpdate = () => {
+  if (!form.value?.id) return
+  if (!hasPerm('release-window:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  versionUpdateDialogRef.value?.open(form.value.id)
+}
+
+const handleVersionUpdateSuccess = () => {
+  // 刷新页面数据
+  const id = route.params.id as string
+  if (id) {
+    load(id)
+  }
 }
 </script>
 

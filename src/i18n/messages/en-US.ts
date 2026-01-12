@@ -116,6 +116,31 @@ export default {
       FROZEN: 'Frozen',
       CLOSED: 'Closed',
       PUBLISHED: 'Published'
+    },
+    versionUpdate: {
+      title: 'Execute Version Update',
+      execute: 'Execute Version Update',
+      repoId: 'Repository',
+      buildTool: 'Build Tool',
+      targetVersion: 'Target Version',
+      repoPath: 'Repository Path',
+      pomPath: 'POM File Path',
+      gradlePropertiesPath: 'Gradle Properties Path',
+      selectRepo: 'Please select a repository',
+      targetVersionPlaceholder: 'e.g., 1.2.3',
+      repoPathPlaceholder: 'Local repository path, e.g., /path/to/repo',
+      pomPathPlaceholder: 'POM file path, leave empty for default pom.xml',
+      gradlePropertiesPathPlaceholder: 'Gradle properties path, leave empty for default gradle.properties',
+      repoIdRequired: 'Please select a repository',
+      targetVersionRequired: 'Please enter target version',
+      buildToolRequired: 'Please select build tool',
+      repoPathRequired: 'Please enter repository path',
+      targetVersionTip: 'Format examples: 1.2.3 (SemVer) or 2024.01.27 (Date version)',
+      repoPathTip: 'Local file system path, e.g., /path/to/repository or C:\\path\\to\\repository',
+      validationFailed: 'Please check if the form is filled correctly',
+      executing: 'Executing version update, please wait...',
+      success: 'Version update started, Run ID: {runId}',
+      failed: 'Version update failed, please check error message'
     }
   },
   project: {
@@ -272,6 +297,11 @@ export default {
       title: 'Run',
       triplesTitle: 'Triples (executedOrder)',
       exportJson: 'Export JSON'
+    },
+    steps: 'Execution Steps',
+    diff: {
+      title: 'Version Update Diff',
+      noDiff: 'No diff information'
     }
   },
   audit: {

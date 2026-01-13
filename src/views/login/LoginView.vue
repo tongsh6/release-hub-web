@@ -43,11 +43,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+
+const REMEMBER_ME_KEY = 'RH_REMEMBER_ME'
+const SAVED_USERNAME_KEY = 'RH_SAVED_USERNAME'
 
 const router = useRouter()
 const route = useRoute()
@@ -68,6 +71,29 @@ const rules = computed<FormRules>(() => ({
   password: [{ required: true, message: t('login.validation.passwordRequired'), trigger: 'blur' }]
 }))
 
+// Load saved username on mount
+onMounted(() => {
+  const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY)
+  if (savedRememberMe === 'true') {
+    form.rememberMe = true
+    const savedUsername = localStorage.getItem(SAVED_USERNAME_KEY)
+    if (savedUsername) {
+      form.username = savedUsername
+    }
+  }
+})
+
+// Save or clear username based on rememberMe
+const handleRememberMe = () => {
+  if (form.rememberMe) {
+    localStorage.setItem(REMEMBER_ME_KEY, 'true')
+    localStorage.setItem(SAVED_USERNAME_KEY, form.username)
+  } else {
+    localStorage.removeItem(REMEMBER_ME_KEY)
+    localStorage.removeItem(SAVED_USERNAME_KEY)
+  }
+}
+
 const handleLogin = async () => {
   if (!formRef.value) return
   
@@ -77,6 +103,10 @@ const handleLogin = async () => {
       try {
         // 调用 store action，store 内会调用 api 并持久化 token
         await userStore.login(form)
+        
+        // Save or clear username based on rememberMe
+        handleRememberMe()
+        
         ElMessage.success(t('login.message.success'))
         
         // 跳转回来源页或首页

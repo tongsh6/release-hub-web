@@ -1,7 +1,7 @@
 <template>
   <EntityDialog
     ref="entityRef"
-    :title="t('iteration.detail.attachToWindow')"
+    :title="t('releaseWindow.attachIterations')"
     :confirm-text="t('common.confirm')"
     :cancel-text="t('common.cancel')"
     @confirm="submit"
@@ -32,7 +32,7 @@
         <el-table-column prop="mountedWindows" :label="t('iteration.columns.mountedWindows')" width="160" />
         <el-table-column :label="t('iteration.columns.attachAt')" width="180">
           <template #default="{ row }">
-            {{ row.attachAt ? new Date(row.attachAt).toLocaleString() : '-' }}
+            {{ formatDateTime(row.attachAt) }}
           </template>
         </el-table-column>
       </el-table>
@@ -61,6 +61,7 @@ import { useListPage } from '@/composables/crud/useListPage'
 import { iterationApi, type Iteration } from '@/api/iterationApi'
 import { releaseWindowApi } from '@/api/modules/releaseWindow'
 import { hasPerm } from '@/utils/perm'
+import { formatDateTime } from '@/utils/date'
 
 const { t } = useI18n()
 const emit = defineEmits<{ (e: 'success'): void }>()

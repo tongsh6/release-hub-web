@@ -1,14 +1,18 @@
 <template>
-  <div class="version-policy-list-page">
+  <div class="version-policy-list-page list-page">
     <SearchForm :loading="loading" @search="search" @reset="reset">
       <el-form-item :label="t('versionPolicy.name')">
-        <el-input v-model="query.name" :placeholder="t('versionPolicy.name')" />
+        <el-input v-model="query.name" :placeholder="t('versionPolicy.name')" clearable />
       </el-form-item>
     </SearchForm>
 
-    <div class="mb-4">
-      <el-button type="primary" :icon="Plus" @click="handleAdd">{{ t('versionPolicy.create') }}</el-button>
-    </div>
+    <el-alert 
+      type="info" 
+      :title="t('versionPolicy.builtInNote')" 
+      :closable="false" 
+      show-icon 
+      class="mb-4"
+    />
 
     <DataTable
       :loading="loading"
@@ -19,13 +23,33 @@
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="name" :label="t('versionPolicy.name')" min-width="150" />
-      <el-table-column prop="strategy" :label="t('versionPolicy.strategy')" min-width="150" />
-      <el-table-column :label="t('releaseWindow.actions')" width="150" fixed="right">
-        <template #default>
-          <el-button link type="primary" size="small">{{ t('common.edit') }}</el-button>
-          <el-button link type="danger" size="small">{{ t('common.delete') }}</el-button>
+      <el-table-column prop="id" label="ID" width="100" />
+      <el-table-column prop="name" :label="t('versionPolicy.name')" min-width="180" />
+      <el-table-column prop="scheme" :label="t('versionPolicy.scheme')" width="120">
+        <template #default="{ row }">
+          <el-tag :type="row.scheme === 'SEMVER' ? 'primary' : 'success'" size="small">
+            {{ row.scheme }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="bumpRule" :label="t('versionPolicy.bumpRule')" width="120">
+        <template #default="{ row }">
+          <el-tag v-if="row.bumpRule !== 'NONE'" type="info" size="small">
+            {{ row.bumpRule }}
+          </el-tag>
+          <span v-else class="text-muted">-</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="strategy" :label="t('versionPolicy.strategy')" min-width="180">
+        <template #default="{ row }">
+          <span class="strategy-text">{{ row.strategy }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('common.actions')" width="120" fixed="right">
+        <template #default="{ row }">
+          <el-button link type="primary" size="small" @click="handleView(row)">
+            {{ t('common.detail') }}
+          </el-button>
         </template>
       </el-table-column>
     </DataTable>
@@ -34,11 +58,11 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { Plus } from '@element-plus/icons-vue'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
-import { versionPolicyApi } from '@/api/versionPolicyApi'
+import { versionPolicyApi, type VersionPolicyDisplay } from '@/api/versionPolicyApi'
+import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
 
@@ -49,13 +73,13 @@ const { query, loading, list, total, search, reset, onPageChange, onPageSizeChan
   }
 })
 
-const handleAdd = () => {
-  console.log('Add policy')
+const handleView = (row: VersionPolicyDisplay) => {
+  ElMessage.info(`${t('versionPolicy.name')}: ${row.name}\n${t('versionPolicy.scheme')}: ${row.scheme}\n${t('versionPolicy.bumpRule')}: ${row.bumpRule}`)
 }
 </script>
 
 <style scoped>
-.mb-4 {
-  margin-bottom: 16px;
+.strategy-text {
+  color: #606266;
 }
 </style>

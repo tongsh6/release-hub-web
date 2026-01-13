@@ -853,8 +853,7 @@ runner.test('步骤 5.4: 国际化验证 - 仓库页面', async () => {
   
   const expectedI18n = {
     repo: { zh: '仓库', en: 'Repo' },
-    projectId: { zh: '项目ID', en: 'Project ID' },
-    gitlabProjectId: { zh: 'GitLab 项目ID', en: 'GitLab Project ID' },
+    cloneUrl: { zh: '仓库地址', en: 'Clone URL' },
     defaultBranch: { zh: '默认分支', en: 'Default Branch' },
     health: { zh: '健康', en: 'Health' },
     actions: { zh: '操作', en: 'Actions' }

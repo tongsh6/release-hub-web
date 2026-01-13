@@ -106,3 +106,95 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* ========== 全局工具类 ========== */
+
+/* 间距工具类 */
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.mb-5 {
+  margin-bottom: 20px;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.mt-12 {
+  margin-top: 12px;
+}
+
+.mr-4 {
+  margin-right: 16px;
+}
+
+.ml-4 {
+  margin-left: 16px;
+}
+
+/* 页面容器 */
+.page-container {
+  padding: 20px;
+}
+
+/* 列表页面统一样式 */
+.list-page {
+  padding: 0;
+}
+
+/* 操作按钮行样式 */
+.action-bar {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 卡片头部样式 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 文本辅助类 */
+.text-muted {
+  color: #909399;
+}
+
+/* 详情页页头样式 */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.page-header .page-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.page-header .page-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* 描述字段 Tooltip 样式 */
+.description-tooltip {
+  max-width: 400px;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+}

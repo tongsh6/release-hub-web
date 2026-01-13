@@ -45,7 +45,7 @@
         </el-form-item>
 
         <el-form-item label="Created At" v-if="mode !== 'create'">
-          <span>{{ form.createdAt ? new Date(form.createdAt).toLocaleString() : '-' }}</span>
+          <span>{{ formatDateTime(form.createdAt) }}</span>
         </el-form-item>
       </el-form>
     </el-card>
@@ -58,6 +58,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDetailForm } from '@/composables/crud/useDetailForm'
 import { projectApi, type Project } from '@/api/mock/projectApi'
 import type { FormInstance, FormRules } from 'element-plus'
+import { formatDateTime } from '@/utils/date'
 import type { CrudMode } from '@/types/crud'
 
 const route = useRoute()

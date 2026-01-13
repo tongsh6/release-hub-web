@@ -12,12 +12,6 @@ const routes: RouteRecordRaw[] = [
     name: 'ReleaseWindowDetail',
     component: () => import('@/views/release-window/ReleaseWindowDetail.vue'),
     meta: { titleKey: 'releaseWindow.details', hidden: true, requiresAuth: true, permission: 'release-window:read' }
-  },
-  {
-    path: 'release-windows/:id/attach',
-    name: 'ReleaseWindowAttach',
-    component: () => import('@/views/release-window/ReleaseWindowAttach.vue'),
-    meta: { titleKey: 'iteration.detail.attachToWindow', hidden: true, requiresAuth: true, permission: 'release-window:write' }
   }
 ]
 

@@ -34,6 +34,7 @@ export default {
     logout: '退出登录',
     refresh: '刷新',
     delete: '删除',
+    remove: '移除',
     noData: '暂无数据',
     todo: '待完善',
     pleaseEnter: '请输入',
@@ -68,18 +69,19 @@ export default {
     plan: '计划',
     clear: '清空',
     loginRequired: '请先登录',
-    close: '关闭'
+    close: '关闭',
+    maxLength: '最多输入 {max} 个字符'
   },
   dashboard: {
-    totalProjects: '项目总数',
+    totalRepositories: '仓库总数',
+    totalIterations: '迭代总数',
     activeWindows: '活跃发布窗口',
-    pendingApprovals: '待审批',
-    recentScans: '近期扫描',
+    recentRuns: '近期执行',
     recentActivity: '近期活动',
     noActivity: '暂无活动',
     quickActions: '快捷操作',
     newRelease: '新建发布',
-    runScan: '执行扫描',
+    refresh: '刷新',
   },
   releaseWindow: {
     name: '发布窗口名称',
@@ -109,9 +111,16 @@ export default {
       status: '选择状态',
       enterName: '请输入名称',
       enterDesc: '请输入描述',
-      enterWindowKey: '请输入窗口标识'
+      enterWindowKey: '请输入窗口标识',
+      enterDescription: '请输入描述'
     },
     description: '描述',
+    plannedReleaseAt: '计划发布时间',
+    attachIterations: '关联迭代',
+    associatedIterations: '关联的迭代',
+    noIterations: '暂无关联迭代',
+    noRepos: '暂无关联仓库',
+    confirmDetach: '确认移除此迭代关联？',
     details: '发布窗口详情',
     editTitle: '编辑发布窗口',
     validation: {
@@ -122,11 +131,8 @@ export default {
     },
     statusText: {
       DRAFT: '草稿',
-      INIT: '初始化',
-      OPEN: '开启',
-      FROZEN: '已冻结',
-      CLOSED: '已关闭',
-      PUBLISHED: '已发布'
+      PUBLISHED: '已发布',
+      CLOSED: '已关闭'
     },
     versionUpdate: {
       title: '执行版本更新',
@@ -152,6 +158,25 @@ export default {
       executing: '正在执行版本更新，请稍候...',
       success: '版本更新已启动，执行记录 ID: {runId}',
       failed: '版本更新失败，请查看错误信息'
+    },
+    codeMerge: {
+      button: '代码合并',
+      title: '代码合并',
+      info: '将 feature 分支的最新代码合并到 release 分支',
+      mergeAll: '合并所有迭代',
+      mergeSingle: '合并单个迭代',
+      selectIteration: '请选择迭代',
+      execute: '执行合并',
+      sourceBranch: '源分支',
+      targetBranch: '目标分支',
+      status: {
+        SUCCESS: '成功',
+        CONFLICT: '冲突',
+        FAILED: '失败'
+      },
+      allSuccess: '所有仓库合并成功',
+      hasConflict: '部分仓库存在冲突，请在 GitLab 中手动解决',
+      hasFailed: '部分仓库合并失败，请检查错误信息'
     }
   },
   project: {
@@ -159,18 +184,26 @@ export default {
     noProject: '暂无项目，请先创建项目/子项目',
     selectTip: '请选择一个项目/子项目',
     create: '新建项目',
+    edit: '编辑项目',
     name: '项目名称',
+    namePlaceholder: '请输入项目名称',
+    nameRequired: '项目名称不能为空',
     type: '类型',
     status: '状态',
+    statusActive: '活跃',
+    statusArchived: '已归档',
     code: '编码',
     repoUrl: '仓库地址',
     buildTool: '构建工具',
     defaultBranch: '默认分支',
     description: '描述',
+    descriptionPlaceholder: '请输入项目描述',
     keyword: '关键字',
     enterKeyword: '请输入关键字',
     active: '进行中',
     archived: '已归档',
+    archive: '归档',
+    archiveSuccess: '归档成功',
     dateRange: '创建时间',
   },
   branchRule: {
@@ -178,11 +211,22 @@ export default {
     pattern: '分支模式',
     type: '类型',
     create: '新增规则',
+    edit: '编辑规则',
+    typeAllow: '允许',
+    typeBlock: '阻止',
+    namePlaceholder: '请输入规则名称',
+    patternPlaceholder: '请输入分支模式，如 feature/*',
+    nameRequired: '规则名称不能为空',
+    patternRequired: '分支模式不能为空',
+    typeRequired: '请选择规则类型',
   },
   versionPolicy: {
     name: '策略名称',
-    strategy: '策略',
+    strategy: '策略描述',
+    scheme: '版本方案',
+    bumpRule: '递增规则',
     create: '新增策略',
+    builtInNote: '版本策略为系统内置，支持 SemVer（语义化版本）和 DATE（日期版本）两种方案'
   },
   versionOps: {
     scanConfig: '扫描配置',
@@ -224,7 +268,9 @@ export default {
     confirmDelete: '确认删除迭代 "{key}"？此操作不可恢复',
     columns: {
       key: '迭代标识',
+      name: '迭代名称',
       description: '描述',
+      expectedReleaseAt: '期望上线时间',
       repos: '仓库数',
       mountedWindows: '挂载窗口数',
       attachAt: '最近挂载时间',
@@ -232,6 +278,7 @@ export default {
       updatedAt: '更新时间'
     },
     detail: {
+      title: '迭代详情',
       associatedRepos: '关联仓库',
       noRepos: '暂无关联仓库',
       addRepos: '添加仓库',
@@ -239,18 +286,35 @@ export default {
       mountedWindows: '挂载窗口',
       attachToWindow: '挂载到窗口',
       orchestrateThisIteration: '编排（此迭代）',
-      operations: '操作'
+      operations: '操作',
+      searchRepos: '搜索仓库名称',
+      alreadyAdded: '已添加',
+      selectedCount: '已选择 {count} 个新仓库',
+      noNewRepos: '请至少选择一个新仓库'
+    },
+    version: {
+      baseVersion: '基准版本',
+      devVersion: '开发版本',
+      targetVersion: '目标版本',
+      featureBranch: 'Feature 分支',
+      sync: '同步',
+      syncSuccess: '版本同步成功',
+      conflictDetected: '检测到版本冲突',
+      resolveConflict: '解决冲突',
+      useSystem: '使用系统版本',
+      useRepo: '使用仓库版本',
+      systemVersion: '系统版本',
+      repoVersion: '仓库版本'
     }
   },
   repository: {
     addOrSync: '新增/同步仓库',
-    searchPlaceholder: '按名称/URL/项目/GitLab ID 搜索',
+    searchPlaceholder: '按名称/URL 搜索',
     sync: '同步',
     healthLabel: '健康',
     columns: {
       repo: '仓库',
-      projectId: '项目ID',
-      gitlabProjectId: 'GitLab 项目ID',
+      name: '仓库名称',
       cloneUrl: '仓库地址',
       defaultBranch: '默认分支',
       monoRepo: '单仓',
@@ -260,9 +324,7 @@ export default {
     gateSummary: '门禁摘要',
     branchesMrSummary: '分支与 MR 摘要',
     placeholders: {
-      projectId: '例如 12345',
       name: '例如 backend-service',
-      gitlabProjectId: '例如 123456',
       cloneUrl: 'git@gitlab.com:group/project.git',
       defaultBranch: 'master 或 main'
     },
@@ -281,13 +343,12 @@ export default {
       closedMrs: '已关闭 MR'
     },
     gitlabMissing: '请先在系统设置中配置 GitLab',
+    gitlabUrlNotAvailable: '无法获取 GitLab 地址',
     health: {
       healthy: '健康',
       risk: '风险'
     },
     validation: {
-      projectId: '项目ID 最长 36 个字符',
-      gitlabId: '请输入 GitLab 项目ID',
       name: '名称最长 128 个字符',
       cloneUrl: '仓库地址最长 512 个字符',
       defaultBranch: '默认分支最长 128 个字符'
@@ -319,9 +380,36 @@ export default {
     detail: {
       title: '运行',
       triplesTitle: '三元组（executedOrder）',
-      exportJson: '导出 JSON'
+      exportJson: '导出 JSON',
+      tasksTitle: '运行任务'
     },
     steps: '执行步骤',
+    task: {
+      order: '序号',
+      type: '任务类型',
+      targetType: '目标类型',
+      targetId: '目标 ID',
+      retries: '重试次数',
+      error: '错误信息',
+      retry: '重试',
+      status: {
+        PENDING: '待执行',
+        RUNNING: '执行中',
+        COMPLETED: '已完成',
+        FAILED: '失败',
+        SKIPPED: '已跳过'
+      },
+      types: {
+        CLOSE_ITERATION: '关闭迭代',
+        ARCHIVE_FEATURE_BRANCH: '归档 Feature 分支',
+        MERGE_RELEASE_TO_MASTER: '合并到 Master',
+        CREATE_TAG: '创建标签',
+        UPDATE_POM_VERSION: '更新 POM 版本',
+        TRIGGER_CI_BUILD: '触发 CI 构建',
+        CREATE_RELEASE_BRANCH: '创建 Release 分支',
+        MERGE_FEATURE_TO_RELEASE: '合并到 Release'
+      }
+    },
     diff: {
       title: '版本更新差异',
       noDiff: '无差异信息'
@@ -348,7 +436,9 @@ export default {
     },
     labels: {
       baseUrl: '基础 URL',
-      token: '令牌'
+      token: '令牌',
+      featureTemplate: 'Feature 分支模板',
+      releaseTemplate: 'Release 分支模板'
     },
     buttons: {
       testConnection: '测试连接'

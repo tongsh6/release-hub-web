@@ -13,14 +13,8 @@
       label-width="120px"
       status-icon
     >
-      <el-form-item :label="t('repository.columns.projectId')" prop="projectId">
-        <el-input v-model="form.projectId" :placeholder="t('repository.placeholders.projectId')" :disabled="mode === 'edit'" />
-      </el-form-item>
       <el-form-item :label="t('repository.columns.repo')" prop="name">
         <el-input v-model="form.name" :placeholder="t('repository.placeholders.name')" />
-      </el-form-item>
-      <el-form-item :label="t('repository.columns.gitlabProjectId')" prop="gitlabProjectId">
-        <el-input v-model.number="form.gitlabProjectId" :placeholder="t('repository.placeholders.gitlabProjectId')" type="number" />
       </el-form-item>
       <el-form-item :label="t('repository.columns.cloneUrl')" prop="cloneUrl">
         <el-input v-model="form.cloneUrl" :placeholder="t('repository.placeholders.cloneUrl')" />
@@ -59,8 +53,6 @@ const mode = ref<'create' | 'edit'>('create')
 const currentId = ref<string | null>(null)
 
 const form = reactive<CreateRepoReq>({
-  projectId: '',
-  gitlabProjectId: undefined as unknown as number,
   name: '',
   cloneUrl: '',
   defaultBranch: 'master',
@@ -68,11 +60,6 @@ const form = reactive<CreateRepoReq>({
 })
 
 const rules = {
-  projectId: [
-    { required: true, message: t('common.pleaseEnter') + t('repository.columns.projectId'), trigger: 'blur' },
-    { max: 36, message: t('repository.validation.projectId'), trigger: 'blur' }
-  ],
-  gitlabProjectId: [{ required: true, message: t('repository.validation.gitlabId'), trigger: 'blur', type: 'number' }],
   name: [
     { required: true, message: t('common.pleaseEnter') + t('repository.columns.repo'), trigger: 'blur' },
     { max: 128, message: t('repository.validation.name'), trigger: 'blur' }
@@ -89,8 +76,6 @@ const rules = {
 
 const open = (repo?: any) => {
   visible.value = true
-  form.projectId = repo?.projectId || ''
-  form.gitlabProjectId = (repo?.gitlabProjectId as number | undefined) ?? (undefined as unknown as number)
   form.name = repo?.name || ''
   form.cloneUrl = repo?.cloneUrl || ''
   form.defaultBranch = repo?.defaultBranch || 'master'
@@ -107,7 +92,6 @@ const submit = async () => {
       try {
         if (mode.value === 'edit' && currentId.value) {
           await repositoryApi.update(currentId.value, {
-            gitlabProjectId: form.gitlabProjectId!,
             name: form.name,
             cloneUrl: form.cloneUrl,
             defaultBranch: form.defaultBranch,

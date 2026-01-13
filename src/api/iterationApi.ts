@@ -1,10 +1,24 @@
 import type { PageResult, PageQuery } from '@/types/crud'
 import { apiGet, apiPost, apiPut, apiDel } from '@/api/http'
 
+// 迭代仓库版本信息
+export interface IterationRepoVersionInfo {
+  repoId: string
+  repoName?: string
+  baseVersion?: string
+  devVersion?: string
+  targetVersion?: string
+  featureBranch?: string
+  versionSource?: 'POM' | 'GRADLE' | 'MANUAL' | 'SYSTEM' | 'REPO'
+  versionSyncedAt?: string
+}
+
 // 后端返回的原始数据结构
 export interface IterationRaw {
   key: string
+  name: string
   description: string
+  expectedReleaseAt: string | null
   repoIds: string[]
   createdAt: string
   updatedAt: string
@@ -13,7 +27,9 @@ export interface IterationRaw {
 // 前端使用的数据结构
 export interface Iteration {
   iterationKey: string
+  name: string
   description: string
+  expectedReleaseAt: string | null
   repoIds: string[]
   repoCount: number
   mountedWindows: string  // 暂时使用空字符串
@@ -23,13 +39,16 @@ export interface Iteration {
 }
 
 export interface CreateIterationRequest {
-  iterationKey: string
+  name: string
   description?: string
+  expectedReleaseAt?: string | null
   repoIds?: string[]
 }
 
 export interface UpdateIterationRequest {
+  name?: string
   description?: string
+  expectedReleaseAt?: string | null
   repoIds?: string[]
 }
 
@@ -37,7 +56,9 @@ export interface UpdateIterationRequest {
 function transformIteration(raw: IterationRaw): Iteration {
   return {
     iterationKey: raw.key,
+    name: raw.name || '',
     description: raw.description || '',
+    expectedReleaseAt: raw.expectedReleaseAt,
     repoIds: raw.repoIds || [],
     repoCount: raw.repoIds?.length || 0,
     mountedWindows: '',  // 后端暂未提供此字段
@@ -69,6 +90,7 @@ export const iterationApi = {
       const keyword = query.keyword.toLowerCase()
       list = list.filter(item => 
         item.iterationKey.toLowerCase().includes(keyword) ||
+        item.name?.toLowerCase().includes(keyword) ||
         item.description?.toLowerCase().includes(keyword)
       )
     }
@@ -86,10 +108,6 @@ export const iterationApi = {
 
   async create(payload: CreateIterationRequest): Promise<Iteration> {
     const resp = await apiPost<IterationRaw>('/v1/iterations', payload)
-    // 后端返回的是 ID 字符串，需要重新获取完整数据
-    if (typeof resp === 'string') {
-      return this.get(payload.iterationKey)
-    }
     return transformIteration(resp)
   },
 
@@ -115,5 +133,54 @@ export const iterationApi = {
   async listRepos(key: string): Promise<string[]> {
     const resp = await apiGet<string[]>(`/v1/iterations/${encodeURIComponent(key)}/repos`)
     return resp || []
+  },
+
+  // 获取迭代的仓库版本信息列表
+  async listVersions(key: string): Promise<IterationRepoVersionInfo[]> {
+    const resp = await apiGet<IterationRepoVersionInfo[]>(`/v1/iterations/${encodeURIComponent(key)}/versions`)
+    return resp || []
+  },
+
+  // 获取迭代的单个仓库版本信息
+  async getRepoVersion(key: string, repoId: string): Promise<IterationRepoVersionInfo | null> {
+    const resp = await apiGet<IterationRepoVersionInfo>(`/v1/iterations/${encodeURIComponent(key)}/repos/${encodeURIComponent(repoId)}/version`)
+    return resp || null
+  },
+
+  // 获取仓库版本详情
+  async getRepoVersionInfo(key: string, repoId: string): Promise<IterationRepoVersionInfo | null> {
+    const resp = await apiGet<IterationRepoVersionInfo>(`/v1/iterations/${encodeURIComponent(key)}/repos/${encodeURIComponent(repoId)}/version-info`)
+    return resp || null
+  },
+
+  // 从仓库同步版本
+  async syncVersionFromRepo(key: string, repoId: string): Promise<IterationRepoVersionInfo | null> {
+    const resp = await apiPost<IterationRepoVersionInfo>(`/v1/iterations/${encodeURIComponent(key)}/repos/${encodeURIComponent(repoId)}/sync-version`, {})
+    return resp || null
+  },
+
+  // 检测版本冲突
+  async checkVersionConflict(key: string, repoId: string): Promise<VersionConflict | null> {
+    const resp = await apiGet<VersionConflict>(`/v1/iterations/${encodeURIComponent(key)}/repos/${encodeURIComponent(repoId)}/check-conflict`)
+    return resp || null
+  },
+
+  // 解决版本冲突
+  async resolveVersionConflict(key: string, repoId: string, resolution: ConflictResolution): Promise<IterationRepoVersionInfo | null> {
+    const resp = await apiPost<IterationRepoVersionInfo>(`/v1/iterations/${encodeURIComponent(key)}/repos/${encodeURIComponent(repoId)}/resolve-conflict`, { resolution })
+    return resp || null
   }
 }
+
+// 版本冲突信息
+export interface VersionConflict {
+  repoId: string
+  iterationKey: string
+  systemVersion?: string
+  repoVersion?: string
+  conflictType?: 'MISMATCH' | 'REPO_AHEAD' | 'SYSTEM_AHEAD'
+  message?: string
+}
+
+// 冲突解决策略
+export type ConflictResolution = 'USE_SYSTEM' | 'USE_REPO' | 'CANCEL'

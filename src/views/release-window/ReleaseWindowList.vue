@@ -1,14 +1,10 @@
 <template>
-  <div class="release-window-list-page">
+  <div class="release-window-list-page list-page">
     <SearchForm :loading="loading" @search="search" @reset="reset">
       <el-form-item :label="t('releaseWindow.name')">
         <el-input v-model="query.name" :placeholder="t('releaseWindow.placeholder.name')" clearable />
       </el-form-item>
     </SearchForm>
-
-    <div class="mb-4">
-      <el-button v-perm.disable="'release-window:write'" type="primary" @click="handleCreate">{{ t('releaseWindow.create') }}</el-button>
-    </div>
 
     <DataTable
       :loading="loading"
@@ -19,8 +15,31 @@
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
-      <el-table-column prop="windowKey" :label="t('releaseWindow.windowKey')" width="150" />
+      <template #actions>
+        <el-button v-perm.disable="'release-window:write'" type="primary" :icon="Plus" @click="handleCreate">{{ t('releaseWindow.create') }}</el-button>
+      </template>
+      <el-table-column prop="windowKey" :label="t('releaseWindow.windowKey')" width="180" />
       <el-table-column prop="name" :label="t('releaseWindow.name')" min-width="150" />
+      <el-table-column prop="description" :label="t('releaseWindow.description')" min-width="150">
+        <template #default="{ row }">
+          <el-tooltip
+            v-if="row.description"
+            :content="row.description"
+            placement="top"
+            :show-after="300"
+            effect="dark"
+            popper-class="description-tooltip"
+          >
+            <span class="description-text">{{ row.description }}</span>
+          </el-tooltip>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('releaseWindow.plannedReleaseAt')" width="180">
+        <template #default="{ row }">
+          {{ formatDateTime(row.plannedReleaseAt) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="status" :label="t('releaseWindow.status')" width="100">
         <template #default="{ row }">
           <el-tag :type="getStatusType(row.status)">
@@ -30,14 +49,12 @@
       </el-table-column>
       <el-table-column :label="t('releaseWindow.createdAt')" width="180">
         <template #default="{ row }">
-          {{ new Date(row.createdAt).toLocaleString() }}
+          {{ formatDateTime(row.createdAt) }}
         </template>
       </el-table-column>
       <el-table-column :label="t('releaseWindow.actions')" width="360" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="handleView(row)">{{ t('releaseWindow.view') }}</el-button>
-          
-          <el-button v-perm.disable="'release-window:write'" link type="primary" @click="handleEdit(row)">{{ t('common.edit') }}</el-button>
 
           <el-button 
             v-perm.disable="'release-window:write'"
@@ -45,12 +62,12 @@
             type="primary"
             @click="openAttachIterations(row)"
           >
-            {{ t('iteration.detail.attachToWindow') }}
+            {{ t('releaseWindow.attachIterations') }}
           </el-button>
           
           <el-button 
             v-perm.disable="'release-window:write'"
-            v-if="row.status !== 'FROZEN' && row.status !== 'CLOSED'"
+            v-if="row.status === 'DRAFT' && !row.frozen"
             link 
             type="warning"
             @click="handleFreeze(row)"
@@ -60,27 +77,26 @@
           
           <el-button 
             v-perm.disable="'release-window:write'"
-            v-if="row.status === 'FROZEN'"
+            v-if="row.frozen && row.status === 'DRAFT'"
             link 
-            type="success"
             @click="handleUnfreeze(row)"
           >
             {{ t('releaseWindow.unfreeze') }}
           </el-button>
 
-           <el-button 
+          <el-button 
             v-perm.disable="'release-window:write'"
-            v-if="row.status === 'FROZEN'"
+            v-if="row.status === 'DRAFT'"
             link 
-            type="primary"
+            type="success"
             @click="handlePublish(row)"
           >
             {{ t('releaseWindow.publish') }}
           </el-button>
           
-           <el-button 
+          <el-button 
             v-perm.disable="'release-window:write'"
-            v-if="row.status === 'PUBLISHED' || row.status === 'FROZEN'"
+            v-if="row.status === 'PUBLISHED'"
             link 
             type="danger"
             @click="handleClose(row)"
@@ -100,6 +116,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { Plus } from '@element-plus/icons-vue'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
@@ -108,6 +125,8 @@ import AttachIterationsDialog from './AttachIterationsDialog.vue'
 import { releaseWindowApi, type ReleaseWindow, type ReleaseWindowStatus } from '@/api/modules/releaseWindow'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { hasPerm } from '@/utils/perm'
+import { handleError } from '@/utils/error'
+import { formatDateTime } from '@/utils/date'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -146,14 +165,6 @@ const handleCreate = () => {
   dialogRef.value?.open({ mode: 'create' })
 }
 
-const handleEdit = (row: ReleaseWindow) => {
-  if (!hasPerm('release-window:write')) {
-    ElMessage.warning(t('common.permissionDenied'))
-    return
-  }
-  dialogRef.value?.open({ id: row.id, mode: 'edit' })
-}
-
 const handleView = (row: ReleaseWindow) => {
   router.push({ name: 'ReleaseWindowDetail', params: { id: row.id } })
 }
@@ -171,7 +182,7 @@ if (!hasPerm('release-window:write')) {
     ElMessage.success(t('common.success'))
     fetch()
   } catch (error) {
-    if (error !== 'cancel') console.error(error)
+    if (error !== 'cancel') handleError(error)
   }
 }
 
@@ -185,12 +196,12 @@ if (!hasPerm('release-window:write')) {
     ElMessage.success(t('common.success'))
     fetch()
   } catch (error) {
-    console.error(error)
+    handleError(error)
   }
 }
 
 const handlePublish = async (row: ReleaseWindow) => {
-if (!hasPerm('release-window:write')) {
+  if (!hasPerm('release-window:write')) {
     ElMessage.warning(t('common.permissionDenied'))
     return
   }
@@ -202,7 +213,7 @@ if (!hasPerm('release-window:write')) {
     ElMessage.success(t('common.success'))
     fetch()
   } catch (error) {
-    if (error !== 'cancel') console.error(error)
+    if (error !== 'cancel') handleError(error)
   }
 }
 
@@ -219,7 +230,7 @@ if (!hasPerm('release-window:write')) {
     ElMessage.success(t('common.success'))
     fetch()
   } catch (error) {
-    if (error !== 'cancel') console.error(error)
+    if (error !== 'cancel') handleError(error)
   }
 }
 
@@ -244,7 +255,14 @@ const getStatusType = (status: ReleaseWindowStatus) => {
 </script>
 
 <style scoped>
-.mb-4 {
-  margin-bottom: 16px;
+/* 页面特定样式 - 通用样式已移至 index.css */
+.description-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-all;
 }
 </style>

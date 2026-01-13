@@ -1,17 +1,14 @@
 <template>
-  <div class="group-detail-page" v-loading="loading">
-    <el-page-header @back="handleBack" :content="t('group.detail')" />
-    <el-card class="mt-12">
-      <template #header>
-        <div class="card-header">
-          <span>{{ detail?.name || t('group.title') }}</span>
-          <div>
-            <el-button type="primary" @click="handleBack">{{ t('common.back') }}</el-button>
-            <el-button v-perm.disable="'group:write'" @click="openEdit()">{{ t('common.edit') }}</el-button>
-            <el-button v-perm.disable="'group:delete'" type="danger" @click="handleDelete()">{{ t('common.delete') }}</el-button>
-          </div>
-        </div>
-      </template>
+  <div class="group-detail-page page-container" v-loading="loading">
+    <div class="page-header">
+      <el-button :icon="ArrowLeft" @click="handleBack">{{ t('common.back') }}</el-button>
+      <span class="page-title">{{ detail?.name || t('group.detail') }}</span>
+      <div class="page-actions">
+        <el-button v-perm.disable="'group:write'" type="primary" @click="openEdit()">{{ t('common.edit') }}</el-button>
+        <el-button v-perm.disable="'group:delete'" type="danger" @click="handleDelete()">{{ t('common.delete') }}</el-button>
+      </div>
+    </div>
+    <el-card>
       <el-descriptions :column="2" border>
         <el-descriptions-item :label="t('group.name')">
           {{ detail?.name }}
@@ -32,12 +29,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { ArrowLeft } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n'
 import { groupApi, type GroupView } from '@/api/modules/group'
 import { hasPerm } from '@/utils/perm'
 import GroupDialog from './GroupDialog.vue'
-import { ElMessageBox } from 'element-plus'
+import { handleError } from '@/utils/error'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -54,7 +52,7 @@ const load = async () => {
   try {
     detail.value = await groupApi.get(id)
   } catch (e) {
-    ElMessage.error(t('common.requestFailed'))
+    handleError(e)
   } finally {
     loading.value = false
   }
@@ -71,10 +69,16 @@ const openEdit = () => {
 
 const handleDelete = async () => {
   if (!detail.value) return
-  await ElMessageBox.confirm(t('group.confirmDelete'), t('common.warning'), { type: 'warning' })
-  await groupApi.remove(detail.value.id!)
-  ElMessage.success(t('common.success'))
-  handleBack()
+  try {
+    await ElMessageBox.confirm(t('group.confirmDelete'), t('common.warning'), { type: 'warning' })
+    await groupApi.remove(detail.value.id!)
+    ElMessage.success(t('common.success'))
+    handleBack()
+  } catch (error) {
+    if (error !== 'cancel') {
+      handleError(error)
+    }
+  }
 }
 
 onMounted(load)
@@ -82,12 +86,5 @@ watch(() => route.params.id, load)
 </script>
 
 <style scoped>
-.mt-12 {
-  margin-top: 12px;
-}
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* 页面特定样式 - 通用样式已移至 index.css */
 </style>

@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    :title="title"
+    :title="t('releaseWindow.create')"
     width="600px"
     :before-close="handleBeforeClose"
     append-to-body
@@ -12,41 +12,42 @@
       :rules="rules"
       label-width="120px"
       v-loading="loading"
-      :disabled="mode === 'view'"
     >
-      <el-form-item :label="t('releaseWindow.windowKey')" prop="windowKey" v-if="mode === 'create'">
-        <el-input v-model="form.windowKey" :placeholder="t('releaseWindow.placeholder.enterWindowKey')" />
-      </el-form-item>
-
-      <el-form-item :label="t('releaseWindow.name')" prop="name" v-if="mode === 'create'">
-        <el-input v-model="form.name" :placeholder="t('releaseWindow.placeholder.enterName')" />
+      <el-form-item :label="t('releaseWindow.name')" prop="name">
+        <el-input
+          v-model="form.name"
+          :placeholder="t('releaseWindow.placeholder.enterName')"
+          :maxlength="200"
+          show-word-limit
+        />
       </el-form-item>
       
-      <el-form-item :label="t('releaseWindow.startAt')" prop="startAt" v-if="mode === 'edit'">
-         <el-date-picker
-            v-model="form.startAt"
-            type="datetime"
-            :placeholder="t('common.selectDateTime')"
-            value-format="YYYY-MM-DDTHH:mm:ss"
-          />
+      <el-form-item :label="t('releaseWindow.plannedReleaseAt')" prop="plannedReleaseAt">
+        <el-date-picker
+          v-model="form.plannedReleaseAt"
+          type="datetime"
+          :placeholder="t('common.selectDateTime')"
+          style="width: 100%"
+          value-format="YYYY-MM-DDTHH:mm:ss.SSSZ"
+        />
       </el-form-item>
-
-      <el-form-item :label="t('releaseWindow.endAt')" prop="endAt" v-if="mode === 'edit'">
-         <el-date-picker
-            v-model="form.endAt"
-            type="datetime"
-            :placeholder="t('common.selectDateTime')"
-            value-format="YYYY-MM-DDTHH:mm:ss"
-          />
+      
+      <el-form-item :label="t('releaseWindow.description')" prop="description">
+        <el-input
+          v-model="form.description"
+          type="textarea"
+          :rows="3"
+          :maxlength="2000"
+          show-word-limit
+          :placeholder="t('releaseWindow.placeholder.enterDescription')"
+        />
       </el-form-item>
-
     </el-form>
 
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="close">{{ t('common.cancel') }}</el-button>
         <el-button 
-          v-if="mode !== 'view'" 
           type="primary" 
           :loading="saving" 
           @click="handleSubmit"
@@ -59,10 +60,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDialogForm } from '@/composables/crud/useDialogForm'
-import { releaseWindowApi, type ReleaseWindow } from '@/api/modules/releaseWindow'
+import { releaseWindowApi } from '@/api/modules/releaseWindow'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const { t } = useI18n()
@@ -73,93 +74,46 @@ const emit = defineEmits<{
 
 const formRef = ref<FormInstance>()
 
-// Define a local interface that covers all fields we might edit
 interface DialogFormState {
-  id: string
-  windowKey: string
   name: string
-  startAt: string
-  endAt: string
+  description: string
+  plannedReleaseAt: string
 }
 
-const { visible, mode, loading, saving, form, open, close, submit, onSuccess } = useDialogForm<DialogFormState>({
-  fetchById: async (id) => {
-    const res = await releaseWindowApi.get(String(id))
-    return {
-      id: res.id,
-      windowKey: res.windowKey,
-      name: res.name,
-      startAt: res.startAt || '',
-      endAt: res.endAt || ''
-    }
-  },
+const { visible, loading, saving, form, open, close, submit, onSuccess } = useDialogForm<DialogFormState>({
   create: async (data) => {
     return releaseWindowApi.create({
-      windowKey: data.windowKey,
-      name: data.name
-    })
-  },
-  update: async (id, data) => {
-    // In edit mode, we are configuring the window time
-    return releaseWindowApi.configure(String(id), {
-      startAt: data.startAt,
-      endAt: data.endAt
+      name: data.name,
+      description: data.description || undefined,
+      plannedReleaseAt: data.plannedReleaseAt || undefined
     })
   },
   defaultForm: {
-    id: '',
-    windowKey: '',
     name: '',
-    startAt: '',
-    endAt: ''
+    description: '',
+    plannedReleaseAt: ''
   }
 })
 
-// Bind success callback to emit
 onSuccess((payload) => {
   emit('success', payload)
 })
 
-const title = computed(() => {
-  const map: Record<string, string> = {
-    create: t('releaseWindow.create'),
-    edit: t('releaseWindow.configureTime'), // Changed title for edit mode
-    view: t('releaseWindow.details')
-  }
-  return map[mode.value]
-})
-
-const rules = computed<FormRules>(() => {
-  if (mode.value === 'create') {
-    return {
-      windowKey: [
-        { required: true, message: t('releaseWindow.validation.required'), trigger: 'blur' }
-      ],
-      name: [
-        { required: true, message: t('releaseWindow.validation.required'), trigger: 'blur' }
-      ]
-    }
-  }
-  if (mode.value === 'edit') {
-     return {
-      startAt: [
-        { required: true, message: t('releaseWindow.validation.required'), trigger: 'change' }
-      ],
-      endAt: [
-        { required: true, message: t('releaseWindow.validation.required'), trigger: 'change' }
-      ]
-    }
-  }
-  return {}
-})
+const rules: FormRules = {
+  name: [
+    { required: true, message: t('releaseWindow.validation.required'), trigger: 'blur' },
+    { max: 200, message: t('common.maxLength', { max: 200 }), trigger: 'blur' }
+  ],
+  description: [
+    { max: 2000, message: t('common.maxLength', { max: 2000 }), trigger: 'blur' }
+  ]
+}
 
 const handleSubmit = async () => {
   if (!formRef.value) return
   await formRef.value.validate(async (valid) => {
     if (valid) {
       await submit()
-      // onSuccess is handled inside useDialogForm submit logic, 
-      // but if we want to ensure emit happens only on success and then close
     }
   })
 }

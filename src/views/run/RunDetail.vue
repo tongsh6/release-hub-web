@@ -1,14 +1,13 @@
 <template>
   <div class="page-container">
+    <div class="page-header">
+      <el-button :icon="ArrowLeft" @click="goBack">{{ t('common.back') }}</el-button>
+      <span class="page-title">{{ t('run.detail.title') }}: {{ runId }}</span>
+      <div class="page-actions">
+        <el-button type="primary" @click="handleExport">{{ t('run.detail.exportJson') }}</el-button>
+      </div>
+    </div>
     <el-card v-loading="loading">
-      <template #header>
-        <div class="card-header">
-          <span>{{ t('run.detail.title') }}: {{ runId }}</span>
-          <div>
-            <el-button type="primary" @click="handleExport">{{ t('run.detail.exportJson') }}</el-button>
-          </div>
-        </div>
-      </template>
       <el-descriptions :column="2" border>
         <el-descriptions-item :label="t('run.columns.type')">{{ detail?.runType }}</el-descriptions-item>
         <el-descriptions-item :label="t('run.columns.status')">{{ detail?.status }}</el-descriptions-item>
@@ -18,6 +17,64 @@
       </el-descriptions>
     </el-card>
 
+    <!-- 运行任务列表 -->
+    <el-card style="margin-top: 16px;" v-loading="tasksLoading">
+      <template #header>
+        <div class="card-header">
+          <span>{{ t('run.detail.tasksTitle') }}</span>
+          <el-button size="small" @click="fetchTasks">{{ t('common.refresh') }}</el-button>
+        </div>
+      </template>
+      <el-table :data="tasks" style="width: 100%">
+        <el-table-column prop="taskOrder" :label="t('run.task.order')" width="80" />
+        <el-table-column prop="taskType" :label="t('run.task.type')" width="200">
+          <template #default="{ row }">
+            <span class="task-type">{{ formatTaskType(row.taskType) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="targetType" :label="t('run.task.targetType')" width="120">
+          <template #default="{ row }">
+            <el-tag v-if="row.targetType" size="small" type="info">{{ row.targetType }}</el-tag>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="targetId" :label="t('run.task.targetId')" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="status" :label="t('run.columns.status')" width="120">
+          <template #default="{ row }">
+            <el-tag :type="getTaskStatusType(row.status)" size="small">
+              {{ formatTaskStatus(row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="retryCount" :label="t('run.task.retries')" width="100">
+          <template #default="{ row }">
+            {{ row.retryCount }} / {{ row.maxRetries }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="errorMessage" :label="t('run.task.error')" min-width="200" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span v-if="row.errorMessage" class="error-message">{{ row.errorMessage }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('common.actions')" width="100" fixed="right">
+          <template #default="{ row }">
+            <el-button 
+              v-if="row.status === 'FAILED' && row.retryCount < row.maxRetries"
+              link 
+              type="primary" 
+              size="small" 
+              @click="handleRetryTask(row.id)"
+              :loading="retryingTasks[row.id]"
+            >
+              {{ t('run.task.retry') }}
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
+    <!-- 执行项列表（原有） -->
     <el-card style="margin-top: 16px;" v-loading="loading">
       <template #header>
         <div class="card-header">
@@ -66,18 +123,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { runApi, type RunDetail } from '@/api/runApi'
+import { ArrowLeft } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { runApi, type RunDetail, type RunTask } from '@/api/runApi'
 import MRFirstTimeline from '@/components/run/MRFirstTimeline.vue'
 import DiffViewer from '@/components/run/DiffViewer.vue'
+import { handleError } from '@/utils/error'
 
 const route = useRoute()
+const router = useRouter()
 const runId = route.params.runId as string
 const { t } = useI18n()
 const loading = ref(false)
+const tasksLoading = ref(false)
 const detail = ref<RunDetail>()
+const tasks = ref<RunTask[]>([])
+const retryingTasks = reactive<Record<string, boolean>>({})
+
+const goBack = () => {
+  router.push({ name: 'Runs' })
+}
 
 async function fetchDetail() {
   loading.value = true
@@ -86,6 +154,48 @@ async function fetchDetail() {
   } finally {
     loading.value = false
   }
+}
+
+async function fetchTasks() {
+  tasksLoading.value = true
+  try {
+    tasks.value = await runApi.getTasks(runId)
+  } catch (err) {
+    handleError(err)
+  } finally {
+    tasksLoading.value = false
+  }
+}
+
+async function handleRetryTask(taskId: string) {
+  retryingTasks[taskId] = true
+  try {
+    await runApi.retryTask(runId, taskId)
+    ElMessage.success(t('common.success'))
+    await fetchTasks()
+  } catch (err) {
+    handleError(err)
+  } finally {
+    retryingTasks[taskId] = false
+  }
+}
+
+function getTaskStatusType(status: string): string {
+  switch (status) {
+    case 'COMPLETED': return 'success'
+    case 'FAILED': return 'danger'
+    case 'RUNNING': return 'warning'
+    case 'SKIPPED': return 'info'
+    default: return ''
+  }
+}
+
+function formatTaskStatus(status: string): string {
+  return t(`run.task.status.${status}`) || status
+}
+
+function formatTaskType(taskType: string): string {
+  return t(`run.task.types.${taskType}`) || taskType
 }
 
 function handleExport() {
@@ -135,12 +245,14 @@ function extractDiff(message: string): string | null {
   return null
 }
 
-onMounted(fetchDetail)
+onMounted(() => {
+  fetchDetail()
+  fetchTasks()
+})
 </script>
 
 <style scoped>
-.page-container { padding: 20px; }
-.card-header { display: flex; justify-content: space-between; align-items: center; }
+/* 页面特定样式 - 通用样式已移至 index.css */
 .step-header {
   display: flex;
   align-items: center;
@@ -154,5 +266,13 @@ onMounted(fetchDetail)
 .version-info {
   margin-bottom: 8px;
   font-weight: 500;
+}
+.task-type {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+}
+.error-message {
+  color: var(--el-color-danger);
+  font-size: 12px;
 }
 </style>

@@ -4,8 +4,6 @@ import type { ApiResponse } from '@/types/dto'
 
 export interface Repository {
   id: string
-  projectId: string
-  gitlabProjectId: number
   name: string
   cloneUrl: string
   defaultBranch: string
@@ -39,8 +37,6 @@ export interface BranchSummary {
 }
 
 export interface CreateRepoReq {
-  projectId: string
-  gitlabProjectId: number
   name: string
   cloneUrl: string
   defaultBranch: string
@@ -48,7 +44,6 @@ export interface CreateRepoReq {
 }
 
 export interface UpdateRepoReq {
-  gitlabProjectId: number
   name: string
   cloneUrl: string
   defaultBranch: string
@@ -67,13 +62,11 @@ export interface ApiPageResponse<T> {
 }
 
 export const repositoryApi = {
-  async list(query: PageQuery & { keyword?: string; projectId?: string; gitlabProjectId?: number | string }): Promise<PageResult<Repository>> {
+  async list(query: PageQuery & { keyword?: string }): Promise<PageResult<Repository>> {
     const params = {
       page: query.page - 1,
       size: query.pageSize,
-      keyword: query.keyword,
-      projectId: query.projectId,
-      gitlabProjectId: query.gitlabProjectId
+      keyword: query.keyword
     }
     const res = await http.get<ApiPageResponse<Repository[]>>('/v1/repositories/paged', { params })
     return {
@@ -104,11 +97,6 @@ export const repositoryApi = {
 
   async getBranchSummary(id: Id): Promise<BranchSummary> {
     const res = await http.get<ApiResponse<BranchSummary>>(`/v1/repositories/${id}/branch-summary`)
-    return res.data.data
-  },
-
-  async sync(id: Id): Promise<boolean> {
-    const res = await http.post<ApiResponse<boolean>>(`/v1/repositories/${id}/sync`)
     return res.data.data
   }
 }

@@ -34,6 +34,7 @@ export default {
     logout: 'Logout',
     refresh: 'Refresh',
     delete: 'Delete',
+    remove: 'Remove',
     noData: 'No Data',
     todo: 'TODO',
     pleaseEnter: 'Please enter ',
@@ -68,18 +69,19 @@ export default {
     plan: 'Plan',
     clear: 'Clear',
     loginRequired: 'Please login first',
-    close: 'Close'
+    close: 'Close',
+    maxLength: 'Maximum {max} characters'
   },
   dashboard: {
-    totalProjects: 'Total Projects',
-    activeWindows: 'Active Release Windows',
-    pendingApprovals: 'Pending Approvals',
-    recentScans: 'Recent Scans',
+    totalRepositories: 'Total Repositories',
+    totalIterations: 'Total Iterations',
+    activeWindows: 'Active Windows',
+    recentRuns: 'Recent Runs',
     recentActivity: 'Recent Activity',
     noActivity: 'No recent activity',
     quickActions: 'Quick Actions',
     newRelease: 'New Release',
-    runScan: 'Run Scan',
+    refresh: 'Refresh',
   },
   releaseWindow: {
     name: 'ReleaseWindow Name',
@@ -110,8 +112,15 @@ export default {
       enterName: 'Enter name',
       enterDesc: 'Enter description',
       enterWindowKey: 'Enter window key',
+      enterDescription: 'Enter description',
     },
     description: 'Description',
+    plannedReleaseAt: 'Planned Release',
+    attachIterations: 'Attach Iterations',
+    associatedIterations: 'Associated Iterations',
+    noIterations: 'No associated iterations',
+    noRepos: 'No associated repositories',
+    confirmDetach: 'Confirm to detach this iteration?',
     details: 'ReleaseWindow Details',
     editTitle: 'Edit ReleaseWindow',
     validation: {
@@ -122,11 +131,8 @@ export default {
     },
     statusText: {
       DRAFT: 'Draft',
-      INIT: 'Init',
-      OPEN: 'Open',
-      FROZEN: 'Frozen',
-      CLOSED: 'Closed',
-      PUBLISHED: 'Published'
+      PUBLISHED: 'Published',
+      CLOSED: 'Closed'
     },
     versionUpdate: {
       title: 'Execute Version Update',
@@ -152,6 +158,25 @@ export default {
       executing: 'Executing version update, please wait...',
       success: 'Version update started, Run ID: {runId}',
       failed: 'Version update failed, please check error message'
+    },
+    codeMerge: {
+      button: 'Code Merge',
+      title: 'Code Merge',
+      info: 'Merge latest code from feature branches to release branch',
+      mergeAll: 'Merge All Iterations',
+      mergeSingle: 'Merge Single Iteration',
+      selectIteration: 'Select iteration',
+      execute: 'Execute Merge',
+      sourceBranch: 'Source Branch',
+      targetBranch: 'Target Branch',
+      status: {
+        SUCCESS: 'Success',
+        CONFLICT: 'Conflict',
+        FAILED: 'Failed'
+      },
+      allSuccess: 'All repositories merged successfully',
+      hasConflict: 'Some repositories have conflicts, please resolve in GitLab',
+      hasFailed: 'Some repositories failed to merge, please check error messages'
     }
   },
   project: {
@@ -159,18 +184,26 @@ export default {
     noProject: 'No projects, please create first',
     selectTip: 'Please select a project/subproject',
     create: 'Create Project',
+    edit: 'Edit Project',
     name: 'Project Name',
+    namePlaceholder: 'Enter project name',
+    nameRequired: 'Project name is required',
     type: 'Type',
     status: 'Status',
+    statusActive: 'Active',
+    statusArchived: 'Archived',
     code: 'Code',
     repoUrl: 'Repo URL',
     buildTool: 'Build Tool',
     defaultBranch: 'Default Branch',
     description: 'Description',
+    descriptionPlaceholder: 'Enter project description',
     keyword: 'Keyword',
     enterKeyword: 'Enter keyword',
     active: 'Active',
     archived: 'Archived',
+    archive: 'Archive',
+    archiveSuccess: 'Archived successfully',
     dateRange: 'Created Date',
   },
   branchRule: {
@@ -178,11 +211,22 @@ export default {
     pattern: 'Branch Pattern',
     type: 'Type',
     create: 'Add Rule',
+    edit: 'Edit Rule',
+    typeAllow: 'Allow',
+    typeBlock: 'Block',
+    namePlaceholder: 'Enter rule name',
+    patternPlaceholder: 'Enter branch pattern, e.g. feature/*',
+    nameRequired: 'Rule name is required',
+    patternRequired: 'Branch pattern is required',
+    typeRequired: 'Please select rule type',
   },
   versionPolicy: {
     name: 'Policy Name',
     strategy: 'Strategy',
+    scheme: 'Version Scheme',
+    bumpRule: 'Bump Rule',
     create: 'Add Policy',
+    builtInNote: 'Version policies are built-in. Supports SemVer (Semantic Versioning) and DATE (Date-based) schemes.',
   },
   versionOps: {
     scanConfig: 'Scan Configuration',
@@ -224,7 +268,9 @@ export default {
     confirmDelete: 'Are you sure to delete iteration "{key}"? This action cannot be undone',
     columns: {
       key: 'Iteration Key',
+      name: 'Iteration Name',
       description: 'Description',
+      expectedReleaseAt: 'Expected Release',
       repos: 'Repos',
       mountedWindows: 'Mounted Windows',
       attachAt: 'Latest Mount Time',
@@ -232,6 +278,7 @@ export default {
       updatedAt: 'Updated At'
     },
     detail: {
+      title: 'Iteration Detail',
       associatedRepos: 'Associated Repositories',
       noRepos: 'No repositories associated',
       addRepos: 'Add Repos',
@@ -239,18 +286,21 @@ export default {
       mountedWindows: 'Mounted Windows',
       attachToWindow: 'Attach to Window',
       orchestrateThisIteration: 'Orchestrate (this iteration)',
-      operations: 'Operations'
+      operations: 'Operations',
+      searchRepos: 'Search repository name',
+      alreadyAdded: 'Already Added',
+      selectedCount: '{count} new repositories selected',
+      noNewRepos: 'Please select at least one new repository'
     }
   },
   repository: {
     addOrSync: 'Add / Sync Repo',
-    searchPlaceholder: 'Search by name/URL/project/GitLab ID',
+    searchPlaceholder: 'Search by name/URL',
     sync: 'Sync',
     healthLabel: 'Health',
     columns: {
       repo: 'Repository',
-      projectId: 'Project ID',
-      gitlabProjectId: 'GitLab Project ID',
+      name: 'Repository Name',
       cloneUrl: 'Clone URL',
       defaultBranch: 'Default Branch',
       monoRepo: 'Mono Repo',
@@ -260,9 +310,7 @@ export default {
     gateSummary: 'Gate Summary',
     branchesMrSummary: 'Branches & MR Summary',
     placeholders: {
-      projectId: 'e.g. 12345',
       name: 'e.g. backend-service',
-      gitlabProjectId: 'e.g. 123456',
       cloneUrl: 'git@gitlab.com:group/project.git',
       defaultBranch: 'master or main'
     },
@@ -281,13 +329,12 @@ export default {
       closedMrs: 'Closed MRs'
     },
     gitlabMissing: 'Configure GitLab settings first',
+    gitlabUrlNotAvailable: 'GitLab URL not available',
     health: {
       healthy: 'Healthy',
       risk: 'Risk'
     },
     validation: {
-      projectId: 'Project ID max 36 chars',
-      gitlabId: 'GitLab project ID is required',
       name: 'Name max 128 chars',
       cloneUrl: 'Clone URL max 512 chars',
       defaultBranch: 'Default branch max 128 chars'
@@ -348,7 +395,9 @@ export default {
     },
     labels: {
       baseUrl: 'Base URL',
-      token: 'Token'
+      token: 'Token',
+      featureTemplate: 'Feature Branch Template',
+      releaseTemplate: 'Release Branch Template'
     },
     buttons: {
       testConnection: 'Test Connection'

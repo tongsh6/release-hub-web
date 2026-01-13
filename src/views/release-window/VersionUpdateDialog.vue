@@ -190,7 +190,6 @@ const handleSubmit = async () => {
       handleClose()
     } catch (err) {
       handleError(err)
-      ElMessage.error(t('releaseWindow.versionUpdate.failed'))
     } finally {
       submitting.value = false
     }

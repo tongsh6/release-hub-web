@@ -34,7 +34,7 @@
       </el-table-column>
       <el-table-column prop="createdAt" label="Created At" width="180">
         <template #default="{ row }">
-          {{ new Date(row.createdAt).toLocaleString() }}
+          {{ formatDateTime(row.createdAt) }}
         </template>
       </el-table-column>
       <el-table-column label="Actions" width="220" fixed="right">
@@ -64,6 +64,7 @@ import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
 import ProjectDialog from './ProjectDialog.vue'
 import { projectApi, type Project } from '@/api/mock/projectApi'
+import { formatDateTime } from '@/utils/date'
 
 const router = useRouter()
 const dialogRef = ref<InstanceType<typeof ProjectDialog>>()

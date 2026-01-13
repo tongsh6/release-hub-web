@@ -1,14 +1,10 @@
 <template>
-  <div class="repository-list-page">
+  <div class="repository-list-page list-page">
     <SearchForm :loading="loading" @search="search" @reset="reset">
       <el-form-item :label="t('common.keyword')">
         <el-input v-model="query.keyword" :placeholder="t('repository.searchPlaceholder')" clearable />
       </el-form-item>
     </SearchForm>
-
-    <div class="mb-4">
-      <el-button v-perm.disable="'repository:write'" type="primary" @click="openCreate">{{ t('repository.addOrSync') }}</el-button>
-    </div>
 
     <DataTable
       :loading="loading"
@@ -19,9 +15,11 @@
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
+      <template #actions>
+        <el-button v-perm.disable="'repository:write'" type="primary" @click="openCreate">{{ t('repository.addOrSync') }}</el-button>
+      </template>
       <el-table-column prop="name" :label="t('repository.columns.repo')" min-width="200" />
-      <el-table-column prop="projectId" :label="t('repository.columns.projectId')" width="140" />
-      <el-table-column prop="gitlabProjectId" :label="t('repository.columns.gitlabProjectId')" width="140" />
+      <el-table-column prop="cloneUrl" :label="t('repository.columns.cloneUrl')" min-width="200" />
       <el-table-column prop="defaultBranch" :label="t('repository.columns.defaultBranch')" width="140" />
       <el-table-column :label="t('repository.healthLabel')" width="200">
         <template #default="{ row }">
@@ -32,10 +30,9 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" width="260" fixed="right">
+      <el-table-column :label="t('common.actions')" width="200" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-          <el-button v-perm.disable="'repository:write'" link size="small" type="success" @click="sync(row)">{{ t('repository.sync') }}</el-button>
           <el-button v-perm.disable="'repository:write'" link size="small" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
         </template>
       </el-table-column>
@@ -86,28 +83,9 @@ function openEdit(row: any) {
   }
   editRef.value?.open(row)
 }
-
-async function sync(row: any) {
-  if (!hasPerm('repository:write')) {
-    ElMessage.warning(t('common.permissionDenied'))
-    return
-  }
-  try {
-    await repositoryApi.sync(row.id)
-    ElMessage.success(t('common.success'))
-    search()
-  } catch (e: any) {
-    console.error(e)
-    const msg = e?.code === 'GITLAB_SETTINGS_MISSING' ? t('repository.gitlabMissing') : t('common.requestFailed')
-    ElMessage.error(msg)
-  }
-}
 </script>
 
 <style scoped>
-.mb-4 {
-  margin-bottom: 16px;
-}
 .health-metrics {
   margin-left: 8px;
   color: #909399;

@@ -9,8 +9,7 @@ const runner = new TestRunner()
 // 期望的表格列
 const EXPECTED_COLUMNS = {
   name: '仓库',
-  projectId: '项目ID',
-  gitlabProjectId: 'GitLab 项目ID',
+  cloneUrl: '仓库地址',
   defaultBranch: '默认分支',
   health: '健康',
   actions: '操作'
@@ -456,8 +455,7 @@ runner.test('仓库分支MR摘要显示正确', async () => {
 const I18N_TEXTS = {
   columns: {
     repo: { zh: '仓库', en: 'Repo' },
-    projectId: { zh: '项目ID', en: 'Project ID' },
-    gitlabProjectId: { zh: 'GitLab 项目ID', en: 'GitLab Project ID' },
+    cloneUrl: { zh: '仓库地址', en: 'Clone URL' },
     defaultBranch: { zh: '默认分支', en: 'Default Branch' },
     health: { zh: '健康', en: 'Health' },
     actions: { zh: '操作', en: 'Actions' }

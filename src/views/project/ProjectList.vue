@@ -1,10 +1,20 @@
 <template>
-  <div class="branch-rule-list-page list-page">
+  <div class="project-list-page">
     <SearchForm :loading="loading" @search="search" @reset="reset">
-      <el-form-item :label="t('branchRule.name')">
-        <el-input v-model="query.name" :placeholder="t('branchRule.name')" clearable />
+      <el-form-item :label="t('project.name')">
+        <el-input v-model="query.name" :placeholder="t('project.namePlaceholder')" clearable />
+      </el-form-item>
+      <el-form-item :label="t('project.status')">
+        <el-select v-model="query.status" :placeholder="t('common.pleaseSelect')" clearable>
+          <el-option :label="t('project.statusActive')" value="ACTIVE" />
+          <el-option :label="t('project.statusArchived')" value="ARCHIVED" />
+        </el-select>
       </el-form-item>
     </SearchForm>
+
+    <div class="mb-4">
+      <el-button type="primary" :icon="Plus" @click="handleAdd">{{ t('project.create') }}</el-button>
+    </div>
 
     <DataTable
       :loading="loading"
@@ -15,28 +25,31 @@
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
-      <template #actions>
-        <el-button type="primary" :icon="Plus" @click="handleAdd">{{ t('branchRule.create') }}</el-button>
-      </template>
-      <el-table-column prop="id" label="ID" width="280" />
-      <el-table-column prop="name" :label="t('branchRule.name')" min-width="150" />
-      <el-table-column prop="pattern" :label="t('branchRule.pattern')" min-width="150" />
-      <el-table-column prop="type" :label="t('branchRule.type')" width="120">
+      <el-table-column prop="id" label="ID" width="300" />
+      <el-table-column prop="name" :label="t('project.name')" min-width="150" />
+      <el-table-column prop="description" :label="t('project.description')" min-width="200" show-overflow-tooltip />
+      <el-table-column prop="status" :label="t('project.status')" width="120">
         <template #default="{ row }">
-          <el-tag :type="row.type === 'ALLOW' ? 'success' : 'danger'">
-            {{ row.type === 'ALLOW' ? t('branchRule.typeAllow') : t('branchRule.typeBlock') }}
+          <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'">
+            {{ row.status === 'ACTIVE' ? t('project.statusActive') : t('project.statusArchived') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" width="150" fixed="right">
+      <el-table-column :label="t('common.actions')" width="200" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleEdit(row)">{{ t('common.edit') }}</el-button>
+          <el-button 
+            v-if="row.status === 'ACTIVE'" 
+            link type="warning" 
+            size="small" 
+            @click="handleArchive(row)"
+          >{{ t('project.archive') }}</el-button>
           <el-popconfirm
             :title="t('common.deleteConfirm')"
             @confirm="handleDelete(row)"
           >
             <template #reference>
-          <el-button link type="danger" size="small">{{ t('common.delete') }}</el-button>
+              <el-button link type="danger" size="small">{{ t('common.delete') }}</el-button>
             </template>
           </el-popconfirm>
         </template>
@@ -46,22 +59,16 @@
     <!-- 新增/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="isEdit ? t('branchRule.edit') : t('branchRule.create')"
+      :title="isEdit ? t('project.edit') : t('project.create')"
       width="500px"
       @closed="resetForm"
     >
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="t('branchRule.name')" prop="name">
-          <el-input v-model="form.name" :placeholder="t('branchRule.namePlaceholder')" />
+        <el-form-item :label="t('project.name')" prop="name">
+          <el-input v-model="form.name" :placeholder="t('project.namePlaceholder')" />
         </el-form-item>
-        <el-form-item :label="t('branchRule.pattern')" prop="pattern">
-          <el-input v-model="form.pattern" :placeholder="t('branchRule.patternPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('branchRule.type')" prop="type">
-          <el-radio-group v-model="form.type">
-            <el-radio value="ALLOW">{{ t('branchRule.typeAllow') }}</el-radio>
-            <el-radio value="BLOCK">{{ t('branchRule.typeBlock') }}</el-radio>
-          </el-radio-group>
+        <el-form-item :label="t('project.description')" prop="description">
+          <el-input v-model="form.description" type="textarea" :rows="3" :placeholder="t('project.descriptionPlaceholder')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -80,15 +87,16 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
-import { branchRuleApi, type BranchRule } from '@/api/branchRuleApi'
+import { projectApi, type Project } from '@/api/projectApi'
 import { handleError } from '@/utils/error'
 
 const { t } = useI18n()
 
 const { query, loading, list, total, search, reset, onPageChange, onPageSizeChange, reload } = useListPage({
-  fetcher: branchRuleApi.list,
+  fetcher: projectApi.list,
   defaultQuery: {
-    name: ''
+    name: '',
+    status: ''
   }
 })
 
@@ -100,14 +108,11 @@ const formRef = ref<FormInstance>()
 
 const form = reactive({
   name: '',
-  pattern: '',
-  type: 'ALLOW' as 'ALLOW' | 'BLOCK'
+  description: ''
 })
 
 const rules: FormRules = {
-  name: [{ required: true, message: t('branchRule.nameRequired'), trigger: 'blur' }],
-  pattern: [{ required: true, message: t('branchRule.patternRequired'), trigger: 'blur' }],
-  type: [{ required: true, message: t('branchRule.typeRequired'), trigger: 'change' }]
+  name: [{ required: true, message: t('project.nameRequired'), trigger: 'blur' }]
 }
 
 const handleAdd = () => {
@@ -116,18 +121,27 @@ const handleAdd = () => {
   dialogVisible.value = true
 }
 
-const handleEdit = (row: BranchRule) => {
+const handleEdit = (row: Project) => {
   isEdit.value = true
   editId.value = row.id
   form.name = row.name
-  form.pattern = row.pattern
-  form.type = row.type
+  form.description = row.description || ''
   dialogVisible.value = true
 }
 
-const handleDelete = async (row: BranchRule) => {
+const handleArchive = async (row: Project) => {
   try {
-    await branchRuleApi.remove(row.id)
+    await projectApi.archive(row.id)
+    ElMessage.success(t('project.archiveSuccess'))
+    reload()
+  } catch (e) {
+    handleError(e)
+  }
+}
+
+const handleDelete = async (row: Project) => {
+  try {
+    await projectApi.remove(row.id)
     ElMessage.success(t('common.deleteSuccess'))
     reload()
   } catch (e) {
@@ -142,10 +156,10 @@ const handleSave = async () => {
   saving.value = true
   try {
     if (isEdit.value) {
-      await branchRuleApi.update(editId.value, form)
+      await projectApi.update(editId.value, form)
       ElMessage.success(t('common.updateSuccess'))
     } else {
-      await branchRuleApi.create(form)
+      await projectApi.create(form)
       ElMessage.success(t('common.createSuccess'))
     }
     dialogVisible.value = false
@@ -159,12 +173,13 @@ const handleSave = async () => {
 
 const resetForm = () => {
   form.name = ''
-  form.pattern = ''
-  form.type = 'ALLOW'
+  form.description = ''
   formRef.value?.resetFields()
 }
 </script>
 
 <style scoped>
-/* 页面特定样式 - 通用样式已移至 index.css */
+.mb-4 {
+  margin-bottom: 16px;
+}
 </style>

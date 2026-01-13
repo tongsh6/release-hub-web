@@ -42,6 +42,7 @@ import { useI18n } from 'vue-i18n'
 import EntityDialog from '@/components/common/EntityDialog.vue'
 import { groupApi, type GroupView } from '@/api/modules/group'
 import { useDialogForm } from '@/composables/crud/useDialogForm'
+import { handleError } from '@/utils/error'
 
 const { t } = useI18n()
 const emit = defineEmits<{ (e: 'success'): void }>()
@@ -77,7 +78,7 @@ const {
       })
       ElMessage.success(t('group.createSuccess'))
     } catch (error) {
-      ElMessage.error(t('group.createFailed'))
+      handleError(error)
       throw error
     }
   },
@@ -90,7 +91,7 @@ const {
       })
       ElMessage.success(t('group.updateSuccess'))
     } catch (error) {
-      ElMessage.error(t('group.updateFailed'))
+      handleError(error)
       throw error
     }
   },

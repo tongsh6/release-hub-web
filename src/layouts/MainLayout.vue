@@ -164,10 +164,6 @@ const logout = () => {
   align-items: center;
 }
 
-.mr-4 {
-  margin-right: 16px;
-}
-
 /* 右侧主区域允许自适应，并防止内容把布局撑坏（关键） */
 .rh-main {
   flex: 1 1 auto;

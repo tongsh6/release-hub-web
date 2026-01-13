@@ -1,5 +1,10 @@
 <template>
   <div class="data-table-wrapper">
+    <!-- 操作按钮区域 -->
+    <div v-if="$slots.actions" class="table-actions">
+      <slot name="actions" />
+    </div>
+
     <el-table
       v-loading="loading"
       :data="data"
@@ -67,6 +72,12 @@ const handleSizeChange = (val: number) => {
   background-color: #fff;
   padding: 16px;
   border-radius: 4px;
+}
+.table-actions {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 .pagination-wrapper {
   margin-top: 16px;

@@ -26,33 +26,22 @@
             <div class="tree-node">
               <span class="node-label">{{ data.name }}</span>
               <span class="node-code">{{ data.code }}</span>
-              <div class="node-actions">
-                <el-button link type="primary" @click.stop="handleView(data)">{{ t('common.detail') }}</el-button>
-                <el-button 
-                  v-perm.disable="'group:write'" 
-                  link 
-                  type="primary" 
-                  @click.stop="handleEdit(data)"
-                >
-                  {{ t('common.edit') }}
+              <el-dropdown class="node-actions" trigger="click" @command="(cmd: string) => handleCommand(cmd, data)">
+                <el-button link type="primary" @click.stop>
+                  {{ t('common.actions') }}
+                  <el-icon class="el-icon--right"><ArrowDown /></el-icon>
                 </el-button>
-                <el-button 
-                  v-perm.disable="'group:write'" 
-                  link 
-                  type="success" 
-                  @click.stop="handleCreateChild(data)"
-                >
-                  {{ t('group.createChild') }}
-                </el-button>
-                <el-button 
-                  v-perm.disable="'group:delete'" 
-                  link 
-                  type="danger" 
-                  @click.stop="handleDelete(data)"
-                >
-                  {{ t('common.delete') }}
-                </el-button>
-              </div>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="view">{{ t('common.detail') }}</el-dropdown-item>
+                    <el-dropdown-item command="edit" :disabled="!hasPerm('group:write')">{{ t('common.edit') }}</el-dropdown-item>
+                    <el-dropdown-item command="createChild" :disabled="!hasPerm('group:write')">{{ t('group.createChild') }}</el-dropdown-item>
+                    <el-dropdown-item command="delete" divided :disabled="!hasPerm('group:delete')">
+                      <span class="text-danger">{{ t('common.delete') }}</span>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </div>
           </template>
         </el-tree>
@@ -98,12 +87,14 @@ import { ref, watch, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ElTree } from 'element-plus'
 import { useI18n } from 'vue-i18n'
+import { ArrowDown } from '@element-plus/icons-vue'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import { groupApi, type GroupNode } from '@/api/modules/group'
 import GroupDialog from './GroupDialog.vue'
 import { useGroupTree } from '@/composables/useGroupTree'
 import { hasPerm } from '@/utils/perm'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import { handleError } from '@/utils/error'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -151,6 +142,23 @@ const handleNodeClick = (node: GroupNode) => {
   onNodeClick(node)
 }
 
+const handleCommand = (command: string, node: GroupNode) => {
+  switch (command) {
+    case 'view':
+      handleView(node)
+      break
+    case 'edit':
+      handleEdit(node)
+      break
+    case 'createChild':
+      handleCreateChild(node)
+      break
+    case 'delete':
+      handleDelete(node)
+      break
+  }
+}
+
 const handleView = (node: GroupNode) => {
   router.push({ name: 'GroupDetail', params: { id: node.id } })
 }
@@ -190,10 +198,9 @@ const handleDelete = async (node: GroupNode) => {
     ElMessage.success(t('group.deleteSuccess'))
     await loadTree()
   } catch (error: any) {
-    if (error === 'cancel') return
-    const message = (error?.code === 'GROUP_DELETE_HAS_CHILDREN') ? t('group.deleteBlocked') : t('common.requestFailed')
-    ElMessage.error(message)
-    console.error(error)
+    if (error !== 'cancel') {
+      handleError(error)
+    }
   }
 }
 
@@ -235,8 +242,10 @@ onMounted(loadTree)
 }
 .node-actions {
   margin-left: auto;
-  display: flex;
-  gap: 6px;
+}
+
+.text-danger {
+  color: var(--el-color-danger);
 }
 .detail-card {
   margin: 12px;

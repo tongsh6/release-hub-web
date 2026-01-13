@@ -1,16 +1,15 @@
 <template>
   <div class="page-container">
+    <div class="page-header">
+      <el-button :icon="ArrowLeft" @click="goBack">{{ t('common.back') }}</el-button>
+      <span class="page-title">{{ detail?.name || t('repository.columns.repo') }}</span>
+      <div class="page-actions">
+        <el-button @click="handleSync" :loading="syncing">{{ t('common.sync') }}</el-button>
+        <el-button @click="refresh">{{ t('common.refresh') }}</el-button>
+        <el-button type="primary" @click="openGitLab" :disabled="!gitlabUrl">{{ t('repository.openGitLab') }}</el-button>
+      </div>
+    </div>
     <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>{{ t('repository.columns.repo') }}: {{ repoId }}</span>
-          <div>
-            <el-button @click="handleSync" :loading="syncing">{{ t('common.sync') }}</el-button>
-            <el-button @click="refresh">{{ t('common.refresh') }}</el-button>
-            <el-button type="primary">{{ t('repository.openGitLab') }}</el-button>
-          </div>
-        </div>
-      </template>
       <div class="mb-2">{{ t('repository.gateSummary') }}</div>
       <el-descriptions :column="2" border>
         <el-descriptions-item :label="t('repository.gateSummaryLabels.protectedBranch')">
@@ -61,20 +60,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { ArrowLeft } from '@element-plus/icons-vue'
 import { repositoryApi, type Repository, type GateSummary, type BranchSummary } from '@/api/repositoryApi'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
+const router = useRouter()
 const repoId = route.params.repo as string
 const { t } = useI18n()
+
+const goBack = () => {
+  router.push({ name: 'Repositories' })
+}
 
 const detail = ref<Repository>()
 const gateSummary = ref<GateSummary>()
 const branchSummary = ref<BranchSummary>()
 const syncing = ref(false)
+
+/**
+ * 从 cloneUrl 解析出 GitLab Web URL
+ * 支持 SSH (git@gitlab.com:group/project.git) 和 HTTPS (https://gitlab.com/group/project.git) 格式
+ */
+const gitlabUrl = computed(() => {
+  const cloneUrl = detail.value?.cloneUrl
+  if (!cloneUrl) return ''
+  
+  // SSH 格式: git@gitlab.example.com:group/project.git
+  const sshMatch = cloneUrl.match(/^git@([^:]+):(.+?)(\.git)?$/)
+  if (sshMatch) {
+    const [, host, path] = sshMatch
+    return `https://${host}/${path}`
+  }
+  
+  // HTTPS 格式: https://gitlab.example.com/group/project.git
+  const httpsMatch = cloneUrl.match(/^https?:\/\/([^/]+)\/(.+?)(\.git)?$/)
+  if (httpsMatch) {
+    const [, host, path] = httpsMatch
+    return `https://${host}/${path}`
+  }
+  
+  // 如果无法解析，尝试直接打开（去掉 .git 后缀）
+  return cloneUrl.replace(/\.git$/, '')
+})
+
+/**
+ * 在新窗口打开 GitLab 仓库页面
+ */
+function openGitLab() {
+  if (gitlabUrl.value) {
+    window.open(gitlabUrl.value, '_blank')
+  } else {
+    ElMessage.warning(t('repository.gitlabUrlNotAvailable'))
+  }
+}
 
 async function handleSync() {
   if (!repoId) return
@@ -112,6 +154,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-container { padding: 20px; }
-.card-header { display: flex; justify-content: space-between; align-items: center; }
+/* 页面特定样式 - 通用样式已移至 index.css */
 </style>

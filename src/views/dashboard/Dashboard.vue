@@ -2,43 +2,43 @@
   <div class="dashboard-container">
     <el-row :gutter="20">
       <el-col :span="6">
-        <el-card shadow="hover">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
-              <span>{{ t('dashboard.totalProjects') }}</span>
+              <span>{{ t('dashboard.totalRepositories') }}</span>
             </div>
           </template>
-          <div class="card-value">12</div>
+          <div class="card-value">{{ stats?.totalRepositories ?? '-' }}</div>
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover">
+        <el-card shadow="hover" v-loading="loading">
+          <template #header>
+            <div class="card-header">
+              <span>{{ t('dashboard.totalIterations') }}</span>
+            </div>
+          </template>
+          <div class="card-value">{{ stats?.totalIterations ?? '-' }}</div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
               <span>{{ t('dashboard.activeWindows') }}</span>
             </div>
           </template>
-          <div class="card-value">3</div>
+          <div class="card-value">{{ stats?.activeWindows ?? '-' }}</div>
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
-              <span>{{ t('dashboard.pendingApprovals') }}</span>
+              <span>{{ t('dashboard.recentRuns') }}</span>
             </div>
           </template>
-          <div class="card-value">5</div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card shadow="hover">
-          <template #header>
-            <div class="card-header">
-              <span>{{ t('dashboard.recentScans') }}</span>
-            </div>
-          </template>
-          <div class="card-value">8</div>
+          <div class="card-value">{{ stats?.recentRuns ?? '-' }}</div>
         </el-card>
       </el-col>
     </el-row>
@@ -62,8 +62,8 @@
             </div>
           </template>
           <div class="quick-actions">
-            <el-button type="primary" plain>{{ t('dashboard.newRelease') }}</el-button>
-            <el-button type="success" plain>{{ t('dashboard.runScan') }}</el-button>
+            <el-button type="primary" plain @click="goToNewRelease">{{ t('dashboard.newRelease') }}</el-button>
+            <el-button type="success" plain @click="refresh">{{ t('dashboard.refresh') }}</el-button>
           </div>
         </el-card>
       </el-col>
@@ -72,9 +72,40 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { dashboardApi, type DashboardStats } from '@/api/dashboardApi'
+import { handleError } from '@/utils/error'
 
 const { t } = useI18n()
+const router = useRouter()
+
+const loading = ref(false)
+const stats = ref<DashboardStats>()
+
+async function fetchStats() {
+  loading.value = true
+  try {
+    stats.value = await dashboardApi.getStats()
+  } catch (e) {
+    handleError(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+function goToNewRelease() {
+  router.push('/release-windows')
+}
+
+function refresh() {
+  fetchStats()
+}
+
+onMounted(() => {
+  fetchStats()
+})
 </script>
 
 <style scoped>

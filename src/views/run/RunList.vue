@@ -1,5 +1,5 @@
 <template>
-  <div class="run-list-page">
+  <div class="run-list-page list-page">
     <SearchForm :loading="loading" @search="search" @reset="reset">
       <el-form-item :label="t('run.filters.windowKey')">
         <el-input v-model="query.windowKey" />
@@ -73,6 +73,7 @@ import { runApi } from '@/api/runApi'
 import { hasPerm } from '@/utils/perm'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
+import { handleError } from '@/utils/error'
 
 const userStore = useUserStore()
 const { t } = useI18n()
@@ -124,7 +125,7 @@ async function handleRetry(row: any) {
     search()
   } catch (e) {
     if (e !== 'cancel') {
-      console.error(e)
+      handleError(e)
     }
   }
 }

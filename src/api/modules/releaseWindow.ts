@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut } from '@/api/http'
+import { apiGet, apiPost } from '@/api/http'
 import type { BuildTool, PageQuery, PageResult } from '@/types/dto'
 
 const BASE = '/v1'
@@ -11,11 +11,11 @@ export interface ReleaseWindowView {
   id: string
   windowKey: string
   name: string
+  description?: string
+  plannedReleaseAt?: string
   status: ReleaseWindowStatus
   createdAt: string
   updatedAt: string
-  startAt?: string
-  endAt?: string
   frozen: boolean
   publishedAt?: string
 }
@@ -24,13 +24,9 @@ export interface ReleaseWindowView {
 export type ReleaseWindow = ReleaseWindowView
 
 export interface CreateReleaseWindowReq {
-  windowKey: string
   name: string
-}
-
-export interface ConfigureReleaseWindowReq {
-  startAt: string
-  endAt: string
+  description?: string
+  plannedReleaseAt?: string
 }
 
 export type PublishReleaseWindowReq = Record<string, never>
@@ -68,11 +64,6 @@ export function create(req: CreateReleaseWindowReq): Promise<ReleaseWindowView> 
   return apiPost<ReleaseWindowView>(`${BASE}/release-windows`, req)
 }
 
-// Note: Backend uses PUT /release-windows/{id}/window for configuration (startAt, endAt)
-export function configure(id: string, req: ConfigureReleaseWindowReq): Promise<ReleaseWindowView> {
-  return apiPut<ReleaseWindowView>(`${BASE}/release-windows/${id}/window`, req)
-}
-
 export function freeze(id: string): Promise<ReleaseWindowView> {
   return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/freeze`, {})
 }
@@ -89,28 +80,58 @@ export function closeWindow(id: string): Promise<ReleaseWindowView> {
   return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/close`, {})
 }
 
-export function attach(id: string, iterationKey: string): Promise<ReleaseWindowView> {
-  return apiPost<ReleaseWindowView>(`${BASE}/windows/${id}/attach`, { iterationKey })
+export function attach(id: string, iterationKey: string): Promise<string[]> {
+  return apiPost<string[]>(`${BASE}/release-windows/${id}/attach`, { iterationKeys: [iterationKey] })
 }
 
-export function detach(id: string): Promise<ReleaseWindowView> {
-  return apiPost<ReleaseWindowView>(`${BASE}/windows/${id}/detach`, {})
+export function detach(id: string, iterationKey: string): Promise<boolean> {
+  return apiPost<boolean>(`${BASE}/release-windows/${id}/detach`, { iterationKey })
+}
+
+export function listIterations(id: string): Promise<any[]> {
+  return apiGet<any[]>(`${BASE}/release-windows/${id}/iterations`)
 }
 
 export function orchestrate(id: string): Promise<any> {
-  return apiPost<any>(`${BASE}/windows/${id}/orchestrate`, {})
+  return apiPost<any>(`${BASE}/release-windows/${id}/orchestrate`, {})
 }
 
 export function getPlan(id: string): Promise<any> {
-  return apiGet<any>(`${BASE}/windows/${id}/plan`)
+  return apiGet<any>(`${BASE}/release-windows/${id}/plan`)
 }
 
 export function getDryPlan(id: string): Promise<any> {
-  return apiGet<any>(`${BASE}/windows/${id}/dry-plan`)
+  return apiGet<any>(`${BASE}/release-windows/${id}/dry-plan`)
 }
 
 export function executeVersionUpdate(id: string, req: VersionUpdateRequest): Promise<VersionUpdateResponse> {
   return apiPost<VersionUpdateResponse>(`${BASE}/release-windows/${id}/execute/version-update`, req)
+}
+
+// --- 代码合并相关 ---
+
+export interface CodeMergeResult {
+  repoId: string
+  repoName: string
+  sourceBranch: string
+  targetBranch: string
+  status: 'SUCCESS' | 'CONFLICT' | 'FAILED'
+  message?: string
+  mergedAt?: string
+}
+
+/**
+ * 合并指定迭代的代码到 release 分支
+ */
+export function mergeIteration(windowId: string, iterationKey: string): Promise<CodeMergeResult[]> {
+  return apiPost<CodeMergeResult[]>(`${BASE}/release-windows/${windowId}/iterations/${iterationKey}/merge`, {})
+}
+
+/**
+ * 批量合并所有迭代的代码到 release 分支
+ */
+export function mergeAll(windowId: string): Promise<CodeMergeResult[]> {
+  return apiPost<CodeMergeResult[]>(`${BASE}/release-windows/${windowId}/merge`, {})
 }
 
 // Alias for compatibility if needed, or prefer using explicit names above
@@ -118,15 +139,17 @@ export const releaseWindowApi = {
   list,
   get: getById,
   create,
-  configure,
   freeze,
   unfreeze,
   publish,
   close: closeWindow,
   attach,
   detach,
+  listIterations,
   orchestrate,
   getPlan,
   getDryPlan,
-  executeVersionUpdate
+  executeVersionUpdate,
+  mergeIteration,
+  mergeAll
 }

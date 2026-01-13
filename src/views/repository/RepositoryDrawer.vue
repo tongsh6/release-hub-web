@@ -115,18 +115,5 @@ defineExpose({
 </script>
 
 <style scoped>
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.mb-4 {
-  margin-bottom: 16px;
-}
-.mt-4 {
-  margin-top: 16px;
-}
-.mb-2 {
-  margin-bottom: 8px;
-}
+/* 页面特定样式 - 通用样式已移至 index.css */
 </style>

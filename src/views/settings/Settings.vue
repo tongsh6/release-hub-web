@@ -19,11 +19,11 @@
 
       <!-- Naming Tab -->
       <el-tab-pane :label="t('settings.tabs.naming')" name="naming">
-        <el-form :model="namingForm" label-width="140px" class="pane-card">
-          <el-form-item label="Feature Template">
+        <el-form :model="namingForm" label-width="160px" class="pane-card">
+          <el-form-item :label="t('settings.labels.featureTemplate')">
              <el-input v-model="namingForm.featureTemplate" placeholder="feature/{code}-{desc}" />
           </el-form-item>
-          <el-form-item label="Release Template">
+          <el-form-item :label="t('settings.labels.releaseTemplate')">
              <el-input v-model="namingForm.releaseTemplate" placeholder="release/{version}" />
           </el-form-item>
           <el-form-item>
@@ -63,6 +63,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { settingsApi, type GitLabSettings, type NamingSettings, type BlockingSettings } from '@/api/settingsApi'
+import { handleError } from '@/utils/error'
 
 const { t } = useI18n()
 const active = ref('gitlab')
@@ -87,6 +88,8 @@ const saveGitLab = async () => {
   try {
     await settingsApi.saveGitLab(gitlabForm.value)
     ElMessage.success(t('common.saveSuccess'))
+  } catch (error) {
+    handleError(error)
   } finally {
     saving.value = false
   }
@@ -97,6 +100,8 @@ const testGitLab = async () => {
   try {
     await settingsApi.testGitLab()
     ElMessage.success(t('common.success'))
+  } catch (error) {
+    handleError(error)
   } finally {
     testing.value = false
   }
@@ -116,6 +121,8 @@ const saveNaming = async () => {
   try {
     await settingsApi.saveNaming(namingForm.value)
     ElMessage.success(t('common.saveSuccess'))
+  } catch (error) {
+    handleError(error)
   } finally {
     saving.value = false
   }
@@ -135,6 +142,8 @@ const saveBlocking = async () => {
   try {
     await settingsApi.saveBlocking(blockingForm.value)
     ElMessage.success(t('common.saveSuccess'))
+  } catch (error) {
+    handleError(error)
   } finally {
     saving.value = false
   }

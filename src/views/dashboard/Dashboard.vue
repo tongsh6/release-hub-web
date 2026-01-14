@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <el-row :gutter="20">
       <el-col :span="6">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card v-loading="loading" shadow="hover">
           <template #header>
             <div class="card-header">
               <span>{{ t('dashboard.totalRepositories') }}</span>
@@ -12,7 +12,7 @@
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card v-loading="loading" shadow="hover">
           <template #header>
             <div class="card-header">
               <span>{{ t('dashboard.totalIterations') }}</span>
@@ -22,7 +22,7 @@
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card v-loading="loading" shadow="hover">
           <template #header>
             <div class="card-header">
               <span>{{ t('dashboard.activeWindows') }}</span>
@@ -32,7 +32,7 @@
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card v-loading="loading" shadow="hover">
           <template #header>
             <div class="card-header">
               <span>{{ t('dashboard.recentRuns') }}</span>

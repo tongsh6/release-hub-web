@@ -13,8 +13,8 @@
           v-model="keyword"
           :placeholder="t('common.keyword')"
           clearable
-          @keyup.enter="doSearch"
           style="width: 240px"
+          @keyup.enter="doSearch"
         />
         <el-button class="ml-8" type="primary" @click="doSearch">{{ t('common.search') }}</el-button>
         <el-button class="ml-8" @click="clearSelection">{{ t('common.clear') }}</el-button>

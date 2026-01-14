@@ -1,10 +1,10 @@
 <template>
-  <div class="page-container" v-loading="loading">
+  <div v-loading="loading" class="page-container">
     <div class="toolbar">
       <el-button type="primary" @click="fetchData">{{ t('common.refresh') }}</el-button>
     </div>
     <el-row :gutter="16">
-      <el-col :span="8" v-for="group in groups" :key="group.reasonKey">
+      <el-col v-for="group in groups" :key="group.reasonKey" :span="8">
         <el-card shadow="hover">
           <template #header>
             <div class="card-header">
@@ -44,7 +44,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { runApi, type RunDetail, type RunItem } from '@/api/runApi'
+import { runApi } from '@/api/runApi'
 import dayjs from 'dayjs'
 
 const { t } = useI18n()
@@ -93,13 +93,7 @@ const fetchData = async () => {
         if (item.finalResult === 'FAILED') {
           // Check last step for reason
           const lastStep = item.steps[item.steps.length - 1]
-          let reason = 'unknown'
-          let msg = lastStep?.message || 'Unknown error'
-          
-          if (msg.toLowerCase().includes('conflict')) reason = 'conflict'
-          else if (msg.toLowerCase().includes('pipeline')) reason = 'pipelineFailed'
-          else if (msg.toLowerCase().includes('approval')) reason = 'approvalRequired'
-          else reason = 'pipelineFailed' // default bucket for now
+          const msg = lastStep?.message || 'Unknown error'
           
           allBlockedItems.push({
             id: `${run.id}-${item.repo}-${item.iterationKey}`,

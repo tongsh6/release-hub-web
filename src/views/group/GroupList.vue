@@ -10,7 +10,7 @@
     </SearchForm>
 
     <el-container class="content">
-      <el-aside width="320px" class="tree-aside" v-loading="loading">
+      <el-aside v-loading="loading" width="320px" class="tree-aside">
         <el-tree
           v-if="hasTreeData"
           ref="treeRef"
@@ -69,7 +69,7 @@
               <span class="label">{{ t('group.code') }}</span>
               <span class="value">{{ selected!.code }}</span>
             </div>
-            <div class="detail-item" v-if="selected!.parentCode">
+            <div v-if="selected!.parentCode" class="detail-item">
               <span class="label">{{ t('group.parentCode') }}</span>
               <span class="value">{{ selected!.parentCode }}</span>
             </div>

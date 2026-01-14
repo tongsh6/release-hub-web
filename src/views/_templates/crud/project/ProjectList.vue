@@ -17,11 +17,11 @@
     </div>
 
     <DataTable
+      v-model:page="query.page"
+      v-model:page-size="query.pageSize"
       :loading="loading"
       :data="list"
       :total="total"
-      v-model:page="query.page"
-      v-model:page-size="query.pageSize"
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
@@ -58,7 +58,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
 import DataTable from '@/components/crud/DataTable.vue'
@@ -66,7 +65,6 @@ import ProjectDialog from './ProjectDialog.vue'
 import { projectApi, type Project } from '@/api/mock/projectApi'
 import { formatDateTime } from '@/utils/date'
 
-const router = useRouter()
 const dialogRef = ref<InstanceType<typeof ProjectDialog>>()
 
 const { query, loading, list, total, fetch, search, reset, onPageChange, onPageSizeChange } = useListPage({

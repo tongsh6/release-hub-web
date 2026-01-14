@@ -7,11 +7,11 @@
     </SearchForm>
 
     <DataTable
+      v-model:page="query.page"
+      v-model:page-size="query.pageSize"
       :loading="loading"
       :data="list"
       :total="total"
-      v-model:page="query.page"
-      v-model:page-size="query.pageSize"
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
@@ -66,8 +66,8 @@
           </el-button>
           
           <el-button 
-            v-perm.disable="'release-window:write'"
             v-if="row.status === 'DRAFT' && !row.frozen"
+            v-perm.disable="'release-window:write'"
             link 
             type="warning"
             @click="handleFreeze(row)"
@@ -76,8 +76,8 @@
           </el-button>
           
           <el-button 
-            v-perm.disable="'release-window:write'"
             v-if="row.frozen && row.status === 'DRAFT'"
+            v-perm.disable="'release-window:write'"
             link 
             @click="handleUnfreeze(row)"
           >
@@ -85,8 +85,8 @@
           </el-button>
 
           <el-button 
-            v-perm.disable="'release-window:write'"
             v-if="row.status === 'DRAFT'"
+            v-perm.disable="'release-window:write'"
             link 
             type="success"
             @click="handlePublish(row)"
@@ -95,8 +95,8 @@
           </el-button>
           
           <el-button 
-            v-perm.disable="'release-window:write'"
             v-if="row.status === 'PUBLISHED'"
+            v-perm.disable="'release-window:write'"
             link 
             type="danger"
             @click="handleClose(row)"
@@ -133,24 +133,8 @@ const router = useRouter()
 const dialogRef = ref<InstanceType<typeof ReleaseWindowDialog>>()
 const attachDialogRef = ref<InstanceType<typeof AttachIterationsDialog>>()
 
-// Since backend returns all items, we handle pagination client-side or just show all for now
-// The useListPage hook assumes server-side pagination usually, but let's adapt it.
-// Current backend API list() returns Array, useListPage expects PageResult.
-// We need a wrapper.
 const listFetcher = async (q: any) => {
-  const data = await releaseWindowApi.list(q)
-  // Ensure data is an array before filtering
-  const arrayData = Array.isArray(data) ? data : []
-  
-  // Client-side filtering if needed
-  let filtered = arrayData
-  if (q.name) {
-    filtered = arrayData.filter(item => item.name.toLowerCase().includes(q.name.toLowerCase()))
-  }
-  return {
-    list: filtered,
-    total: filtered.length
-  }
+  return releaseWindowApi.list(q)
 }
 
 const { query, loading, list, total, fetch, search, reset, onPageChange, onPageSizeChange } = useListPage({

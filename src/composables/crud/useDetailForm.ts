@@ -1,4 +1,4 @@
-import { ref, reactive, toRaw } from 'vue'
+import { ref, toRaw } from 'vue'
 import type { CrudMode, Id } from '@/types/crud'
 
 interface UseDetailFormOptions<T> {

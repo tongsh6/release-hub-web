@@ -2,7 +2,7 @@
  * 发布窗口页面 E2E 测试
  * 包含字段显示验证
  */
-import { TestRunner, PageHelper, Assertions, delay } from '../utils/test-helper'
+import { TestRunner, delay } from '../utils/test-helper'
 
 const runner = new TestRunner()
 
@@ -129,7 +129,7 @@ runner.test('发布窗口列表表头字段显示正确', async () => {
   
   // 验证表头
   const expectedHeaders = Object.values(EXPECTED_COLUMNS)
-  const { found, missing } = await verifyTableHeaders(expectedHeaders)
+  const { found } = await verifyTableHeaders(expectedHeaders)
   
   // 至少需要有窗口标识/名称和操作列
   const hasKeyOrName = found.includes('发布窗口标识') || found.includes('名称') || found.some(h => h.includes('Key') || h.includes('Name'))
@@ -149,13 +149,12 @@ runner.test('发布窗口列表数据字段显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/release-windows')
   await delay(1000)
   
   // 验证数据行
-  const { rowCount, hasData } = await verifyTableRowData()
+  const { rowCount } = await verifyTableRowData()
   
   if (rowCount > 0) {
     // 验证第一行的具体字段
@@ -204,7 +203,6 @@ runner.test('发布窗口状态标签显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/release-windows')
   await delay(1000)
@@ -250,7 +248,6 @@ runner.test('创建发布窗口对话框字段显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/release-windows')
   await delay(1000)
@@ -314,7 +311,6 @@ runner.test('发布窗口详情页字段显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/release-windows')
   await delay(1000)
@@ -341,8 +337,6 @@ runner.test('发布窗口详情页字段显示正确', async () => {
       
       // 验证详情页元素
       const hasDescriptions = await helper.elementExists('.el-descriptions')
-      const hasCards = await helper.elementExists('.el-card')
-      
       if (hasDescriptions) {
         const descItems = await page.$$('.el-descriptions-item')
         console.log(`Found ${descItems.length} description items`)
@@ -377,8 +371,6 @@ runner.test('发布窗口列表操作按钮完整', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
-  
   await helper.navigate('/release-windows')
   await delay(1000)
   
@@ -417,8 +409,6 @@ runner.test('发布窗口搜索功能正常工作', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
-  
   await helper.navigate('/release-windows')
   await delay(1000)
   
@@ -450,7 +440,6 @@ runner.test('重置搜索条件', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/release-windows')
   await delay(1000)
@@ -524,7 +513,6 @@ runner.test('发布窗口列表表头国际化验证', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/release-windows')
   await delay(1000)
@@ -563,7 +551,6 @@ runner.test('发布窗口列表按钮国际化验证', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/release-windows')
   await delay(1000)

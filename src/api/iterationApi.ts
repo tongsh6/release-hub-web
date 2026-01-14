@@ -1,5 +1,6 @@
 import type { PageResult, PageQuery } from '@/types/crud'
-import { apiGet, apiPost, apiPut, apiDel } from '@/api/http'
+import { apiGet, apiPost, apiPut, apiDel, http } from '@/api/http'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 // 迭代仓库版本信息
 export interface IterationRepoVersionInfo {
@@ -70,34 +71,16 @@ function transformIteration(raw: IterationRaw): Iteration {
 
 export const iterationApi = {
   async list(query: PageQuery & { keyword?: string }): Promise<PageResult<Iteration>> {
-    const resp = await apiGet<IterationRaw[]>('/v1/iterations')
-    
-    let rawList: IterationRaw[] = []
-    
-    // 处理不同的响应格式
-    if (Array.isArray(resp)) {
-      rawList = resp
-    } else if (resp && typeof resp === 'object') {
-      // 如果是对象，可能是分页格式
-      rawList = (resp as any).list || (resp as any).data || []
+    const params = {
+      page: query.page,
+      size: query.pageSize,
+      keyword: query.keyword
     }
-    
-    // 转换数据格式
-    let list = rawList.map(transformIteration)
-    
-    // 客户端过滤
-    if (query.keyword) {
-      const keyword = query.keyword.toLowerCase()
-      list = list.filter(item => 
-        item.iterationKey.toLowerCase().includes(keyword) ||
-        item.name?.toLowerCase().includes(keyword) ||
-        item.description?.toLowerCase().includes(keyword)
-      )
-    }
-    
-    return { 
-      list, 
-      total: list.length 
+    const res = await http.get<ApiPageResponse<IterationRaw[]>>('/v1/iterations/paged', { params })
+    const list = (res.data.data || []).map(transformIteration)
+    return {
+      list,
+      total: res.data.page.total
     }
   },
 

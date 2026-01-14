@@ -1,5 +1,4 @@
 import { apiGet, apiPost, apiPut } from '@/api/http'
-import type { ApiResponse } from '@/types/dto'
 import type { Status, BuildTool } from '@/types/dto'
 
 export interface ProjectDTO {

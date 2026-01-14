@@ -1,5 +1,5 @@
 <template>
-  <div class="release-window-detail-page page-container" v-loading="loading">
+  <div v-loading="loading" class="release-window-detail-page page-container">
     <div class="page-header">
       <el-button :icon="ArrowLeft" @click="goBack">{{ t('common.back') }}</el-button>
       <span class="page-title">{{ title }}</span>
@@ -81,14 +81,14 @@
          <el-descriptions-item :label="t('releaseWindow.updatedAt')">
           {{ formatDateTime(form.updatedAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('releaseWindow.publishedAt')" v-if="form.publishedAt">
+        <el-descriptions-item v-if="form.publishedAt" :label="t('releaseWindow.publishedAt')">
           {{ formatDateTime(form.publishedAt) }}
         </el-descriptions-item>
       </el-descriptions>
     </el-card>
 
     <!-- 关联迭代卡片 -->
-    <el-card style="margin-top: 16px;" v-loading="iterationsLoading">
+    <el-card v-loading="iterationsLoading" style="margin-top: 16px;">
       <template #header>
         <div class="card-header">
           <span class="title">{{ t('releaseWindow.associatedIterations') }} ({{ iterations.length }})</span>
@@ -106,7 +106,7 @@
               <div class="iteration-header">
                 <span class="iteration-name">{{ iter.name || iter.key }}</span>
                 <el-tag size="small" type="info" style="margin-left: 8px;">{{ iter.key }}</el-tag>
-                <span class="iteration-meta" v-if="iter.expectedReleaseAt">
+                <span v-if="iter.expectedReleaseAt" class="iteration-meta">
                   {{ t('iteration.columns.expectedReleaseAt') }}: {{ formatDate(iter.expectedReleaseAt) }}
                 </span>
                 <span class="repo-count">{{ t('iteration.columns.repos') }}: {{ iter.repos?.length || 0 }}</span>
@@ -158,7 +158,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { releaseWindowApi, type ReleaseWindow } from '@/api/modules/releaseWindow'
-import { iterationApi, type Iteration } from '@/api/iterationApi'
+import { iterationApi } from '@/api/iterationApi'
 import { repositoryApi, type Repository } from '@/api/repositoryApi'
 import { handleError } from '@/utils/error'
 import { hasPerm } from '@/utils/perm'

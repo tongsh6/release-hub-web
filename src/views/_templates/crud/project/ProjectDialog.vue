@@ -8,10 +8,10 @@
   >
     <el-form
       ref="formRef"
+      v-loading="loading"
       :model="form"
       :rules="rules"
       label-width="100px"
-      v-loading="loading"
       :disabled="mode === 'view'"
     >
       <el-form-item label="Name" prop="name">
@@ -27,7 +27,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="Status" prop="status" v-if="mode !== 'create'">
+      <el-form-item v-if="mode !== 'create'" label="Status" prop="status">
         <el-radio-group v-model="form.status">
           <el-radio value="active">Active</el-radio>
           <el-radio value="frozen">Frozen</el-radio>

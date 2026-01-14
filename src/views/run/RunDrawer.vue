@@ -6,7 +6,7 @@
     destroy-on-close
     @opened="fetchDetail"
   >
-    <div class="drawer-content" v-loading="loading">
+    <div v-loading="loading" class="drawer-content">
       <el-card shadow="never" class="mb-4">
         <template #header>
           <div class="card-header">

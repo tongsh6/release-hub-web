@@ -47,7 +47,6 @@ import {
   Setting,
   Files,
   Monitor,
-  HomeFilled,
   DataBoard,
   Calendar,
   Collection,

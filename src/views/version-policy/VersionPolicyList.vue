@@ -15,11 +15,11 @@
     />
 
     <DataTable
+      v-model:page="query.page"
+      v-model:page-size="query.pageSize"
       :loading="loading"
       :data="list"
       :total="total"
-      v-model:page="query.page"
-      v-model:page-size="query.pageSize"
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >

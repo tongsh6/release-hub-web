@@ -5,7 +5,7 @@
         <el-input v-model="query.windowKey" />
       </el-form-item>
       <el-form-item :label="t('run.filters.repo')">
-        <el-input v-model="query.repo" />
+        <el-input v-model="query.repoId" />
       </el-form-item>
       <el-form-item :label="t('run.filters.iterationKey')">
         <el-input v-model="query.iterationKey" />
@@ -13,17 +13,19 @@
       <el-form-item :label="t('run.filters.status')">
         <el-select v-model="query.status" clearable style="width: 160px">
           <el-option label="FAILED" value="FAILED" />
-          <el-option label="MERGE_BLOCKED" value="MERGE_BLOCKED" />
+          <el-option label="SUCCESS" value="SUCCESS" />
+          <el-option label="RUNNING" value="RUNNING" />
+          <el-option label="COMPLETED" value="COMPLETED" />
         </el-select>
       </el-form-item>
     </SearchForm>
 
     <DataTable
+      v-model:page="query.page"
+      v-model:page-size="query.pageSize"
       :loading="loading"
       :data="list"
       :total="total"
-      v-model:page="query.page"
-      v-model:page-size="query.pageSize"
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
@@ -83,7 +85,7 @@ const { query, loading, list, total, search, reset, onPageChange, onPageSizeChan
   fetcher: runApi.list,
   defaultQuery: {
     windowKey: '',
-    repo: '',
+    repoId: '',
     iterationKey: '',
     status: ''
   }

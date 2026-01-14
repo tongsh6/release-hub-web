@@ -7,11 +7,11 @@
     </SearchForm>
 
     <DataTable
+      v-model:page="query.page"
+      v-model:page-size="query.pageSize"
       :loading="loading"
       :data="list"
       :total="total"
-      v-model:page="query.page"
-      v-model:page-size="query.pageSize"
       @page-change="onPageChange"
       @page-size-change="onPageSizeChange"
     >
@@ -45,7 +45,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/user'
 import { useI18n } from 'vue-i18n'
 import { useListPage } from '@/composables/crud/useListPage'
 import SearchForm from '@/components/crud/SearchForm.vue'
@@ -56,7 +55,6 @@ import { repositoryApi } from '@/api/repositoryApi'
 import { hasPerm } from '@/utils/perm'
 import { ElMessage } from 'element-plus'
 
-const userStore = useUserStore()
 const { t } = useI18n()
 const drawerRef = ref<InstanceType<typeof RepositoryDrawer>>()
 const editRef = ref<InstanceType<typeof RepositoryEdit>>()

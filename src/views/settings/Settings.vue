@@ -11,8 +11,8 @@
             <el-input v-model="gitlabForm.token" type="password" show-password placeholder="Access Token" />
           </el-form-item>
           <el-form-item>
-            <el-button @click="testGitLab" :loading="testing">{{ t('settings.buttons.testConnection') }}</el-button>
-            <el-button type="primary" @click="saveGitLab" :loading="saving">{{ t('common.save') }}</el-button>
+            <el-button :loading="testing" @click="testGitLab">{{ t('settings.buttons.testConnection') }}</el-button>
+            <el-button type="primary" :loading="saving" @click="saveGitLab">{{ t('common.save') }}</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -27,7 +27,7 @@
              <el-input v-model="namingForm.releaseTemplate" placeholder="release/{version}" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="saveNaming" :loading="saving">{{ t('common.save') }}</el-button>
+            <el-button type="primary" :loading="saving" @click="saveNaming">{{ t('common.save') }}</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -45,7 +45,7 @@
             <el-radio label="CONTINUE_ON_BLOCK">{{ t('settings.policy.continueOnBlock') }}</el-radio>
           </el-radio-group>
           <div style="margin-top: 20px;">
-            <el-button type="primary" @click="saveBlocking" :loading="saving">{{ t('common.save') }}</el-button>
+            <el-button type="primary" :loading="saving" @click="saveBlocking">{{ t('common.save') }}</el-button>
           </div>
         </div>
       </el-tab-pane>
@@ -78,7 +78,7 @@ const loadGitLab = async () => {
   try {
     const data = await settingsApi.getGitLab()
     if (data) gitlabForm.value = data
-  } catch (e) {
+  } catch {
     // ignore error on load
   }
 }
@@ -111,7 +111,7 @@ const loadNaming = async () => {
   try {
     const data = await settingsApi.getNaming()
     if (data) namingForm.value = data
-  } catch (e) {
+  } catch {
     /* ignore */
   }
 }
@@ -132,7 +132,7 @@ const loadBlocking = async () => {
   try {
     const data = await settingsApi.getBlocking()
     if (data) blockingForm.value = data
-  } catch (e) {
+  } catch {
     /* ignore */
   }
 }

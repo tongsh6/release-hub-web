@@ -18,7 +18,7 @@
     </el-card>
 
     <!-- 运行任务列表 -->
-    <el-card style="margin-top: 16px;" v-loading="tasksLoading">
+    <el-card v-loading="tasksLoading" style="margin-top: 16px;">
       <template #header>
         <div class="card-header">
           <span>{{ t('run.detail.tasksTitle') }}</span>
@@ -64,8 +64,8 @@
               link 
               type="primary" 
               size="small" 
-              @click="handleRetryTask(row.id)"
               :loading="retryingTasks[row.id]"
+              @click="handleRetryTask(row.id)"
             >
               {{ t('run.task.retry') }}
             </el-button>
@@ -75,7 +75,7 @@
     </el-card>
 
     <!-- 执行项列表（原有） -->
-    <el-card style="margin-top: 16px;" v-loading="loading">
+    <el-card v-loading="loading" style="margin-top: 16px;">
       <template #header>
         <div class="card-header">
           <span>{{ t('run.detail.triplesTitle') }}</span>
@@ -104,7 +104,7 @@
                       <strong>{{ step.actionType }}</strong>: 
                       <el-tag :type="getResultTagType(step.result)" size="small">{{ step.result }}</el-tag>
                     </div>
-                    <div class="step-message" v-if="step.message">
+                    <div v-if="step.message" class="step-message">
                       <div v-if="step.actionType === 'UPDATE_VERSION' && extractDiff(step.message)">
                         <div class="version-info">{{ extractVersionInfo(step.message) }}</div>
                         <DiffViewer :diff="extractDiff(step.message)" />

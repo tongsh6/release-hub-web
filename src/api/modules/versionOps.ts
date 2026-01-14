@@ -1,6 +1,8 @@
-import { apiGet, apiPost } from '@/api/http'
+import { apiGet, apiPost, http } from '@/api/http'
 import { API_BASE, toQuery } from './_shared'
-import type { BuildTool, PageQuery, PageResult, RunStatus, YesNo } from '@/types/dto'
+import type { BuildTool, RunStatus } from '@/types/dto'
+import type { PageQuery, PageResult } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 // DTO Definitions
 export interface VersionScanReq {
@@ -106,7 +108,21 @@ export function update(data: VersionUpdateReq): Promise<VersionUpdateResp> {
 }
 
 export function pageRuns(query: PageQuery & RunListFilter): Promise<PageResult<VersionRunSummaryDTO>> {
-  return apiGet<PageResult<VersionRunSummaryDTO>>(`${MODULE_PATH}/runs`, { params: toQuery(query) })
+  const params = toQuery({
+    page: query.page,
+    size: query.pageSize,
+    projectId: query.projectId,
+    subProjectId: query.subProjectId,
+    branchName: query.branchName,
+    status: query.status,
+    from: query.from,
+    to: query.to
+  })
+  return http.get<ApiPageResponse<VersionRunSummaryDTO[]>>(`${MODULE_PATH}/runs/paged`, { params })
+    .then((res) => ({
+      list: res.data.data,
+      total: res.data.page.total
+    }))
 }
 
 export function getRunDetail(runId: string): Promise<VersionRunDetailDTO> {

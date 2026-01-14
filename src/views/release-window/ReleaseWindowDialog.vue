@@ -8,10 +8,10 @@
   >
     <el-form
       ref="formRef"
+      v-loading="loading"
       :model="form"
       :rules="rules"
       label-width="120px"
-      v-loading="loading"
     >
       <el-form-item :label="t('releaseWindow.name')" prop="name">
         <el-input

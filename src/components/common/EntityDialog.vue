@@ -4,13 +4,16 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-const props = withDefaults(defineProps<{
+const { title, width, confirmText, cancelText } = withDefaults(defineProps<{
   title?: string
   width?: string | number
   confirmText?: string
   cancelText?: string
 }>(), {
-  width: '720px'
+  width: '720px',
+  title: '',
+  confirmText: '',
+  cancelText: ''
 })
 
 const emit = defineEmits<{

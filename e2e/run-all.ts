@@ -17,7 +17,8 @@ const testFiles = [
   'navigation.test.ts',
   'release-window.test.ts',
   'repository.test.ts',
-  'iteration.test.ts'
+  'iteration.test.ts',
+  'release-automation.test.ts'  // 发布自动化功能测试
 ]
 
 interface TestResult {

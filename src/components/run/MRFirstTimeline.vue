@@ -9,14 +9,14 @@
         :status="getStepStatus(step.key)"
       />
     </el-steps>
-    <div class="timeline-body" v-if="currentMessage">
+    <div v-if="currentMessage" class="timeline-body">
       <el-alert :title="currentMessage" :type="messageType" show-icon :closable="false" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { RunStep } from '@/api/runApi'
 

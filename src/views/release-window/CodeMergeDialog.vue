@@ -5,7 +5,7 @@
     width="700px"
     :close-on-click-modal="false"
   >
-    <div class="merge-info" v-if="!results.length">
+    <div v-if="!results.length" class="merge-info">
       <el-alert
         :title="t('releaseWindow.codeMerge.info')"
         type="info"

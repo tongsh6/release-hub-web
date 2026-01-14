@@ -2,7 +2,7 @@
  * 仓库管理页面 E2E 测试
  * 包含字段显示验证
  */
-import { TestRunner, PageHelper, Assertions, delay } from '../utils/test-helper'
+import { TestRunner, delay } from '../utils/test-helper'
 
 const runner = new TestRunner()
 
@@ -125,7 +125,7 @@ runner.test('仓库列表表头字段显示正确', async () => {
   
   // 验证表头
   const expectedHeaders = Object.values(EXPECTED_COLUMNS)
-  const { found, missing } = await verifyTableHeaders(expectedHeaders)
+  const { found } = await verifyTableHeaders(expectedHeaders)
   
   // 至少需要有仓库和操作列
   if (!found.includes('仓库')) {
@@ -144,13 +144,12 @@ runner.test('仓库列表数据字段显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/repositories')
   await delay(1000)
   
   // 验证数据行
-  const { rowCount, hasData } = await verifyTableRowData()
+  const { rowCount } = await verifyTableRowData()
   
   if (rowCount > 0) {
     // 验证第一行的具体字段
@@ -193,8 +192,6 @@ runner.test('仓库搜索功能正常工作', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
-  
   await helper.navigate('/repositories')
   await delay(1000)
   
@@ -223,8 +220,6 @@ runner.test('仓库详情字段显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
-  
   await helper.navigate('/repositories')
   await delay(1000)
   
@@ -283,7 +278,6 @@ runner.test('创建仓库对话框字段显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/repositories')
   await delay(1000)
@@ -338,7 +332,6 @@ runner.test('仓库健康状态标签显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/repositories')
   await delay(1000)
@@ -375,7 +368,6 @@ runner.test('仓库列表操作按钮完整', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/repositories')
   await delay(1000)
@@ -416,7 +408,6 @@ runner.test('仓库分支MR摘要显示正确', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/repositories')
   await delay(1000)
@@ -479,7 +470,6 @@ runner.test('仓库列表表头国际化验证', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/repositories')
   await delay(1000)
@@ -518,7 +508,6 @@ runner.test('仓库列表按钮国际化验证', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/repositories')
   await delay(1000)

@@ -1,7 +1,7 @@
 /**
  * 导航和布局 E2E 测试
  */
-import { TestRunner, PageHelper, Assertions, delay } from '../utils/test-helper'
+import { TestRunner, delay } from '../utils/test-helper'
 
 const runner = new TestRunner()
 
@@ -24,7 +24,6 @@ runner.test('主布局正确渲染', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/')
   await delay(1000)

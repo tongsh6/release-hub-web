@@ -1,4 +1,4 @@
-import { http, apiGet, apiPost } from '@/api/http'
+import { http } from '@/api/http'
 import type { PageResult, PageQuery, Id } from '@/types/crud'
 import type { ApiResponse } from '@/types/dto'
 
@@ -64,7 +64,7 @@ export interface ApiPageResponse<T> {
 export const repositoryApi = {
   async list(query: PageQuery & { keyword?: string }): Promise<PageResult<Repository>> {
     const params = {
-      page: query.page - 1,
+      page: query.page,
       size: query.pageSize,
       keyword: query.keyword
     }

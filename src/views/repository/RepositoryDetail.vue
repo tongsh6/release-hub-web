@@ -4,9 +4,9 @@
       <el-button :icon="ArrowLeft" @click="goBack">{{ t('common.back') }}</el-button>
       <span class="page-title">{{ detail?.name || t('repository.columns.repo') }}</span>
       <div class="page-actions">
-        <el-button @click="handleSync" :loading="syncing">{{ t('common.sync') }}</el-button>
+        <el-button :loading="syncing" @click="handleSync">{{ t('common.sync') }}</el-button>
         <el-button @click="refresh">{{ t('common.refresh') }}</el-button>
-        <el-button type="primary" @click="openGitLab" :disabled="!gitlabUrl">{{ t('repository.openGitLab') }}</el-button>
+        <el-button type="primary" :disabled="!gitlabUrl" @click="openGitLab">{{ t('repository.openGitLab') }}</el-button>
       </div>
     </div>
     <el-card>

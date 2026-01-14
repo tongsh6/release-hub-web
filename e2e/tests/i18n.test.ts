@@ -2,7 +2,7 @@
  * 国际化 (i18n) E2E 测试
  * 验证所有页面的中英文显示正确
  */
-import { TestRunner, PageHelper, Assertions, delay } from '../utils/test-helper'
+import { TestRunner, delay } from '../utils/test-helper'
 
 const runner = new TestRunner()
 
@@ -706,7 +706,6 @@ runner.test('迭代编排对话框国际化验证', async () => {
     await delay(1000)
     
     // 点击编排按钮打开对话框
-    const orchestrateBtn = await page.$('button')
     const allButtons = await page.$$('.el-button')
     for (const btn of allButtons) {
       const text = await page.evaluate((el: Element) => el.textContent, btn)
@@ -1043,8 +1042,6 @@ runner.test('错误消息国际化验证', async () => {
   await ensureLoggedIn()
   
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
-  
   console.log('\n📋 错误消息国际化验证:')
   console.log('=' .repeat(50))
   

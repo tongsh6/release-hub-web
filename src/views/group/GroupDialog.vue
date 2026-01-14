@@ -8,7 +8,7 @@
     @opened="onOpened"
   >
     <template #default>
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="96px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="96px">
         <el-form-item :label="t('group.name')" prop="name">
           <el-input v-model="form.name" :placeholder="t('common.pleaseEnter') + t('group.name')" />
         </el-form-item>
@@ -54,13 +54,9 @@ const presetParentName = ref<string | undefined>(undefined)
 type GroupForm = Pick<GroupView, 'name' | 'code' | 'parentCode'>
 
 const {
-  visible,
   mode,
-  loading,
-  saving,
   form,
   open,
-  close,
   submit,
   onSuccess
 } = useDialogForm<GroupForm>({

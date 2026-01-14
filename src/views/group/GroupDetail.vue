@@ -1,5 +1,5 @@
 <template>
-  <div class="group-detail-page page-container" v-loading="loading">
+  <div v-loading="loading" class="group-detail-page page-container">
     <div class="page-header">
       <el-button :icon="ArrowLeft" @click="handleBack">{{ t('common.back') }}</el-button>
       <span class="page-title">{{ detail?.name || t('group.detail') }}</span>
@@ -16,7 +16,7 @@
         <el-descriptions-item :label="t('group.code')">
           {{ detail?.code }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('group.parentCode')" v-if="detail?.parentCode">
+        <el-descriptions-item v-if="detail?.parentCode" :label="t('group.parentCode')">
           {{ detail?.parentCode }}
         </el-descriptions-item>
       </el-descriptions>
@@ -33,7 +33,6 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n'
 import { groupApi, type GroupView } from '@/api/modules/group'
-import { hasPerm } from '@/utils/perm'
 import GroupDialog from './GroupDialog.vue'
 import { handleError } from '@/utils/error'
 

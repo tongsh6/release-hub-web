@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container" v-loading="loading">
+  <div v-loading="loading" class="page-container">
     <!-- 页面头部 -->
     <div class="page-header">
       <el-button :icon="ArrowLeft" @click="goBack">{{ t('common.back') }}</el-button>
@@ -48,7 +48,7 @@
           </div>
         </div>
       </template>
-      <el-table v-if="repos.length > 0" :data="repos" v-loading="reposLoading" stripe>
+      <el-table v-if="repos.length > 0" v-loading="reposLoading" :data="repos" stripe>
         <el-table-column prop="name" :label="t('repository.columns.name')" min-width="140">
           <template #default="{ row }">
             <span class="repo-name">{{ row.name }}</span>
@@ -91,8 +91,8 @@
               link 
               type="primary" 
               size="small" 
-              @click="handleSyncVersion(row.id)"
               :loading="syncingRepos[row.id]"
+              @click="handleSyncVersion(row.id)"
             >
               {{ t('iteration.version.sync') }}
             </el-button>

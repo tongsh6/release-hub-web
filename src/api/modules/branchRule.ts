@@ -1,6 +1,8 @@
-import { apiGet, apiPost, apiPut } from '@/api/http'
+import { apiPost, apiPut, http } from '@/api/http'
 import { API_BASE, toQuery } from './_shared'
-import type { PageQuery, PageResult, Status, BranchRuleScopeDTO, BranchRuleScopeReq } from '@/types/dto'
+import type { Status, BranchRuleScopeDTO, BranchRuleScopeReq } from '@/types/dto'
+import type { PageQuery, PageResult } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 export type BranchRuleType = 'TEMPLATE' | 'REGEX'
 
@@ -50,8 +52,16 @@ export interface BranchRuleTestResp {
 
 const MODULE_PATH = `${API_BASE}/branch-rules`
 
-export function pageBranchRules(query: PageQuery): Promise<PageResult<BranchRuleDTO>> {
-  return apiGet<PageResult<BranchRuleDTO>>(MODULE_PATH, { params: toQuery(query) })
+export async function pageBranchRules(query: PageQuery): Promise<PageResult<BranchRuleDTO>> {
+  const params = toQuery({
+    page: query.page,
+    size: query.pageSize
+  })
+  const res = await http.get<ApiPageResponse<BranchRuleDTO[]>>(`${MODULE_PATH}/paged`, { params })
+  return {
+    list: res.data.data,
+    total: res.data.page.total
+  }
 }
 
 export function createBranchRule(data: CreateBranchRuleReq): Promise<BranchRuleDTO> {

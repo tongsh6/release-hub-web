@@ -7,7 +7,7 @@
  * 3. 创建 2 个发布窗口
  * 4. 把 5 个迭代分别挂载到发布窗口
  */
-import { TestRunner, PageHelper, Assertions, delay } from '../utils/test-helper'
+import { TestRunner, delay } from '../utils/test-helper'
 
 const runner = new TestRunner()
 
@@ -69,7 +69,6 @@ runner.test('步骤 1.1: 导航到迭代列表页', async () => {
 
 // 创建迭代的辅助函数
 async function createIteration(iterationKey: string): Promise<boolean> {
-  const helper = runner.getHelper()
   const page = runner.getContext().getPage()
   
   // 点击新建按钮
@@ -317,7 +316,6 @@ runner.test('步骤 3.1: 导航到发布窗口列表页', async () => {
 
 // 创建发布窗口的辅助函数
 async function createReleaseWindow(windowKey: string, name: string): Promise<string | null> {
-  const helper = runner.getHelper()
   const page = runner.getContext().getPage()
   
   // 点击创建按钮

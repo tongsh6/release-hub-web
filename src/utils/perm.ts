@@ -10,7 +10,7 @@ export function hasPerm(required?: string): boolean {
     const perms = userStore.permissions || []
     if (mode === 'soft' && perms.length === 0) return true
     return userStore.hasPermission(required)
-  } catch (e) {
+  } catch {
     // Pinia/Router 尚未初始化时的安全降级
     const mode = (import.meta.env.VITE_PERM_MODE || 'soft') as 'off' | 'soft' | 'strict'
     return mode !== 'strict'

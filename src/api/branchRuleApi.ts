@@ -1,5 +1,6 @@
-import { apiGet, apiPost, apiPut, apiDel } from '@/api/http'
+import { apiGet, apiPost, apiPut, apiDel, http } from '@/api/http'
 import type { PageResult, PageQuery, Id } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 export interface BranchRule {
   id: string
@@ -24,22 +25,15 @@ export interface UpdateBranchRuleReq {
 
 export const branchRuleApi = {
   async list(query: PageQuery & { name?: string }): Promise<PageResult<BranchRule>> {
-    const res = await apiGet<BranchRule[]>('/v1/branch-rules')
-    let list = Array.isArray(res) ? res : []
-
-    // 客户端过滤
-    if (query.name) {
-      const keyword = query.name.toLowerCase()
-      list = list.filter(item => item.name.toLowerCase().includes(keyword))
+    const params = {
+      page: query.page,
+      size: query.pageSize,
+      name: query.name
     }
-
-    // 客户端分页
-    const start = (query.page - 1) * query.pageSize
-    const end = start + query.pageSize
-
+    const res = await http.get<ApiPageResponse<BranchRule[]>>('/v1/branch-rules/paged', { params })
     return {
-      list: list.slice(start, end),
-      total: list.length
+      list: res.data.data,
+      total: res.data.page.total
     }
   },
 

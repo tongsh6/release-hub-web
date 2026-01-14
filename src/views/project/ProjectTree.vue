@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <el-container class="tree-container">
-      <el-aside width="300px" class="tree-aside" v-loading="loading">
+      <el-aside v-loading="loading" width="300px" class="tree-aside">
         <div class="tree-header">
           <el-input v-model="filterText" :placeholder="t('project.filter')" />
         </div>

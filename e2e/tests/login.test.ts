@@ -1,7 +1,7 @@
 /**
  * 登录页面 E2E 测试
  */
-import { TestRunner, PageHelper, Assertions, delay } from '../utils/test-helper'
+import { TestRunner, delay } from '../utils/test-helper'
 import { config } from '../puppeteer.config'
 
 const runner = new TestRunner()
@@ -29,7 +29,6 @@ runner.test('登录页面正确渲染', async () => {
 // 测试：空表单提交显示验证错误
 runner.test('空表单提交显示验证错误', async () => {
   const helper = runner.getHelper()
-  const page = runner.getContext().getPage()
   
   await helper.navigate('/login')
   

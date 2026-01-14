@@ -1,5 +1,5 @@
 <template>
-  <div class="project-detail-page" v-loading="loading">
+  <div v-loading="loading" class="project-detail-page">
     <div class="page-header">
       <h2>{{ title }}</h2>
       <div class="actions">
@@ -37,14 +37,14 @@
           />
         </el-form-item>
 
-        <el-form-item label="Status" prop="status" v-if="mode !== 'create'">
+        <el-form-item v-if="mode !== 'create'" label="Status" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio value="active">Active</el-radio>
             <el-radio value="frozen">Frozen</el-radio>
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="Created At" v-if="mode !== 'create'">
+        <el-form-item v-if="mode !== 'create'" label="Created At">
           <span>{{ formatDateTime(form.createdAt) }}</span>
         </el-form-item>
       </el-form>

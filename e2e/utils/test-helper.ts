@@ -1,4 +1,4 @@
-import puppeteer, { Browser, Page, ElementHandle } from 'puppeteer'
+import puppeteer, { Browser, Page } from 'puppeteer'
 import { config } from '../puppeteer.config'
 import * as fs from 'fs'
 import * as path from 'path'

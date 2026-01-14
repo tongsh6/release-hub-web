@@ -12,7 +12,7 @@
             <span>{{ t('repository.columns.repo') }}: {{ detail?.name }}</span>
             <div>
               <el-button @click="refresh">{{ t('common.refresh') }}</el-button>
-              <el-button type="primary" @click="openGitLab" :disabled="!detail?.cloneUrl">{{ t('repository.openGitLab') }}</el-button>
+              <el-button type="primary" :disabled="!detail?.cloneUrl" @click="openGitLab">{{ t('repository.openGitLab') }}</el-button>
             </div>
           </div>
         </template>

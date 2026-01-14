@@ -1,5 +1,7 @@
-import { apiGet, apiPost } from '@/api/http'
-import type { BuildTool, PageQuery, PageResult } from '@/types/dto'
+import { apiGet, apiPost, http } from '@/api/http'
+import type { BuildTool } from '@/types/dto'
+import type { PageQuery, PageResult } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 const BASE = '/v1'
 
@@ -49,11 +51,17 @@ export interface VersionUpdateResponse {
 
 // --- API Functions ---
 
-export function list(query: PageQuery): Promise<ReleaseWindowView[]> {
-  // The backend currently returns List<ReleaseWindowView> directly, not PageResult
-  // If it supports pagination later, we might need to adjust.
-  // For now, assuming it returns array based on schema.d.ts: ApiResponseListReleaseWindowView
-  return apiGet<ReleaseWindowView[]>(`${BASE}/release-windows`)
+export async function list(query: PageQuery & { name?: string }): Promise<PageResult<ReleaseWindowView>> {
+  const params = {
+    page: query.page,
+    size: query.pageSize,
+    name: (query as any).name
+  }
+  const res = await http.get<ApiPageResponse<ReleaseWindowView[]>>(`${BASE}/release-windows/paged`, { params })
+  return {
+    list: res.data.data,
+    total: res.data.page.total
+  }
 }
 
 export function getById(id: string): Promise<ReleaseWindowView> {

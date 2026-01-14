@@ -22,10 +22,10 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleClose">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" @click="handleResolve('USE_SYSTEM')" :loading="loading">
+        <el-button type="primary" :loading="loading" @click="handleResolve('USE_SYSTEM')">
           {{ t('iteration.version.useSystem') }}
         </el-button>
-        <el-button type="success" @click="handleResolve('USE_REPO')" :loading="loading">
+        <el-button type="success" :loading="loading" @click="handleResolve('USE_REPO')">
           {{ t('iteration.version.useRepo') }}
         </el-button>
       </span>

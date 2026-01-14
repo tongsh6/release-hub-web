@@ -43,7 +43,7 @@ export function registerGuards(router: Router) {
         // 确保 fetchMe 成功后再放行
         // 如果 fetchMe 期间 token 过期，axios 拦截器或 fetchMe catch 会处理
         return next({ ...to, replace: true }) // 使用 replace 确保路由解析完整
-      } catch (error) {
+      } catch {
         // fetchMe 失败 (401 会由拦截器处理，但这里可能也会捕获到)
         return next({ path: '/login', query: { redirect: to.fullPath } })
       }

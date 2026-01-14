@@ -8,7 +8,7 @@
     @opened="onOpened"
   >
     <template #default>
-      <el-form :model="form" ref="formRef" label-width="120px">
+      <el-form ref="formRef" :model="form" label-width="120px">
         <el-form-item :label="t('releaseWindow.name')">
           <el-select v-model="form.windowId" :placeholder="t('common.pleaseSelect') + t('releaseWindow.name')">
             <el-option v-for="w in windows" :key="w.id" :label="w.name" :value="w.id" />
@@ -50,7 +50,8 @@ const open = async (iterationKey: string) => {
 const loadWindows = async () => {
   loading.value = true
   try {
-    windows.value = await releaseWindowApi.list({ page: 1, pageSize: 100 } as any)
+    const result = await releaseWindowApi.list({ page: 1, pageSize: 100 } as any)
+    windows.value = result.list
   } catch (err) {
     handleError(err)
   } finally {

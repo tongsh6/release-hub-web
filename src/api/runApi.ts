@@ -51,14 +51,16 @@ export interface RunTask {
 }
 
 export const runApi = {
-  async list(query: PageQuery & { windowKey?: string; repo?: string; iterationKey?: string; status?: string }): Promise<PageResult<Run>> {
+  async list(query: PageQuery & { windowKey?: string; repoId?: string; iterationKey?: string; status?: string; runType?: string; operator?: string }): Promise<PageResult<Run>> {
     const params = {
-      page: query.page - 1,
+      page: query.page,
       size: query.pageSize,
       windowKey: query.windowKey,
-      repo: query.repo,
+      repoId: query.repoId,
       iterationKey: query.iterationKey,
-      status: query.status
+      status: query.status,
+      runType: query.runType,
+      operator: query.operator
     }
     const res = await http.get<ApiPageResponse<Run[]>>('/v1/runs/paged', { params })
     return {

@@ -1,4 +1,5 @@
-import { apiGet, apiPost, apiPut, apiDel } from '@/api/http'
+import { apiGet, apiPost, apiPut, apiDel, http } from '@/api/http'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 import type { PageResult, PageQuery, Id } from '@/types/crud'
 
 export interface Project {
@@ -22,25 +23,16 @@ export interface UpdateProjectReq {
 
 export const projectApi = {
   async list(query: PageQuery & { name?: string; status?: string }): Promise<PageResult<Project>> {
-    const res = await apiGet<Project[]>('/v1/projects')
-    let list = Array.isArray(res) ? res : []
-
-    // 客户端过滤
-    if (query.name) {
-      const keyword = query.name.toLowerCase()
-      list = list.filter(item => item.name.toLowerCase().includes(keyword))
+    const params = {
+      page: query.page,
+      size: query.pageSize,
+      name: query.name,
+      status: query.status
     }
-    if (query.status) {
-      list = list.filter(item => item.status === query.status)
-    }
-
-    // 客户端分页
-    const start = (query.page - 1) * query.pageSize
-    const end = start + query.pageSize
-
+    const res = await http.get<ApiPageResponse<Project[]>>('/v1/projects/paged', { params })
     return {
-      list: list.slice(start, end),
-      total: list.length
+      list: res.data.data,
+      total: res.data.page.total
     }
   },
 

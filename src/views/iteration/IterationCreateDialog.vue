@@ -8,7 +8,7 @@
     @opened="onOpened"
   >
     <template #default>
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
         <el-form-item :label="t('iteration.columns.name')" prop="name">
           <el-input
             v-model="form.name"
@@ -57,13 +57,8 @@
   const formRef = ref<FormInstance>()
   
   const {
-    visible,
-    mode,
-    loading,
-    saving,
     form,
     open,
-    close,
     submit,
     onSuccess
   } = useDialogForm<CreateIterationRequest>({

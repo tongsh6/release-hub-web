@@ -27,7 +27,9 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: 'jsdom',
-      globals: true
+      globals: true,
+      include: ['src/**/*.{test,spec}.ts', 'src/**/__tests__/**/*.ts'],
+      exclude: ['e2e/**']
     }
   }
 })

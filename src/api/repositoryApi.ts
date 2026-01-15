@@ -36,6 +36,11 @@ export interface BranchSummary {
   closedMrs: number
 }
 
+export interface InitialVersionView {
+  repoId: string
+  version: string | null
+}
+
 export interface CreateRepoReq {
   name: string
   cloneUrl: string
@@ -104,6 +109,11 @@ export const repositoryApi = {
 
   async getBranchSummary(id: Id): Promise<BranchSummary> {
     const res = await http.get<ApiResponse<BranchSummary>>(`/v1/repositories/${id}/branch-summary`)
+    return res.data.data
+  },
+
+  async getInitialVersion(id: Id): Promise<InitialVersionView> {
+    const res = await http.get<ApiResponse<InitialVersionView>>(`/v1/repositories/${id}/initial-version`)
     return res.data.data
   },
 

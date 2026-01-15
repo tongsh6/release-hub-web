@@ -45,6 +45,7 @@ import { ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { repositoryApi, type CreateRepoReq } from '@/api/repositoryApi'
+import { handleError } from '@/utils/error'
 
 const emit = defineEmits(['success'])
 const { t } = useI18n()
@@ -89,6 +90,15 @@ const open = (repo?: any) => {
   form.initialVersion = ''
   mode.value = repo ? 'edit' : 'create'
   currentId.value = repo?.id || null
+  if (repo?.id) {
+    const id = String(repo.id)
+    repositoryApi.getInitialVersion(id)
+      .then((res) => {
+        if (currentId.value !== id) return
+        form.initialVersion = res.version || ''
+      })
+      .catch(() => {})
+  }
 }
 
 const submit = async () => {
@@ -118,7 +128,7 @@ const submit = async () => {
         visible.value = false
         emit('success')
       } catch (e) {
-        console.error(e)
+        handleError(e)
       } finally {
         loading.value = false
       }

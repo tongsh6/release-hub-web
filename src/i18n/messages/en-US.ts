@@ -303,6 +303,7 @@ export default {
       name: 'Repository Name',
       cloneUrl: 'Clone URL',
       defaultBranch: 'Default Branch',
+      initialVersion: 'Initial Version',
       monoRepo: 'Mono Repo',
       writable: 'Writable?'
     },
@@ -312,7 +313,8 @@ export default {
     placeholders: {
       name: 'e.g. backend-service',
       cloneUrl: 'git@gitlab.com:group/project.git',
-      defaultBranch: 'master or main'
+      defaultBranch: 'main (default)',
+      initialVersion: 'e.g. 1.2.3 (optional)'
     },
     gateSummaryLabels: {
       protectedBranch: 'Protected Branch',
@@ -330,6 +332,7 @@ export default {
     },
     gitlabMissing: 'Configure GitLab settings first',
     gitlabUrlNotAvailable: 'GitLab URL not available',
+    confirmDelete: 'Confirm to delete this repository?',
     health: {
       healthy: 'Healthy',
       risk: 'Risk'
@@ -337,7 +340,8 @@ export default {
     validation: {
       name: 'Name max 128 chars',
       cloneUrl: 'Clone URL max 512 chars',
-      defaultBranch: 'Default branch max 128 chars'
+      defaultBranch: 'Default branch max 128 chars',
+      initialVersion: 'Initial version max 50 chars'
     }
   },
   run: {

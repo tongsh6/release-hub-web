@@ -34,6 +34,8 @@
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
           <el-button v-perm.disable="'repository:write'" link size="small" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
+          <el-button v-perm.disable="'repository:write'" link type="warning" size="small" @click="handleSync(row)">{{ t('common.sync') }}</el-button>
+          <el-button v-perm.disable="'repository:write'" link type="danger" size="small" @click="handleDelete(row)">{{ t('common.delete') }}</el-button>
         </template>
       </el-table-column>
     </DataTable>
@@ -53,7 +55,9 @@ import RepositoryDrawer from './RepositoryDrawer.vue'
 import RepositoryEdit from './RepositoryEdit.vue'
 import { repositoryApi } from '@/api/repositoryApi'
 import { hasPerm } from '@/utils/perm'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { ApiError } from '@/api/http'
+import { handleError } from '@/utils/error'
 
 const { t } = useI18n()
 const drawerRef = ref<InstanceType<typeof RepositoryDrawer>>()
@@ -80,6 +84,41 @@ function openEdit(row: any) {
     return
   }
   editRef.value?.open(row)
+}
+
+async function handleDelete(row: any) {
+  if (!hasPerm('repository:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  try {
+    await ElMessageBox.confirm(t('repository.confirmDelete'), t('common.warning'), { type: 'warning' })
+    await repositoryApi.delete(row.id)
+    ElMessage.success(t('common.success'))
+    search()
+  } catch (e) {
+    if (e !== 'cancel') {
+      handleError(e)
+    }
+  }
+}
+
+async function handleSync(row: any) {
+  if (!hasPerm('repository:write')) {
+    ElMessage.warning(t('common.permissionDenied'))
+    return
+  }
+  try {
+    await repositoryApi.sync(row.id)
+    ElMessage.success(t('common.success'))
+    search()
+  } catch (e) {
+    if (e instanceof ApiError && e.code === 'GITLAB_001') {
+      ElMessage.warning(t('repository.gitlabMissing'))
+      return
+    }
+    handleError(e)
+  }
 }
 </script>
 

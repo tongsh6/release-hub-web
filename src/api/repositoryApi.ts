@@ -39,15 +39,17 @@ export interface BranchSummary {
 export interface CreateRepoReq {
   name: string
   cloneUrl: string
-  defaultBranch: string
+  defaultBranch?: string
   monoRepo: boolean
+  initialVersion?: string
 }
 
 export interface UpdateRepoReq {
   name: string
   cloneUrl: string
-  defaultBranch: string
+  defaultBranch?: string
   monoRepo: boolean
+  initialVersion?: string
 }
 
 export interface ApiPageResponse<T> {
@@ -90,6 +92,11 @@ export const repositoryApi = {
     return res.data.data
   },
 
+  async delete(id: Id): Promise<boolean> {
+    const res = await http.delete<ApiResponse<boolean>>(`/v1/repositories/${id}`)
+    return res.data.data
+  },
+
   async getGateSummary(id: Id): Promise<GateSummary> {
     const res = await http.get<ApiResponse<GateSummary>>(`/v1/repositories/${id}/gate-summary`)
     return res.data.data
@@ -97,6 +104,11 @@ export const repositoryApi = {
 
   async getBranchSummary(id: Id): Promise<BranchSummary> {
     const res = await http.get<ApiResponse<BranchSummary>>(`/v1/repositories/${id}/branch-summary`)
+    return res.data.data
+  },
+
+  async sync(id: Id): Promise<Repository> {
+    const res = await http.post<ApiResponse<Repository>>(`/v1/repositories/${id}/sync`)
     return res.data.data
   }
 }

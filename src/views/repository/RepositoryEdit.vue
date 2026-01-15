@@ -22,6 +22,9 @@
       <el-form-item :label="t('repository.columns.defaultBranch')" prop="defaultBranch">
         <el-input v-model="form.defaultBranch" :placeholder="t('repository.placeholders.defaultBranch')" />
       </el-form-item>
+      <el-form-item :label="t('repository.columns.initialVersion')" prop="initialVersion">
+        <el-input v-model="form.initialVersion" :placeholder="t('repository.placeholders.initialVersion')" />
+      </el-form-item>
       <el-form-item :label="t('repository.columns.monoRepo')" prop="monoRepo">
         <el-switch v-model="form.monoRepo" />
       </el-form-item>
@@ -55,8 +58,9 @@ const currentId = ref<string | null>(null)
 const form = reactive<CreateRepoReq>({
   name: '',
   cloneUrl: '',
-  defaultBranch: 'master',
-  monoRepo: false
+  defaultBranch: 'main',
+  monoRepo: false,
+  initialVersion: ''
 })
 
 const rules = {
@@ -69,8 +73,10 @@ const rules = {
     { max: 512, message: t('repository.validation.cloneUrl'), trigger: 'blur' }
   ],
   defaultBranch: [
-    { required: true, message: t('common.pleaseEnter') + t('repository.columns.defaultBranch'), trigger: 'blur' },
     { max: 128, message: t('repository.validation.defaultBranch'), trigger: 'blur' }
+  ],
+  initialVersion: [
+    { max: 50, message: t('repository.validation.initialVersion'), trigger: 'blur' }
   ]
 }
 
@@ -78,8 +84,9 @@ const open = (repo?: any) => {
   visible.value = true
   form.name = repo?.name || ''
   form.cloneUrl = repo?.cloneUrl || ''
-  form.defaultBranch = repo?.defaultBranch || 'master'
+  form.defaultBranch = repo?.defaultBranch || 'main'
   form.monoRepo = repo?.monoRepo ?? false
+  form.initialVersion = ''
   mode.value = repo ? 'edit' : 'create'
   currentId.value = repo?.id || null
 }
@@ -95,10 +102,17 @@ const submit = async () => {
             name: form.name,
             cloneUrl: form.cloneUrl,
             defaultBranch: form.defaultBranch,
-            monoRepo: form.monoRepo
+            monoRepo: form.monoRepo,
+            initialVersion: form.initialVersion || undefined
           })
         } else {
-          await repositoryApi.create(form)
+          await repositoryApi.create({
+            name: form.name,
+            cloneUrl: form.cloneUrl,
+            defaultBranch: form.defaultBranch,
+            monoRepo: form.monoRepo,
+            initialVersion: form.initialVersion || undefined
+          })
         }
         ElMessage.success(t('common.success'))
         visible.value = false

@@ -317,6 +317,7 @@ export default {
       name: '仓库名称',
       cloneUrl: '仓库地址',
       defaultBranch: '默认分支',
+      initialVersion: '初始版本号',
       monoRepo: '单仓',
       writable: '可写？'
     },
@@ -326,7 +327,8 @@ export default {
     placeholders: {
       name: '例如 backend-service',
       cloneUrl: 'git@gitlab.com:group/project.git',
-      defaultBranch: 'master 或 main'
+      defaultBranch: 'main（默认）',
+      initialVersion: '例如 1.2.3（可选）'
     },
     gateSummaryLabels: {
       protectedBranch: '保护分支',
@@ -344,6 +346,7 @@ export default {
     },
     gitlabMissing: '请先在系统设置中配置 GitLab',
     gitlabUrlNotAvailable: '无法获取 GitLab 地址',
+    confirmDelete: '确认删除此仓库？',
     health: {
       healthy: '健康',
       risk: '风险'
@@ -351,7 +354,8 @@ export default {
     validation: {
       name: '名称最长 128 个字符',
       cloneUrl: '仓库地址最长 512 个字符',
-      defaultBranch: '默认分支最长 128 个字符'
+      defaultBranch: '默认分支最长 128 个字符',
+      initialVersion: '初始版本号最长 50 个字符'
     }
   },
   run: {

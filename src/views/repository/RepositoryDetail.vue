@@ -66,6 +66,8 @@ import { useI18n } from 'vue-i18n'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { repositoryApi, type Repository, type GateSummary, type BranchSummary } from '@/api/repositoryApi'
 import { ElMessage } from 'element-plus'
+import { ApiError } from '@/api/http'
+import { handleError } from '@/utils/error'
 
 const route = useRoute()
 const router = useRouter()
@@ -126,7 +128,11 @@ async function handleSync() {
     ElMessage.success(t('common.success'))
     refresh()
   } catch (e) {
-    console.error(e)
+    if (e instanceof ApiError && e.code === 'GITLAB_001') {
+      ElMessage.warning(t('repository.gitlabMissing'))
+    } else {
+      handleError(e)
+    }
   } finally {
     syncing.value = false
   }
@@ -144,7 +150,7 @@ async function refresh() {
     gateSummary.value = g
     branchSummary.value = b
   } catch (e) {
-    console.error(e)
+    handleError(e)
   }
 }
 

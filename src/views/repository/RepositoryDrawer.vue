@@ -18,7 +18,6 @@
         </template>
         
         <el-descriptions :column="1" border>
-            <el-descriptions-item :label="t('repository.columns.projectId')">{{ detail?.projectId }}</el-descriptions-item>
             <el-descriptions-item :label="t('repository.columns.defaultBranch')">{{ detail?.defaultBranch }}</el-descriptions-item>
             <el-descriptions-item :label="t('repository.columns.cloneUrl')">{{ detail?.cloneUrl }}</el-descriptions-item>
             <el-descriptions-item :label="t('repository.columns.monoRepo')">{{ detail?.monoRepo ? t('common.yes') : t('common.no') }}</el-descriptions-item>

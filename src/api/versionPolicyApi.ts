@@ -43,10 +43,6 @@ function toDisplay(policy: VersionPolicy): VersionPolicyDisplay {
 }
 
 export const versionPolicyApi = {
-  /**
-   * 获取版本策略列表
-   * @param query 查询参数（支持客户端分页和过滤）
-   */
   async list(query: PageQuery & { name?: string }): Promise<PageResult<VersionPolicyDisplay>> {
     const params = {
       page: query.page,

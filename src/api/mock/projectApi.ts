@@ -32,12 +32,8 @@ export const projectApi = {
       list = list.filter(p => p.status === query.status)
     }
 
-    const start = (query.page - 1) * query.pageSize
-    const end = start + query.pageSize
-    const pageList = list.slice(start, end)
-
     return {
-      list: pageList,
+      list,
       total: list.length
     }
   },

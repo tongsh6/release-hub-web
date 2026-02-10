@@ -1,10 +1,14 @@
 import type { RouteRecordRaw } from 'vue-router'
-import projectRoutes from './modules/projects'
 import releaseWindowRoutes from './modules/release-window'
 import branchRuleRoutes from './modules/branch-rules'
 import versionPolicyRoutes from './modules/version-policies'
 import versionOpsRoutes from './modules/version-ops'
-import templateCrudRoutes from './modules/templateCrud'
+import iterationsRoutes from './modules/iterations'
+import repositoriesRoutes from './modules/repositories'
+import runsRoutes from './modules/runs'
+import settingsRoutes from './modules/settings'
+import groupsRoutes from './modules/groups'
+import calendarRoutes from './modules/calendar'
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
@@ -16,20 +20,24 @@ export const constantRoutes: RouteRecordRaw[] = [
         path: 'home',
         name: 'Home',
         component: () => import('@/views/home/HomeView.vue'),
-        meta: { title: 'Home', requiresAuth: true }
+        meta: { title: 'Home', requiresAuth: true, hidden: true }
       },
       {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/Dashboard.vue'),
-        meta: { title: 'Dashboard', titleKey: 'menu.dashboard', requiresAuth: true, permission: 'dashboard:read' }
+        meta: { title: 'Dashboard', titleKey: 'menu.dashboard', requiresAuth: true, permission: 'dashboard:read', order: 10 }
       },
-      ...projectRoutes,
+      ...calendarRoutes,
       ...releaseWindowRoutes,
       ...branchRuleRoutes,
       ...versionPolicyRoutes,
       ...versionOpsRoutes,
-      ...templateCrudRoutes
+      ...iterationsRoutes,
+      ...repositoriesRoutes,
+      ...runsRoutes,
+      ...settingsRoutes,
+      ...groupsRoutes
     ]
   },
   {

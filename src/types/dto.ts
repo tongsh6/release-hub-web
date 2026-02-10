@@ -7,24 +7,6 @@ export interface ApiResponse<T> {
   traceId?: string;
 }
 
-export interface PageQuery {
-  page: number;
-  size: number;
-  sort?: SortSpec[];
-}
-
-export interface SortSpec {
-  field: string;
-  direction: 'ASC' | 'DESC';
-}
-
-export interface PageResult<T> {
-  records: T[];
-  page: number;
-  size: number;
-  total: number;
-}
-
 export type YesNo = 'YES' | 'NO';
 export type BuildTool = 'MAVEN' | 'GRADLE';
 export type Status = 'ENABLED' | 'DISABLED';

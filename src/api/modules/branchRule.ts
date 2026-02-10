@@ -1,6 +1,8 @@
-import { get, post, put } from '@/api/http'
+import { apiPost, apiPut, http } from '@/api/http'
 import { API_BASE, toQuery } from './_shared'
-import type { PageQuery, PageResult, Status, BranchRuleScopeDTO, BranchRuleScopeReq } from '@/types/dto'
+import type { Status, BranchRuleScopeDTO, BranchRuleScopeReq } from '@/types/dto'
+import type { PageQuery, PageResult } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 export type BranchRuleType = 'TEMPLATE' | 'REGEX'
 
@@ -50,26 +52,34 @@ export interface BranchRuleTestResp {
 
 const MODULE_PATH = `${API_BASE}/branch-rules`
 
-export function pageBranchRules(query: PageQuery): Promise<PageResult<BranchRuleDTO>> {
-  return get<PageResult<BranchRuleDTO>>(MODULE_PATH, { params: toQuery(query) })
+export async function pageBranchRules(query: PageQuery): Promise<PageResult<BranchRuleDTO>> {
+  const params = toQuery({
+    page: query.page,
+    size: query.pageSize
+  })
+  const res = await http.get<ApiPageResponse<BranchRuleDTO[]>>(`${MODULE_PATH}/paged`, { params })
+  return {
+    list: res.data.data,
+    total: res.data.page.total
+  }
 }
 
 export function createBranchRule(data: CreateBranchRuleReq): Promise<BranchRuleDTO> {
-  return post<BranchRuleDTO>(MODULE_PATH, data)
+  return apiPost<BranchRuleDTO>(MODULE_PATH, data)
 }
 
 export function updateBranchRule(id: string, data: UpdateBranchRuleReq): Promise<BranchRuleDTO> {
-  return put<BranchRuleDTO>(`${MODULE_PATH}/${id}`, data)
+  return apiPut<BranchRuleDTO>(`${MODULE_PATH}/${id}`, data)
 }
 
 export function enableBranchRule(id: string): Promise<void> {
-  return post<void>(`${MODULE_PATH}/${id}/enable`)
+  return apiPost<void>(`${MODULE_PATH}/${id}/enable`)
 }
 
 export function disableBranchRule(id: string): Promise<void> {
-  return post<void>(`${MODULE_PATH}/${id}/disable`)
+  return apiPost<void>(`${MODULE_PATH}/${id}/disable`)
 }
 
 export function testBranchRule(data: BranchRuleTestReq): Promise<BranchRuleTestResp> {
-  return post<BranchRuleTestResp>(`${MODULE_PATH}/test`, data)
+  return apiPost<BranchRuleTestResp>(`${MODULE_PATH}/test`, data)
 }

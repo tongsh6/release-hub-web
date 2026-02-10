@@ -1,6 +1,8 @@
-import { get, post } from '@/api/http'
+import { apiGet, apiPost, http } from '@/api/http'
 import { API_BASE, toQuery } from './_shared'
-import type { BuildTool, PageQuery, PageResult, RunStatus, YesNo } from '@/types/dto'
+import type { BuildTool, RunStatus } from '@/types/dto'
+import type { PageQuery, PageResult } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 // DTO Definitions
 export interface VersionScanReq {
@@ -98,21 +100,35 @@ export interface RunLogsResp {
 const MODULE_PATH = `${API_BASE}/version-ops`
 
 export function scan(data: VersionScanReq): Promise<VersionScanResp> {
-  return post<VersionScanResp>(`${MODULE_PATH}/scan`, data)
+  return apiPost<VersionScanResp>(`${MODULE_PATH}/scan`, data)
 }
 
 export function update(data: VersionUpdateReq): Promise<VersionUpdateResp> {
-  return post<VersionUpdateResp>(`${MODULE_PATH}/update`, data)
+  return apiPost<VersionUpdateResp>(`${MODULE_PATH}/update`, data)
 }
 
 export function pageRuns(query: PageQuery & RunListFilter): Promise<PageResult<VersionRunSummaryDTO>> {
-  return get<PageResult<VersionRunSummaryDTO>>(`${MODULE_PATH}/runs`, { params: toQuery(query) })
+  const params = toQuery({
+    page: query.page,
+    size: query.pageSize,
+    projectId: query.projectId,
+    subProjectId: query.subProjectId,
+    branchName: query.branchName,
+    status: query.status,
+    from: query.from,
+    to: query.to
+  })
+  return http.get<ApiPageResponse<VersionRunSummaryDTO[]>>(`${MODULE_PATH}/runs/paged`, { params })
+    .then((res) => ({
+      list: res.data.data,
+      total: res.data.page.total
+    }))
 }
 
 export function getRunDetail(runId: string): Promise<VersionRunDetailDTO> {
-  return get<VersionRunDetailDTO>(`${MODULE_PATH}/runs/${runId}`)
+  return apiGet<VersionRunDetailDTO>(`${MODULE_PATH}/runs/${runId}`)
 }
 
 export function getRunLogs(runId: string): Promise<RunLogsResp> {
-  return get<RunLogsResp>(`${MODULE_PATH}/runs/${runId}/logs`)
+  return apiGet<RunLogsResp>(`${MODULE_PATH}/runs/${runId}/logs`)
 }

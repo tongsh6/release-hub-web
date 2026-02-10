@@ -1,4 +1,6 @@
 import type { PageResult, PageQuery, Id } from '@/types/crud'
+import { http, apiGet, apiPost, apiPut } from '@/api/http'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 // Types
 export interface {{pascal moduleName}} {
@@ -9,75 +11,36 @@ export interface {{pascal moduleName}} {
   description?: string
 }
 
-// Mock In-memory DB
-let data: {{pascal moduleName}}[] = Array.from({ length: 25 }).map((_, i) => ({
-  id: String(i + 1),
-  name: `{{entityName}} Demo ${i + 1}`,
-  status: i % 3 === 0 ? 'frozen' : 'active',
-  createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-  description: `This is description for {{entityName}} ${i + 1}`
-}))
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+const BASE = '/v1'
 
 export const {{camel apiName}} = {
   async list(query: PageQuery & { name?: string; status?: string }): Promise<PageResult<{{pascal moduleName}}>> {
-    await delay(500)
-    let list = [...data]
-
-    if (query.name) {
-      list = list.filter(p => p.name.toLowerCase().includes(query.name!.toLowerCase()))
+    const params = {
+      page: query.page,
+      size: query.pageSize,
+      name: query.name,
+      status: query.status
     }
-    if (query.status) {
-      list = list.filter(p => p.status === query.status)
-    }
-
-    const start = (query.page - 1) * query.pageSize
-    const end = start + query.pageSize
-    const pageList = list.slice(start, end)
-
+    const res = await http.get<ApiPageResponse<{{pascal moduleName}}[]>>(`${BASE}/{{kebab moduleName}}s/paged`, { params })
     return {
-      list: pageList,
-      total: list.length
+      list: res.data.data,
+      total: res.data.page.total
     }
   },
 
   async get(id: Id): Promise<{{pascal moduleName}}> {
-    await delay(300)
-    const item = data.find(p => p.id === String(id))
-    if (!item) throw new Error('{{entityName}} not found')
-    return { ...item }
+    return await apiGet<{{pascal moduleName}}>(`${BASE}/{{kebab moduleName}}s/${id}`)
   },
 
   async create(payload: Omit<{{pascal moduleName}}, 'id' | 'createdAt'>): Promise<{{pascal moduleName}}> {
-    await delay(800)
-    const newItem: {{pascal moduleName}} = {
-      ...payload,
-      id: String(data.length + 1 + Math.floor(Math.random() * 1000)),
-      createdAt: new Date().toISOString()
-    }
-    data.unshift(newItem)
-    return newItem
+    return await apiPost<{{pascal moduleName}}>(`${BASE}/{{kebab moduleName}}s`, payload)
   },
 
   async update(id: Id, payload: Partial<{{pascal moduleName}}>): Promise<{{pascal moduleName}}> {
-    await delay(800)
-    const index = data.findIndex(p => p.id === String(id))
-    if (index === -1) throw new Error('{{entityName}} not found')
-    
-    const updated = { ...data[index], ...payload } as {{pascal moduleName}}
-    data[index] = updated
-    return updated
+    return await apiPut<{{pascal moduleName}}>(`${BASE}/{{kebab moduleName}}s/${id}`, payload)
   },
 
   async freeze(id: Id): Promise<void> {
-    await delay(500)
-    const index = data.findIndex(p => p.id === String(id))
-    if (index === -1) throw new Error('{{entityName}} not found')
-    
-    const item = data[index]
-    if (item) {
-      item.status = item.status === 'active' ? 'frozen' : 'active'
-    }
+    await http.post(`${BASE}/{{kebab moduleName}}s/${id}/freeze`)
   }
 }

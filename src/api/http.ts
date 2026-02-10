@@ -1,6 +1,7 @@
 // src/api/http.ts
 import axios, { type AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import type { ApiResponse } from '@/types/dto'
+import { i18n } from '@/i18n'
 
 const TOKEN_KEY = 'RH_TOKEN'
 
@@ -31,6 +32,8 @@ function getBaseURL(): string {
   return (env?.VITE_API_BASE_URL as string) || 'http://localhost:8080'
 }
 
+export type ApiPath = `/v1/${string}`
+
 export const http: AxiosInstance = axios.create({
   baseURL: getBaseURL(),
   timeout: 20_000,
@@ -54,10 +57,10 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (resp: AxiosResponse) => {
     const body = resp.data
-    if (isApiResponse(body) && body.code !== '0') {
+    if (isApiResponse(body) && body.code !== '0' && body.code !== 'OK') {
       throw new ApiError({
         code: body.code,
-        message: body.message || '业务异常',
+        message: body.message || i18n.global.t('common.businessError'),
         traceId: body.traceId,
         httpStatus: resp.status,
         details: body.data
@@ -76,7 +79,7 @@ http.interceptors.response.use(
         return Promise.reject(
           new ApiError({
             code: 'AUTH_FAILED',
-            message: 'Incorrect username or password',
+            message: i18n.global.t('login.message.authFailed'),
             httpStatus: status,
             details: data
           })
@@ -100,7 +103,7 @@ http.interceptors.response.use(
       return Promise.reject(
         new ApiError({
           code: data.code || 'HTTP_ERROR',
-          message: data.message || '请求失败',
+          message: data.message || i18n.global.t('common.requestFailed'),
           traceId: data.traceId,
           httpStatus: status,
           details: data.data
@@ -111,7 +114,7 @@ http.interceptors.response.use(
     return Promise.reject(
       new ApiError({
         code: 'NETWORK_ERROR',
-        message: err.message || '网络异常',
+        message: err.message || i18n.global.t('common.networkError'),
         httpStatus: status,
         details: data
       })
@@ -141,6 +144,18 @@ export function del<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   return request<T>({ ...(config || {}), url, method: 'DELETE' })
 }
 
+export function apiGet<T>(path: ApiPath, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'GET' })
+}
+export function apiPost<T>(path: ApiPath, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'POST', data })
+}
+export function apiPut<T>(path: ApiPath, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'PUT', data })
+}
+export function apiDel<T>(path: ApiPath, config?: AxiosRequestConfig): Promise<T> {
+  return request<T>({ ...(config || {}), url: path, method: 'DELETE' })
+}
 export default {
   get,
   post,

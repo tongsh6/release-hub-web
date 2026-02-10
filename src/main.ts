@@ -9,6 +9,7 @@ import '@/styles/index.css'
 import '@/styles/element/index.scss'
 import { handleError } from '@/utils/error'
 import { i18n } from '@/i18n'
+import permDirective from '@/directives/perm'
 
 const app = createApp(App)
 
@@ -22,5 +23,7 @@ app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
+
+app.directive('perm', permDirective)
 
 app.mount('#app')

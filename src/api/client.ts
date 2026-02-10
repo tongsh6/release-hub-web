@@ -1,4 +1,4 @@
-import { http } from './http'
+import { apiGet, apiPost, apiPut, apiDel, type ApiPath } from './http'
 import type { paths } from './schema'
 import type { AxiosRequestConfig } from 'axios'
 
@@ -30,13 +30,17 @@ type QueryParamsType<P extends Path, M extends Method> =
       : undefined
     : undefined
 
+function toApiPath<P extends Path>(url: P): ApiPath {
+  return (String(url).replace(/^\/api\//, '/')) as ApiPath
+}
+
 export const apiClient = {
   get: <P extends Path>(
     url: P, 
     params?: QueryParamsType<P, 'get'>,
     config?: AxiosRequestConfig
   ): Promise<ResponseType<P, 'get'>> => {
-    return http.get(url, { ...config, params })
+    return apiGet(toApiPath(url), { ...config, params })
   },
 
   post: <P extends Path>(
@@ -44,7 +48,7 @@ export const apiClient = {
     data: RequestBodyType<P, 'post'>,
     config?: AxiosRequestConfig
   ): Promise<ResponseType<P, 'post'>> => {
-    return http.post(url, data, config)
+    return apiPost(toApiPath(url), data, config)
   },
 
   put: <P extends Path>(
@@ -52,13 +56,13 @@ export const apiClient = {
     data: RequestBodyType<P, 'put'>,
     config?: AxiosRequestConfig
   ): Promise<ResponseType<P, 'put'>> => {
-    return http.put(url, data, config)
+    return apiPut(toApiPath(url), data, config)
   },
 
   delete: <P extends Path>(
     url: P, 
     config?: AxiosRequestConfig
   ): Promise<ResponseType<P, 'delete'>> => {
-    return http.delete(url, config)
+    return apiDel(toApiPath(url), config)
   }
 }

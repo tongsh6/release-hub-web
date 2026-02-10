@@ -6,6 +6,7 @@
     <div class="search-form-actions">
       <el-button type="primary" :loading="loading" @click="$emit('search')">{{ t('common.search') }}</el-button>
       <el-button @click="$emit('reset')">{{ t('common.reset') }}</el-button>
+      <slot name="extra-actions" />
     </div>
   </el-form>
 </template>

@@ -1,114 +1,165 @@
-import { get, post, put } from '@/api/http'
-import type { PageQuery, PageResult, ReleaseWindowStatus } from '@/types/dto'
+import { apiGet, apiPost, http } from '@/api/http'
+import type { BuildTool } from '@/types/dto'
+import type { PageQuery, PageResult } from '@/types/crud'
+import type { ApiPageResponse } from '@/api/repositoryApi'
 
 const BASE = '/v1'
 
-export interface ReleaseWindowSummaryDTO {
+// --- DTOs (Matched with Backend) ---
+
+export type ReleaseWindowStatus = 'DRAFT' | 'INIT' | 'OPEN' | 'FROZEN' | 'CLOSED' | 'PUBLISHED'
+
+export interface ReleaseWindowView {
   id: string
+  windowKey: string
   name: string
-  code?: string
-  projectId: string
-  projectName?: string
-  startAt: string
-  endAt: string
-  status: ReleaseWindowStatus
-  owner?: string
-  updatedAt: string
-}
-
-export interface ReleaseWindowDetailDTO extends ReleaseWindowSummaryDTO {
   description?: string
-  freezeReason?: string
+  plannedReleaseAt?: string
+  status: ReleaseWindowStatus
+  createdAt: string
+  updatedAt: string
+  frozen: boolean
   publishedAt?: string
-  publishedBy?: string
-  changeHistory?: ReleaseWindowChangeDTO[]
 }
 
-export interface ReleaseWindowChangeDTO {
-  id: string
-  at: string
-  by: string
-  type: 'CREATE' | 'UPDATE' | 'FREEZE' | 'UNFREEZE' | 'PUBLISH'
-  summary: string
-  diff?: Record<string, { from?: any; to?: any }>
-}
-
-export interface ReleaseWindowListFilter {
-  projectId?: string
-  status?: ReleaseWindowStatus
-  keyword?: string
-  startFrom?: string
-  startTo?: string
-}
+// Re-export for compatibility with some UI components using 'ReleaseWindow' name
+export type ReleaseWindow = ReleaseWindowView
 
 export interface CreateReleaseWindowReq {
   name: string
-  code?: string
-  projectId: string
-  startAt: string
-  endAt: string
   description?: string
-  owner?: string
+  plannedReleaseAt?: string
+  groupCode: string
 }
 
-export interface UpdateReleaseWindowReq {
-  name?: string
-  code?: string
-  startAt?: string
-  endAt?: string
-  description?: string
-  owner?: string
+export type PublishReleaseWindowReq = Record<string, never>
+
+export type FreezeReleaseWindowReq = Record<string, never>
+
+export interface VersionUpdateRequest {
+  repoId: string
+  targetVersion: string
+  buildTool: BuildTool
+  repoPath: string
+  pomPath?: string
+  gradlePropertiesPath?: string
 }
 
-export interface FreezeReleaseWindowReq {
-  reason: string
+export interface VersionUpdateResponse {
+  runId: string
+  status: string
 }
 
-export interface UnfreezeReleaseWindowReq {
-  reason?: string
+// --- API Functions ---
+
+export async function list(query: PageQuery & { name?: string; status?: string }): Promise<PageResult<ReleaseWindowView>> {
+  const params = {
+    page: query.page,
+    size: query.pageSize,
+    name: (query as any).name,
+    status: (query as any).status
+  }
+  const res = await http.get<ApiPageResponse<ReleaseWindowView[]>>(`${BASE}/release-windows/paged`, { params })
+  return {
+    list: res.data.data,
+    total: res.data.page.total
+  }
 }
 
-export interface PublishReleaseWindowReq {
-  note?: string
+export function getById(id: string): Promise<ReleaseWindowView> {
+  return apiGet<ReleaseWindowView>(`${BASE}/release-windows/${id}`)
 }
 
-function toQuery(params: Record<string, any>): Record<string, any> {
-  const out: Record<string, any> = {}
-  Object.entries(params).forEach(([k, v]) => {
-    if (v === undefined || v === null || v === '') return
-    out[k] = v
-  })
-  return out
+export function create(req: CreateReleaseWindowReq): Promise<ReleaseWindowView> {
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows`, req)
 }
 
-export function pageReleaseWindows(query: PageQuery, filter?: ReleaseWindowListFilter): Promise<PageResult<ReleaseWindowSummaryDTO>> {
-  return get(`${BASE}/release-windows`, { params: toQuery({ ...query, ...(filter || {}) }) })
+export function freeze(id: string): Promise<ReleaseWindowView> {
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/freeze`, {})
 }
 
-export function getReleaseWindow(id: string): Promise<ReleaseWindowDetailDTO> {
-  return get(`${BASE}/release-windows/${id}`)
+export function unfreeze(id: string): Promise<ReleaseWindowView> {
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/unfreeze`, {})
 }
 
-export function createReleaseWindow(req: CreateReleaseWindowReq): Promise<ReleaseWindowDetailDTO> {
-  return post(`${BASE}/release-windows`, req)
+export function publish(id: string): Promise<ReleaseWindowView> {
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/publish`, {})
 }
 
-export function updateReleaseWindow(id: string, req: UpdateReleaseWindowReq): Promise<ReleaseWindowDetailDTO> {
-  return put(`${BASE}/release-windows/${id}`, req)
+export function closeWindow(id: string): Promise<ReleaseWindowView> {
+  return apiPost<ReleaseWindowView>(`${BASE}/release-windows/${id}/close`, {})
 }
 
-export function freezeReleaseWindow(id: string, req: FreezeReleaseWindowReq): Promise<void> {
-  return post(`${BASE}/release-windows/${id}/freeze`, req)
+export function attach(id: string, iterationKey: string): Promise<string[]> {
+  return apiPost<string[]>(`${BASE}/release-windows/${id}/attach`, { iterationKeys: [iterationKey] })
 }
 
-export function unfreezeReleaseWindow(id: string, req: UnfreezeReleaseWindowReq = {}): Promise<void> {
-  return post(`${BASE}/release-windows/${id}/unfreeze`, req)
+export function detach(id: string, iterationKey: string): Promise<boolean> {
+  return apiPost<boolean>(`${BASE}/release-windows/${id}/detach`, { iterationKey })
 }
 
-export function publishReleaseWindow(id: string, req: PublishReleaseWindowReq = {}): Promise<void> {
-  return post(`${BASE}/release-windows/${id}/publish`, req)
+export function listIterations(id: string): Promise<any[]> {
+  return apiGet<any[]>(`${BASE}/release-windows/${id}/iterations`)
 }
 
-export function listReleaseWindowChanges(id: string): Promise<ReleaseWindowChangeDTO[]> {
-  return get(`${BASE}/release-windows/${id}/changes`)
+export function orchestrate(id: string): Promise<any> {
+  return apiPost<any>(`${BASE}/release-windows/${id}/orchestrate`, {})
+}
+
+export function getPlan(id: string): Promise<any> {
+  return apiGet<any>(`${BASE}/release-windows/${id}/plan`)
+}
+
+export function getDryPlan(id: string): Promise<any> {
+  return apiGet<any>(`${BASE}/release-windows/${id}/dry-plan`)
+}
+
+export function executeVersionUpdate(id: string, req: VersionUpdateRequest): Promise<VersionUpdateResponse> {
+  return apiPost<VersionUpdateResponse>(`${BASE}/release-windows/${id}/execute/version-update`, req)
+}
+
+// --- 代码合并相关 ---
+
+export interface CodeMergeResult {
+  repoId: string
+  repoName: string
+  sourceBranch: string
+  targetBranch: string
+  status: 'SUCCESS' | 'CONFLICT' | 'FAILED'
+  message?: string
+  mergedAt?: string
+}
+
+/**
+ * 合并指定迭代的代码到 release 分支
+ */
+export function mergeIteration(windowId: string, iterationKey: string): Promise<CodeMergeResult[]> {
+  return apiPost<CodeMergeResult[]>(`${BASE}/release-windows/${windowId}/iterations/${iterationKey}/merge`, {})
+}
+
+/**
+ * 批量合并所有迭代的代码到 release 分支
+ */
+export function mergeAll(windowId: string): Promise<CodeMergeResult[]> {
+  return apiPost<CodeMergeResult[]>(`${BASE}/release-windows/${windowId}/merge`, {})
+}
+
+// Alias for compatibility if needed, or prefer using explicit names above
+export const releaseWindowApi = {
+  list,
+  get: getById,
+  create,
+  freeze,
+  unfreeze,
+  publish,
+  close: closeWindow,
+  attach,
+  detach,
+  listIterations,
+  orchestrate,
+  getPlan,
+  getDryPlan,
+  executeVersionUpdate,
+  mergeIteration,
+  mergeAll
 }

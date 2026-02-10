@@ -1,37 +1,53 @@
 <template>
   <el-dialog
     v-model="visible"
-    :title="title"
+    :title="t('releaseWindow.create')"
     width="600px"
     :before-close="handleBeforeClose"
     append-to-body
   >
     <el-form
       ref="formRef"
+      v-loading="loading"
       :model="form"
       :rules="rules"
-      label-width="100px"
-      v-loading="loading"
-      :disabled="mode === 'view'"
+      label-width="120px"
     >
       <el-form-item :label="t('releaseWindow.name')" prop="name">
-        <el-input v-model="form.name" :placeholder="t('releaseWindow.placeholder.enterName')" />
-      </el-form-item>
-      
-      <el-form-item :label="t('releaseWindow.description')" prop="description">
-        <el-input 
-          v-model="form.description" 
-          type="textarea" 
-          :placeholder="t('releaseWindow.placeholder.enterDesc')" 
-          :rows="3" 
+        <el-input
+          v-model="form.name"
+          :placeholder="t('releaseWindow.placeholder.enterName')"
+          :maxlength="200"
+          show-word-limit
         />
       </el-form-item>
 
-      <el-form-item :label="t('releaseWindow.status')" prop="status" v-if="mode !== 'create'">
-        <el-radio-group v-model="form.status">
-          <el-radio value="active">{{ t('releaseWindow.active') }}</el-radio>
-          <el-radio value="frozen">{{ t('releaseWindow.frozen') }}</el-radio>
-        </el-radio-group>
+      <el-form-item :label="t('group.title')" prop="groupCode">
+        <GroupTreeSelect
+          v-model="form.groupCode"
+          :leaf-only="true"
+        />
+      </el-form-item>
+      
+      <el-form-item :label="t('releaseWindow.plannedReleaseAt')" prop="plannedReleaseAt">
+        <el-date-picker
+          v-model="form.plannedReleaseAt"
+          type="datetime"
+          :placeholder="t('common.selectDateTime')"
+          style="width: 100%"
+          value-format="YYYY-MM-DDTHH:mm:ss.SSSZ"
+        />
+      </el-form-item>
+      
+      <el-form-item :label="t('releaseWindow.description')" prop="description">
+        <el-input
+          v-model="form.description"
+          type="textarea"
+          :rows="3"
+          :maxlength="2000"
+          show-word-limit
+          :placeholder="t('releaseWindow.placeholder.enterDescription')"
+        />
       </el-form-item>
     </el-form>
 
@@ -39,7 +55,6 @@
       <span class="dialog-footer">
         <el-button @click="close">{{ t('common.cancel') }}</el-button>
         <el-button 
-          v-if="mode !== 'view'" 
           type="primary" 
           :loading="saving" 
           @click="handleSubmit"
@@ -52,10 +67,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDialogForm } from '@/composables/crud/useDialogForm'
-import { releaseWindowApi, type ReleaseWindow } from '@/api/releaseWindowApi'
+import { releaseWindowApi } from '@/api/modules/releaseWindow'
+import GroupTreeSelect from '@/components/common/GroupTreeSelect.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const { t } = useI18n()
@@ -66,42 +82,46 @@ const emit = defineEmits<{
 
 const formRef = ref<FormInstance>()
 
-const { visible, mode, loading, saving, form, open, close, submit, onSuccess } = useDialogForm<ReleaseWindow>({
-  fetchById: releaseWindowApi.get,
-  create: releaseWindowApi.create,
-  update: releaseWindowApi.update,
+interface DialogFormState {
+  name: string
+  description: string
+  plannedReleaseAt: string
+  groupCode: string
+}
+
+const { visible, loading, saving, form, open, close, submit, onSuccess } = useDialogForm<DialogFormState>({
+  create: async (data) => {
+    return releaseWindowApi.create({
+      name: data.name,
+      description: data.description || undefined,
+      plannedReleaseAt: data.plannedReleaseAt || undefined,
+      groupCode: data.groupCode
+    })
+  },
   defaultForm: {
-    id: '',
     name: '',
-    status: 'active',
-    createdAt: '',
-    description: ''
+    description: '',
+    plannedReleaseAt: '',
+    groupCode: ''
   }
 })
 
-// Bind success callback to emit
 onSuccess((payload) => {
   emit('success', payload)
 })
 
-const title = computed(() => {
-  const map: Record<string, string> = {
-    create: t('releaseWindow.create'),
-    edit: t('releaseWindow.editTitle'),
-    view: t('releaseWindow.details')
-  }
-  return map[mode.value]
-})
-
-const rules = computed<FormRules>(() => ({
+const rules: FormRules = {
   name: [
-    { required: true, message: t('releaseWindow.validation.nameRequired'), trigger: 'blur' },
-    { min: 3, max: 50, message: t('releaseWindow.validation.nameLength'), trigger: 'blur' }
+    { required: true, message: t('releaseWindow.validation.required'), trigger: 'blur' },
+    { max: 200, message: t('common.maxLength', { max: 200 }), trigger: 'blur' }
   ],
-  status: [
-    { required: true, message: t('releaseWindow.validation.statusRequired'), trigger: 'change' }
+  groupCode: [
+    { required: true, message: t('group.selectGroup'), trigger: 'change' }
+  ],
+  description: [
+    { max: 2000, message: t('common.maxLength', { max: 2000 }), trigger: 'blur' }
   ]
-}))
+}
 
 const handleSubmit = async () => {
   if (!formRef.value) return

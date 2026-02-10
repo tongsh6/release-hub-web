@@ -20,10 +20,10 @@
     <el-container class="rh-main-container">
       <el-header>
         <div class="header-content">
-          <span>ReleaseHub Dashboard</span>
+          <span>{{ t('header.title') }}</span>
           <div class="header-right">
             <LocaleSwitch class="mr-4" />
-            <el-button type="primary" link @click="logout">Logout</el-button>
+            <el-button type="primary" link @click="logout">{{ t('common.logout') }}</el-button>
           </div>
         </div>
       </el-header>
@@ -45,31 +45,43 @@ import {
   Menu as IconMenu,
   List,
   Setting,
-  Files,
   Monitor,
-  HomeFilled
+  DataBoard,
+  Calendar,
+  Collection,
+  Folder,
+  TrendCharts,
+  Warning
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 const userStore = useUserStore()
 
 const activeMenu = computed(() => route.path)
 
 const menuRoutes = computed(() => {
   const mainRoute = constantRoutes.find(r => r.path === '/')
-  return mainRoute?.children || []
+  const children = (mainRoute?.children || []).filter(r => !r.meta?.hidden)
+  return children.sort((a, b) => {
+    const ao = (a.meta?.order as number) ?? 999
+    const bo = (b.meta?.order as number) ?? 999
+    return ao - bo
+  })
 })
 
 const getIcon = (name: string) => {
   switch (name) {
-    case 'Dashboard': return HomeFilled
-    case 'ReleaseWindows': return IconMenu
-    case 'Projects': return Files
+    case 'Dashboard': return DataBoard
+    case 'ReleaseWindows': return Calendar
     case 'BranchRules': return Setting
     case 'VersionPolicies': return List
     case 'VersionOps': return Monitor
+    case 'Iterations': return Collection
+    case 'Repositories': return Folder
+    case 'Runs': return TrendCharts
+    case 'BlockBoard': return Warning
     default: return IconMenu
   }
 }
@@ -147,10 +159,6 @@ const logout = () => {
 .header-right {
   display: flex;
   align-items: center;
-}
-
-.mr-4 {
-  margin-right: 16px;
 }
 
 /* 右侧主区域允许自适应，并防止内容把布局撑坏（关键） */

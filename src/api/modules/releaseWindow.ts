@@ -29,6 +29,7 @@ export interface CreateReleaseWindowReq {
   name: string
   description?: string
   plannedReleaseAt?: string
+  groupCode: string
 }
 
 export type PublishReleaseWindowReq = Record<string, never>
@@ -51,11 +52,12 @@ export interface VersionUpdateResponse {
 
 // --- API Functions ---
 
-export async function list(query: PageQuery & { name?: string }): Promise<PageResult<ReleaseWindowView>> {
+export async function list(query: PageQuery & { name?: string; status?: string }): Promise<PageResult<ReleaseWindowView>> {
   const params = {
     page: query.page,
     size: query.pageSize,
-    name: (query as any).name
+    name: (query as any).name,
+    status: (query as any).status
   }
   const res = await http.get<ApiPageResponse<ReleaseWindowView[]>>(`${BASE}/release-windows/paged`, { params })
   return {

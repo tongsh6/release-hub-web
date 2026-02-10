@@ -9,7 +9,7 @@ export default {
   },
   menu: {
     dashboard: '仪表盘',
-    projects: '项目管理',
+    calendar: '发布日历',
     releaseWindows: '发布窗口',
     branchRules: '分支规则',
     versionPolicies: '版本策略',
@@ -70,7 +70,8 @@ export default {
     clear: '清空',
     loginRequired: '请先登录',
     close: '关闭',
-    maxLength: '最多输入 {max} 个字符'
+    maxLength: '最多输入 {max} 个字符',
+    all: '全部'
   },
   dashboard: {
     totalRepositories: '仓库总数',
@@ -178,33 +179,6 @@ export default {
       hasConflict: '部分仓库存在冲突，请在 GitLab 中手动解决',
       hasFailed: '部分仓库合并失败，请检查错误信息'
     }
-  },
-  project: {
-    filter: '筛选项目',
-    noProject: '暂无项目，请先创建项目/子项目',
-    selectTip: '请选择一个项目/子项目',
-    create: '新建项目',
-    edit: '编辑项目',
-    name: '项目名称',
-    namePlaceholder: '请输入项目名称',
-    nameRequired: '项目名称不能为空',
-    type: '类型',
-    status: '状态',
-    statusActive: '活跃',
-    statusArchived: '已归档',
-    code: '编码',
-    repoUrl: '仓库地址',
-    buildTool: '构建工具',
-    defaultBranch: '默认分支',
-    description: '描述',
-    descriptionPlaceholder: '请输入项目描述',
-    keyword: '关键字',
-    enterKeyword: '请输入关键字',
-    active: '进行中',
-    archived: '已归档',
-    archive: '归档',
-    archiveSuccess: '归档成功',
-    dateRange: '创建时间',
   },
   branchRule: {
     name: '规则名称',
@@ -477,14 +451,22 @@ export default {
   ,
   header: {
     title: 'ReleaseHub'
-  }
-  ,
+  },
+  calendar: {
+    title: '发布日历',
+    today: '今天',
+    more: '更多'
+  },
   group: {
     title: '分组设置',
     name: '名称',
     code: '编码',
     parentCode: '父级编码',
+    codePlaceholder: '留空自动生成',
+    codeAutoGenTip: '留空时系统自动生成编码（如 001、001001）',
     searchPlaceholder: '按名称或编码筛选',
+    selectGroup: '请选择分组',
+    hasChildren: '有子分组',
     emptyFiltered: '没有匹配的分组',
     create: '新增分组',
     createTop: '新增顶层分组',
@@ -509,5 +491,38 @@ export default {
       parentLength: '父级编码最长 64 个字符',
       codeImmutable: '编码不可修改'
     }
+  },
+  orchestration: {
+    title: '发布编排',
+    status: {
+      preparing: '准备中',
+      finishing: '收尾中',
+      completed: '已完成',
+      unknown: '未知'
+    },
+    steps: {
+      prepare: '准备',
+      merge: '代码合并',
+      version: '版本更新',
+      finish: '收尾'
+    },
+    iterationCount: '迭代数',
+    repoCount: '仓库数',
+    previewPlan: '预览计划',
+    mergeDirection: '合并方向',
+    mergeAll: '合并所有',
+    versionAction: '版本操作',
+    updatePomGradle: '更新 POM/Gradle 版本',
+    finishActions: '收尾操作',
+    finishAction: {
+      mergeToMaster: '合并到 Master',
+      createTag: '创建标签',
+      archiveBranch: '归档分支'
+    },
+    executeFinish: '执行收尾',
+    recentRuns: '最近执行记录',
+    planPreview: '执行计划预览',
+    confirmMergeAll: '确认合并所有迭代的代码到 release 分支？',
+    confirmOrchestrate: '确认执行收尾编排？将合并到 master 并创建标签'
   }
 }

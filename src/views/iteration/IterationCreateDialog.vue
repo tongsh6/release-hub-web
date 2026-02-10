@@ -4,7 +4,7 @@
     :title="t('iteration.new')"
     :confirm-text="t('common.confirm')"
     :cancel-text="t('common.cancel')"
-    @confirm="submit"
+    @confirm="submitWithValidation"
     @opened="onOpened"
   >
     <template #default>
@@ -17,6 +17,14 @@
             show-word-limit
           />
         </el-form-item>
+
+        <el-form-item :label="t('group.title')" prop="groupCode">
+          <GroupTreeSelect
+            v-model="form.groupCode"
+            :leaf-only="true"
+          />
+        </el-form-item>
+
         <el-form-item :label="t('iteration.columns.expectedReleaseAt')" prop="expectedReleaseAt">
           <el-date-picker
             v-model="form.expectedReleaseAt"
@@ -39,75 +47,113 @@
       </el-form>
     </template>
   </EntityDialog>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref } from 'vue'
-  import type { FormInstance, FormRules } from 'element-plus'
-  import { ElMessage } from 'element-plus'
-  import { useI18n } from 'vue-i18n'
-  import EntityDialog from '@/components/common/EntityDialog.vue'
-  import { useDialogForm } from '@/composables/crud/useDialogForm'
-  import { iterationApi, type CreateIterationRequest } from '@/api/iterationApi'
-  
-  const { t } = useI18n()
-  const emit = defineEmits<{ (e: 'success'): void }>()
-  
-  const entityRef = ref<InstanceType<typeof EntityDialog>>()
-  const formRef = ref<FormInstance>()
-  
-  const {
-    form,
-    open,
-    submit,
-    onSuccess
-  } = useDialogForm<CreateIterationRequest>({
-    fetchById: async (id) => {
-      const key = String(id)
-      const res = await iterationApi.get(key)
-      return { name: res.name, description: res.description, expectedReleaseAt: res.expectedReleaseAt }
-    },
-    create: async (payload: CreateIterationRequest) => {
-      await iterationApi.create(payload)
-      ElMessage.success(t('common.save'))
-    },
-    update: async (id, payload: CreateIterationRequest) => {
-      await iterationApi.create(payload)
-      ElMessage.success(t('common.save'))
-    },
-    defaultForm: {
-      name: '',
-      description: '',
-      expectedReleaseAt: null
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+import EntityDialog from '@/components/common/EntityDialog.vue'
+import GroupTreeSelect from '@/components/common/GroupTreeSelect.vue'
+import { useDialogForm } from '@/composables/crud/useDialogForm'
+import { iterationApi, type CreateIterationRequest } from '@/api/iterationApi'
+
+const { t } = useI18n()
+const emit = defineEmits<{ (e: 'success'): void }>()
+
+const entityRef = ref<InstanceType<typeof EntityDialog>>()
+const formRef = ref<FormInstance>()
+
+interface IterationFormState {
+  name: string
+  description?: string
+  expectedReleaseAt?: string | null
+  groupCode: string
+}
+
+const {
+  form,
+  open,
+  submit,
+  onSuccess
+} = useDialogForm<IterationFormState>({
+  fetchById: async (id) => {
+    const key = String(id)
+    const res = await iterationApi.get(key)
+    return { 
+      name: res.name, 
+      description: res.description, 
+      expectedReleaseAt: res.expectedReleaseAt,
+      groupCode: '' // Iteration 目前没有返回 groupCode，后续需要后端支持
     }
-  })
-  
-  onSuccess(() => {
-    entityRef.value?.close()
-    emit('success')
-  })
-  
-  const rules: FormRules = {
-    name: [
-      { required: true, message: t('common.pleaseEnter') + t('iteration.columns.name'), trigger: 'blur' },
-      { max: 500, message: t('common.maxLength', { max: 500 }), trigger: 'blur' }
-    ],
-    description: [
-      { max: 2000, message: t('common.maxLength', { max: 2000 }), trigger: 'blur' }
-    ]
+  },
+  create: async (payload: IterationFormState) => {
+    const req: CreateIterationRequest = {
+      name: payload.name,
+      description: payload.description,
+      expectedReleaseAt: payload.expectedReleaseAt,
+      groupCode: payload.groupCode
+    }
+    await iterationApi.create(req)
+    ElMessage.success(t('common.success'))
+  },
+  update: async (id, payload: IterationFormState) => {
+    await iterationApi.update(String(id), {
+      name: payload.name,
+      description: payload.description,
+      expectedReleaseAt: payload.expectedReleaseAt,
+      groupCode: payload.groupCode
+    })
+    ElMessage.success(t('common.success'))
+  },
+  defaultForm: {
+    name: '',
+    description: '',
+    expectedReleaseAt: null,
+    groupCode: ''
   }
-  
-  const openCreate = () => {
-    open({ mode: 'create' })
-    entityRef.value?.open()
+})
+
+onSuccess(() => {
+  entityRef.value?.close()
+  emit('success')
+})
+
+const rules: FormRules = {
+  name: [
+    { required: true, message: t('common.pleaseEnter') + t('iteration.columns.name'), trigger: 'blur' },
+    { max: 500, message: t('common.maxLength', { max: 500 }), trigger: 'blur' }
+  ],
+  groupCode: [
+    { required: true, message: t('group.selectGroup'), trigger: 'change' }
+  ],
+  description: [
+    { max: 2000, message: t('common.maxLength', { max: 2000 }), trigger: 'blur' }
+  ]
+}
+
+const submitWithValidation = async () => {
+  if (!formRef.value) {
+    await submit()
+    return
   }
-  
-  const onOpened = () => {
-    formRef.value?.clearValidate()
-  }
-  
-  defineExpose({ open: openCreate })
-  </script>
-  
-  <style scoped>
-  </style>
+  const valid = await formRef.value.validate().catch(() => false)
+  if (!valid) return
+  await submit()
+}
+
+const openCreate = () => {
+  open({ mode: 'create' })
+  entityRef.value?.open()
+}
+
+const onOpened = () => {
+  formRef.value?.clearValidate()
+}
+
+defineExpose({ open: openCreate })
+</script>
+
+<style scoped>
+</style>

@@ -15,9 +15,10 @@
         <el-form-item :label="t('group.code')" prop="code">
           <el-input
             v-model="form.code"
-            :placeholder="t('common.pleaseEnter') + t('group.code')"
+            :placeholder="t('group.codePlaceholder')"
             :disabled="mode === 'edit'"
           />
+          <div v-if="mode === 'create'" class="form-tip">{{ t('group.codeAutoGenTip') }}</div>
         </el-form-item>
         <el-form-item :label="t('group.parentCode')" prop="parentCode">
           <el-input
@@ -69,7 +70,7 @@ const {
     try {
       await groupApi.create({
         name: payload.name!,
-        code: payload.code!,
+        code: payload.code || undefined,
         parentCode: payload.parentCode
       })
       ElMessage.success(t('group.createSuccess'))
@@ -106,7 +107,6 @@ const rules: FormRules = {
     { max: 128, message: t('group.validation.nameLength'), trigger: 'blur' }
   ],
   code: [
-    { required: true, message: t('group.validation.codeRequired'), trigger: 'blur' },
     { max: 64, message: t('group.validation.codeLength'), trigger: 'blur' }
   ],
   parentCode: [
@@ -146,5 +146,10 @@ defineExpose({ open: openWithPreset, openEdit })
 <style scoped>
 .preset-tip {
   margin-top: 6px;
+}
+.form-tip {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  margin-top: 4px;
 }
 </style>

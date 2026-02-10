@@ -45,7 +45,6 @@ import {
   Menu as IconMenu,
   List,
   Setting,
-  Files,
   Monitor,
   DataBoard,
   Calendar,
@@ -76,7 +75,6 @@ const getIcon = (name: string) => {
   switch (name) {
     case 'Dashboard': return DataBoard
     case 'ReleaseWindows': return Calendar
-    case 'Projects': return Files
     case 'BranchRules': return Setting
     case 'VersionPolicies': return List
     case 'VersionOps': return Monitor

@@ -22,6 +22,12 @@
       <el-form-item :label="t('repository.columns.defaultBranch')" prop="defaultBranch">
         <el-input v-model="form.defaultBranch" :placeholder="t('repository.placeholders.defaultBranch')" />
       </el-form-item>
+      <el-form-item :label="t('group.title')" prop="groupCode">
+        <GroupTreeSelect
+          v-model="form.groupCode"
+          :leaf-only="true"
+        />
+      </el-form-item>
       <el-form-item :label="t('repository.columns.initialVersion')" prop="initialVersion">
         <el-input v-model="form.initialVersion" :placeholder="t('repository.placeholders.initialVersion')" />
       </el-form-item>
@@ -45,6 +51,7 @@ import { ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { repositoryApi, type CreateRepoReq } from '@/api/repositoryApi'
+import GroupTreeSelect from '@/components/common/GroupTreeSelect.vue'
 import { handleError } from '@/utils/error'
 
 const emit = defineEmits(['success'])
@@ -61,7 +68,8 @@ const form = reactive<CreateRepoReq>({
   cloneUrl: '',
   defaultBranch: 'main',
   monoRepo: false,
-  initialVersion: ''
+  initialVersion: '',
+  groupCode: ''
 })
 
 const rules = {
@@ -76,6 +84,9 @@ const rules = {
   defaultBranch: [
     { max: 128, message: t('repository.validation.defaultBranch'), trigger: 'blur' }
   ],
+  groupCode: [
+    { required: true, message: t('group.selectGroup'), trigger: 'change' }
+  ],
   initialVersion: [
     { max: 50, message: t('repository.validation.initialVersion'), trigger: 'blur' }
   ]
@@ -88,6 +99,7 @@ const open = (repo?: any) => {
   form.defaultBranch = repo?.defaultBranch || 'main'
   form.monoRepo = repo?.monoRepo ?? false
   form.initialVersion = ''
+  form.groupCode = repo?.groupCode || ''
   mode.value = repo ? 'edit' : 'create'
   currentId.value = repo?.id || null
   if (repo?.id) {
@@ -113,7 +125,8 @@ const submit = async () => {
             cloneUrl: form.cloneUrl,
             defaultBranch: form.defaultBranch,
             monoRepo: form.monoRepo,
-            initialVersion: form.initialVersion || undefined
+            initialVersion: form.initialVersion || undefined,
+            groupCode: form.groupCode
           })
         } else {
           await repositoryApi.create({
@@ -121,7 +134,8 @@ const submit = async () => {
             cloneUrl: form.cloneUrl,
             defaultBranch: form.defaultBranch,
             monoRepo: form.monoRepo,
-            initialVersion: form.initialVersion || undefined
+            initialVersion: form.initialVersion || undefined,
+            groupCode: form.groupCode
           })
         }
         ElMessage.success(t('common.success'))

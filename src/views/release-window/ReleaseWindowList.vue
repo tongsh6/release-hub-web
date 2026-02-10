@@ -4,6 +4,14 @@
       <el-form-item :label="t('releaseWindow.name')">
         <el-input v-model="query.name" :placeholder="t('releaseWindow.placeholder.name')" clearable />
       </el-form-item>
+      <el-form-item :label="t('releaseWindow.status')">
+        <el-select v-model="query.status" :placeholder="t('common.all')" clearable style="width: 150px">
+          <el-option value="" :label="t('common.all')" />
+          <el-option value="DRAFT" :label="t('releaseWindow.statusText.DRAFT')" />
+          <el-option value="PUBLISHED" :label="t('releaseWindow.statusText.PUBLISHED')" />
+          <el-option value="CLOSED" :label="t('releaseWindow.statusText.CLOSED')" />
+        </el-select>
+      </el-form-item>
     </SearchForm>
 
     <DataTable

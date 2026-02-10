@@ -9,7 +9,7 @@ export default {
   },
   menu: {
     dashboard: 'Dashboard',
-    projects: 'Projects',
+    calendar: 'Calendar',
     releaseWindows: 'Release Windows',
     branchRules: 'Branch Rules',
     versionPolicies: 'Version Policies',
@@ -70,7 +70,8 @@ export default {
     clear: 'Clear',
     loginRequired: 'Please login first',
     close: 'Close',
-    maxLength: 'Maximum {max} characters'
+    maxLength: 'Maximum {max} characters',
+    all: 'All'
   },
   dashboard: {
     totalRepositories: 'Total Repositories',
@@ -178,33 +179,6 @@ export default {
       hasConflict: 'Some repositories have conflicts, please resolve in GitLab',
       hasFailed: 'Some repositories failed to merge, please check error messages'
     }
-  },
-  project: {
-    filter: 'Filter projects',
-    noProject: 'No projects, please create first',
-    selectTip: 'Please select a project/subproject',
-    create: 'Create Project',
-    edit: 'Edit Project',
-    name: 'Project Name',
-    namePlaceholder: 'Enter project name',
-    nameRequired: 'Project name is required',
-    type: 'Type',
-    status: 'Status',
-    statusActive: 'Active',
-    statusArchived: 'Archived',
-    code: 'Code',
-    repoUrl: 'Repo URL',
-    buildTool: 'Build Tool',
-    defaultBranch: 'Default Branch',
-    description: 'Description',
-    descriptionPlaceholder: 'Enter project description',
-    keyword: 'Keyword',
-    enterKeyword: 'Enter keyword',
-    active: 'Active',
-    archived: 'Archived',
-    archive: 'Archive',
-    archiveSuccess: 'Archived successfully',
-    dateRange: 'Created Date',
   },
   branchRule: {
     name: 'Rule Name',
@@ -436,14 +410,22 @@ export default {
   ,
   header: {
     title: 'ReleaseHub'
-  }
-  ,
+  },
+  calendar: {
+    title: 'Release Calendar',
+    today: 'Today',
+    more: 'more'
+  },
   group: {
     title: 'Groups',
     name: 'Name',
     code: 'Code',
     parentCode: 'Parent Code',
+    codePlaceholder: 'Leave empty for auto-generation',
+    codeAutoGenTip: 'Auto-generated if left empty (e.g., 001, 001001)',
     searchPlaceholder: 'Filter by name or code',
+    selectGroup: 'Select a group',
+    hasChildren: 'Has children',
     emptyFiltered: 'No matching groups',
     create: 'Create Group',
     createTop: 'Create Top-Level Group',
@@ -468,5 +450,38 @@ export default {
       parentLength: 'Parent code must be at most 64 characters',
       codeImmutable: 'Code cannot be changed'
     }
+  },
+  orchestration: {
+    title: 'Release Orchestration',
+    status: {
+      preparing: 'Preparing',
+      finishing: 'Finishing',
+      completed: 'Completed',
+      unknown: 'Unknown'
+    },
+    steps: {
+      prepare: 'Prepare',
+      merge: 'Code Merge',
+      version: 'Version Update',
+      finish: 'Finish'
+    },
+    iterationCount: 'Iterations',
+    repoCount: 'Repositories',
+    previewPlan: 'Preview Plan',
+    mergeDirection: 'Merge Direction',
+    mergeAll: 'Merge All',
+    versionAction: 'Version Action',
+    updatePomGradle: 'Update POM/Gradle Version',
+    finishActions: 'Finish Actions',
+    finishAction: {
+      mergeToMaster: 'Merge to Master',
+      createTag: 'Create Tag',
+      archiveBranch: 'Archive Branch'
+    },
+    executeFinish: 'Execute Finish',
+    recentRuns: 'Recent Runs',
+    planPreview: 'Execution Plan Preview',
+    confirmMergeAll: 'Confirm to merge all iterations to release branch?',
+    confirmOrchestrate: 'Confirm to execute finish orchestration? Will merge to master and create tags.'
   }
 }

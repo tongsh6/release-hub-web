@@ -147,8 +147,20 @@
       </div>
     </el-card>
 
+    <!-- 编排控制台 -->
+    <OrchestrationPanel
+      v-if="form.id && iterations.length > 0"
+      :window-id="form.id"
+      :window-status="form.status || 'DRAFT'"
+      :iteration-count="iterations.length"
+      :repo-count="totalRepoCount"
+      @open-version-update="openVersionUpdate"
+      @refresh="handleRefresh"
+    />
+
     <AttachIterationsDialog ref="attachDialogRef" @success="handleAttachSuccess" />
     <CodeMergeDialog ref="codeMergeDialogRef" />
+    <VersionUpdateDialog ref="versionUpdateDialogRef" @success="handleRefresh" />
   </div>
 </template>
 
@@ -166,6 +178,8 @@ import { formatDateTime, formatDate } from '@/utils/date'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import AttachIterationsDialog from './AttachIterationsDialog.vue'
 import CodeMergeDialog from './CodeMergeDialog.vue'
+import OrchestrationPanel from './OrchestrationPanel.vue'
+import VersionUpdateDialog from './VersionUpdateDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -176,6 +190,7 @@ const iterationsLoading = ref(false)
 const form = ref<Partial<ReleaseWindow>>({})
 const attachDialogRef = ref<InstanceType<typeof AttachIterationsDialog>>()
 const codeMergeDialogRef = ref<InstanceType<typeof CodeMergeDialog>>()
+const versionUpdateDialogRef = ref<InstanceType<typeof VersionUpdateDialog>>()
 
 // 迭代信息（包含仓库详情）
 interface IterationWithRepos {
@@ -264,6 +279,10 @@ onMounted(() => {
 
 const title = computed(() => form.value.name || t('releaseWindow.details'))
 
+const totalRepoCount = computed(() => {
+  return iterations.value.reduce((sum, iter) => sum + (iter.repos?.length || 0), 0)
+})
+
 const goBack = () => {
   router.back()
 }
@@ -290,6 +309,18 @@ const openCodeMerge = () => {
     form.value.id,
     iterations.value.map(iter => ({ key: iter.key, name: iter.name }))
   )
+}
+
+const openVersionUpdate = () => {
+  if (!form.value?.id) return
+  versionUpdateDialogRef.value?.open(form.value.id, iterations.value.flatMap(iter => iter.repos || []))
+}
+
+const handleRefresh = () => {
+  const id = route.params.id as string
+  if (id) {
+    load(id)
+  }
 }
 
 const handleFreeze = async () => {

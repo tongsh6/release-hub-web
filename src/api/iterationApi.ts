@@ -44,6 +44,7 @@ export interface CreateIterationRequest {
   description?: string
   expectedReleaseAt?: string | null
   repoIds?: string[]
+  groupCode: string
 }
 
 export interface UpdateIterationRequest {
@@ -51,6 +52,7 @@ export interface UpdateIterationRequest {
   description?: string
   expectedReleaseAt?: string | null
   repoIds?: string[]
+  groupCode?: string
 }
 
 // 将后端数据转换为前端格式

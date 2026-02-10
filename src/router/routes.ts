@@ -1,5 +1,4 @@
 import type { RouteRecordRaw } from 'vue-router'
-import projectRoutes from './modules/projects'
 import releaseWindowRoutes from './modules/release-window'
 import branchRuleRoutes from './modules/branch-rules'
 import versionPolicyRoutes from './modules/version-policies'
@@ -8,8 +7,8 @@ import iterationsRoutes from './modules/iterations'
 import repositoriesRoutes from './modules/repositories'
 import runsRoutes from './modules/runs'
 import settingsRoutes from './modules/settings'
-import templateCrudRoutes from './modules/templateCrud'
 import groupsRoutes from './modules/groups'
+import calendarRoutes from './modules/calendar'
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
@@ -29,7 +28,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/dashboard/Dashboard.vue'),
         meta: { title: 'Dashboard', titleKey: 'menu.dashboard', requiresAuth: true, permission: 'dashboard:read', order: 10 }
       },
-      ...projectRoutes,
+      ...calendarRoutes,
       ...releaseWindowRoutes,
       ...branchRuleRoutes,
       ...versionPolicyRoutes,
@@ -38,7 +37,6 @@ export const constantRoutes: RouteRecordRaw[] = [
       ...repositoriesRoutes,
       ...runsRoutes,
       ...settingsRoutes,
-      ...templateCrudRoutes,
       ...groupsRoutes
     ]
   },

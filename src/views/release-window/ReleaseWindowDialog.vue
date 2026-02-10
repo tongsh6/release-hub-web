@@ -21,6 +21,13 @@
           show-word-limit
         />
       </el-form-item>
+
+      <el-form-item :label="t('group.title')" prop="groupCode">
+        <GroupTreeSelect
+          v-model="form.groupCode"
+          :leaf-only="true"
+        />
+      </el-form-item>
       
       <el-form-item :label="t('releaseWindow.plannedReleaseAt')" prop="plannedReleaseAt">
         <el-date-picker
@@ -64,6 +71,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDialogForm } from '@/composables/crud/useDialogForm'
 import { releaseWindowApi } from '@/api/modules/releaseWindow'
+import GroupTreeSelect from '@/components/common/GroupTreeSelect.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const { t } = useI18n()
@@ -78,6 +86,7 @@ interface DialogFormState {
   name: string
   description: string
   plannedReleaseAt: string
+  groupCode: string
 }
 
 const { visible, loading, saving, form, open, close, submit, onSuccess } = useDialogForm<DialogFormState>({
@@ -85,13 +94,15 @@ const { visible, loading, saving, form, open, close, submit, onSuccess } = useDi
     return releaseWindowApi.create({
       name: data.name,
       description: data.description || undefined,
-      plannedReleaseAt: data.plannedReleaseAt || undefined
+      plannedReleaseAt: data.plannedReleaseAt || undefined,
+      groupCode: data.groupCode
     })
   },
   defaultForm: {
     name: '',
     description: '',
-    plannedReleaseAt: ''
+    plannedReleaseAt: '',
+    groupCode: ''
   }
 })
 
@@ -103,6 +114,9 @@ const rules: FormRules = {
   name: [
     { required: true, message: t('releaseWindow.validation.required'), trigger: 'blur' },
     { max: 200, message: t('common.maxLength', { max: 200 }), trigger: 'blur' }
+  ],
+  groupCode: [
+    { required: true, message: t('group.selectGroup'), trigger: 'change' }
   ],
   description: [
     { max: 2000, message: t('common.maxLength', { max: 2000 }), trigger: 'blur' }

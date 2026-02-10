@@ -47,6 +47,7 @@ export interface CreateRepoReq {
   defaultBranch?: string
   monoRepo: boolean
   initialVersion?: string
+  groupCode: string
 }
 
 export interface UpdateRepoReq {
@@ -55,6 +56,7 @@ export interface UpdateRepoReq {
   defaultBranch?: string
   monoRepo: boolean
   initialVersion?: string
+  groupCode: string
 }
 
 export interface ApiPageResponse<T> {

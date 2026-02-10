@@ -28,6 +28,12 @@
           :leaf-only="true"
         />
       </el-form-item>
+      <el-form-item :label="t('repository.columns.repoType')" prop="repoType">
+        <el-radio-group v-model="form.repoType">
+          <el-radio value="SERVICE">{{ t('repository.repoTypes.SERVICE') }}</el-radio>
+          <el-radio value="LIBRARY">{{ t('repository.repoTypes.LIBRARY') }}</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item :label="t('repository.columns.initialVersion')" prop="initialVersion">
         <el-input v-model="form.initialVersion" :placeholder="t('repository.placeholders.initialVersion')" />
       </el-form-item>
@@ -67,6 +73,7 @@ const form = reactive<CreateRepoReq>({
   name: '',
   cloneUrl: '',
   defaultBranch: 'main',
+  repoType: 'SERVICE',
   monoRepo: false,
   initialVersion: '',
   groupCode: ''
@@ -97,6 +104,7 @@ const open = (repo?: any) => {
   form.name = repo?.name || ''
   form.cloneUrl = repo?.cloneUrl || ''
   form.defaultBranch = repo?.defaultBranch || 'main'
+  form.repoType = repo?.repoType || 'SERVICE'
   form.monoRepo = repo?.monoRepo ?? false
   form.initialVersion = ''
   form.groupCode = repo?.groupCode || ''
@@ -124,6 +132,7 @@ const submit = async () => {
             name: form.name,
             cloneUrl: form.cloneUrl,
             defaultBranch: form.defaultBranch,
+            repoType: form.repoType,
             monoRepo: form.monoRepo,
             initialVersion: form.initialVersion || undefined,
             groupCode: form.groupCode
@@ -133,6 +142,7 @@ const submit = async () => {
             name: form.name,
             cloneUrl: form.cloneUrl,
             defaultBranch: form.defaultBranch,
+            repoType: form.repoType,
             monoRepo: form.monoRepo,
             initialVersion: form.initialVersion || undefined,
             groupCode: form.groupCode

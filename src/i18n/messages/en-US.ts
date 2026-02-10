@@ -277,9 +277,14 @@ export default {
       name: 'Repository Name',
       cloneUrl: 'Clone URL',
       defaultBranch: 'Default Branch',
+      repoType: 'Repo Type',
       initialVersion: 'Initial Version',
       monoRepo: 'Mono Repo',
       writable: 'Writable?'
+    },
+    repoTypes: {
+      SERVICE: 'Service',
+      LIBRARY: 'Library'
     },
     openGitLab: 'Open in GitLab',
     gateSummary: 'Gate Summary',

@@ -21,6 +21,11 @@
       <el-table-column prop="name" :label="t('repository.columns.repo')" min-width="200" />
       <el-table-column prop="cloneUrl" :label="t('repository.columns.cloneUrl')" min-width="200" />
       <el-table-column prop="defaultBranch" :label="t('repository.columns.defaultBranch')" width="140" />
+      <el-table-column prop="repoType" :label="t('repository.columns.repoType')" width="120">
+        <template #default="{ row }">
+          <el-tag :type="row.repoType === 'LIBRARY' ? 'warning' : 'primary'" size="small">{{ t(`repository.repoTypes.${row.repoType || 'SERVICE'}`) }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column :label="t('repository.healthLabel')" width="200">
         <template #default="{ row }">
           <el-tag v-if="row.nonCompliantBranchCount > 0" type="danger">{{ t('repository.health.risk') }} ({{ row.nonCompliantBranchCount }})</el-tag>

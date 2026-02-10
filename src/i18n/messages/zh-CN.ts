@@ -291,9 +291,14 @@ export default {
       name: '仓库名称',
       cloneUrl: '仓库地址',
       defaultBranch: '默认分支',
+      repoType: '仓库类型',
       initialVersion: '初始版本号',
       monoRepo: '单仓',
       writable: '可写？'
+    },
+    repoTypes: {
+      SERVICE: '服务',
+      LIBRARY: '类库'
     },
     openGitLab: '打开 GitLab',
     gateSummary: '门禁摘要',

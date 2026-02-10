@@ -7,6 +7,7 @@ export interface Repository {
   name: string
   cloneUrl: string
   defaultBranch: string
+  repoType: string
   monoRepo: boolean
   branchCount: number
   activeBranchCount: number
@@ -45,6 +46,7 @@ export interface CreateRepoReq {
   name: string
   cloneUrl: string
   defaultBranch?: string
+  repoType?: string
   monoRepo: boolean
   initialVersion?: string
   groupCode: string
@@ -54,6 +56,7 @@ export interface UpdateRepoReq {
   name: string
   cloneUrl: string
   defaultBranch?: string
+  repoType?: string
   monoRepo: boolean
   initialVersion?: string
   groupCode: string

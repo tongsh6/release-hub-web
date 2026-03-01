@@ -158,6 +158,12 @@
       @refresh="handleRefresh"
     />
 
+    <!-- 分支状态面板 -->
+    <BranchStatusPanel
+      v-if="form.id && iterations.length > 0"
+      :window-id="form.id"
+    />
+
     <AttachIterationsDialog ref="attachDialogRef" @success="handleAttachSuccess" />
     <CodeMergeDialog ref="codeMergeDialogRef" />
     <VersionUpdateDialog ref="versionUpdateDialogRef" @success="handleRefresh" />
@@ -180,6 +186,7 @@ import AttachIterationsDialog from './AttachIterationsDialog.vue'
 import CodeMergeDialog from './CodeMergeDialog.vue'
 import OrchestrationPanel from './OrchestrationPanel.vue'
 import VersionUpdateDialog from './VersionUpdateDialog.vue'
+import BranchStatusPanel from './BranchStatusPanel.vue'
 
 const route = useRoute()
 const router = useRouter()

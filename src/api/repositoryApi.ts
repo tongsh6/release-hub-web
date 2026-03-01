@@ -2,6 +2,8 @@ import { http } from '@/api/http'
 import type { PageResult, PageQuery, Id } from '@/types/crud'
 import type { ApiResponse } from '@/types/dto'
 
+export type GitProvider = 'GITHUB' | 'GITLAB' | 'MOCK'
+
 export interface Repository {
   id: string
   name: string
@@ -9,6 +11,8 @@ export interface Repository {
   defaultBranch: string
   repoType: string
   monoRepo: boolean
+  gitProvider?: GitProvider
+  gitToken?: string
   branchCount: number
   activeBranchCount: number
   nonCompliantBranchCount: number
@@ -50,6 +54,8 @@ export interface CreateRepoReq {
   monoRepo: boolean
   initialVersion?: string
   groupCode: string
+  gitProvider?: GitProvider
+  gitToken?: string
 }
 
 export interface UpdateRepoReq {
@@ -60,6 +66,8 @@ export interface UpdateRepoReq {
   monoRepo: boolean
   initialVersion?: string
   groupCode: string
+  gitProvider?: GitProvider
+  gitToken?: string
 }
 
 export interface ApiPageResponse<T> {

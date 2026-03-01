@@ -40,6 +40,28 @@
       <el-form-item :label="t('repository.columns.monoRepo')" prop="monoRepo">
         <el-switch v-model="form.monoRepo" />
       </el-form-item>
+
+      <!-- Git 配置折叠区 -->
+      <el-divider content-position="left">Git 配置</el-divider>
+      <el-form-item label="Git Provider" prop="gitProvider">
+        <el-select v-model="form.gitProvider" placeholder="选择 Git 提供商" style="width: 100%;">
+          <el-option label="Mock（测试用）" value="MOCK" />
+          <el-option label="GitHub" value="GITHUB" />
+          <el-option label="GitLab" value="GITLAB" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Git Token" prop="gitToken">
+        <el-input
+          v-model="form.gitToken"
+          type="password"
+          show-password
+          placeholder="Personal Access Token"
+          clearable
+        />
+        <div v-if="mode === 'edit' && maskedToken" class="token-hint">
+          当前 Token: {{ maskedToken }}
+        </div>
+      </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -53,12 +75,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance } from 'element-plus'
-import { repositoryApi, type CreateRepoReq } from '@/api/repositoryApi'
+import { repositoryApi, type CreateRepoReq, type GitProvider } from '@/api/repositoryApi'
 import GroupTreeSelect from '@/components/common/GroupTreeSelect.vue'
 import { handleError } from '@/utils/error'
+
+interface RepoForm extends CreateRepoReq {
+  gitProvider: GitProvider
+  gitToken: string
+}
 
 const emit = defineEmits(['success'])
 const { t } = useI18n()
@@ -68,15 +95,24 @@ const loading = ref(false)
 const formRef = ref<FormInstance>()
 const mode = ref<'create' | 'edit'>('create')
 const currentId = ref<string | null>(null)
+const originalToken = ref<string | null>(null)
 
-const form = reactive<CreateRepoReq>({
+const form = reactive<RepoForm>({
   name: '',
   cloneUrl: '',
   defaultBranch: 'main',
   repoType: 'SERVICE',
   monoRepo: false,
   initialVersion: '',
-  groupCode: ''
+  groupCode: '',
+  gitProvider: 'MOCK',
+  gitToken: ''
+})
+
+const maskedToken = computed(() => {
+  if (!originalToken.value) return ''
+  if (originalToken.value.length <= 4) return '****'
+  return originalToken.value.substring(0, 4) + '****'
 })
 
 const rules = {
@@ -108,6 +144,9 @@ const open = (repo?: any) => {
   form.monoRepo = repo?.monoRepo ?? false
   form.initialVersion = ''
   form.groupCode = repo?.groupCode || ''
+  form.gitProvider = repo?.gitProvider || 'MOCK'
+  form.gitToken = ''
+  originalToken.value = repo?.gitToken || null
   mode.value = repo ? 'edit' : 'create'
   currentId.value = repo?.id || null
   if (repo?.id) {
@@ -127,26 +166,21 @@ const submit = async () => {
     if (valid) {
       loading.value = true
       try {
+        const payload = {
+          name: form.name,
+          cloneUrl: form.cloneUrl,
+          defaultBranch: form.defaultBranch,
+          repoType: form.repoType,
+          monoRepo: form.monoRepo,
+          initialVersion: form.initialVersion || undefined,
+          groupCode: form.groupCode,
+          gitProvider: form.gitProvider,
+          gitToken: form.gitToken || undefined
+        }
         if (mode.value === 'edit' && currentId.value) {
-          await repositoryApi.update(currentId.value, {
-            name: form.name,
-            cloneUrl: form.cloneUrl,
-            defaultBranch: form.defaultBranch,
-            repoType: form.repoType,
-            monoRepo: form.monoRepo,
-            initialVersion: form.initialVersion || undefined,
-            groupCode: form.groupCode
-          })
+          await repositoryApi.update(currentId.value, payload)
         } else {
-          await repositoryApi.create({
-            name: form.name,
-            cloneUrl: form.cloneUrl,
-            defaultBranch: form.defaultBranch,
-            repoType: form.repoType,
-            monoRepo: form.monoRepo,
-            initialVersion: form.initialVersion || undefined,
-            groupCode: form.groupCode
-          })
+          await repositoryApi.create(payload)
         }
         ElMessage.success(t('common.success'))
         visible.value = false
@@ -164,3 +198,12 @@ defineExpose({
   open
 })
 </script>
+
+<style scoped>
+.token-hint {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+  font-family: monospace;
+}
+</style>

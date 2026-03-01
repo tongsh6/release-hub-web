@@ -144,6 +144,40 @@ export function mergeAll(windowId: string): Promise<CodeMergeResult[]> {
   return apiPost<CodeMergeResult[]>(`${BASE}/release-windows/${windowId}/merge`, {})
 }
 
+// --- 分支状态相关 ---
+
+export interface FeatureBranchInfo {
+  branchName: string
+  exists: boolean
+  latestCommit?: string
+}
+
+export interface ReleaseBranchInfo {
+  branchName: string
+  exists: boolean
+  latestCommit?: string
+  mergeStatus: 'PENDING' | 'MERGED' | 'CONFLICT'
+}
+
+export interface RepoBranchStatus {
+  repoId: string
+  repoName: string
+  repoCloneUrl: string
+  iterationKey: string
+  featureBranch: FeatureBranchInfo
+  releaseBranch: ReleaseBranchInfo
+}
+
+export interface BranchStatusView {
+  windowId: string
+  windowKey: string
+  repos: RepoBranchStatus[]
+}
+
+export function getBranchStatus(id: string): Promise<BranchStatusView> {
+  return apiGet<BranchStatusView>(`${BASE}/release-windows/${id}/branch-status`)
+}
+
 // Alias for compatibility if needed, or prefer using explicit names above
 export const releaseWindowApi = {
   list,
@@ -161,5 +195,6 @@ export const releaseWindowApi = {
   getDryPlan,
   executeVersionUpdate,
   mergeIteration,
-  mergeAll
+  mergeAll,
+  getBranchStatus
 }

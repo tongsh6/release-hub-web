@@ -419,7 +419,10 @@ export default {
   calendar: {
     title: 'Release Calendar',
     today: 'Today',
-    more: 'more'
+    more: 'more',
+    month: 'Month',
+    week: 'Week',
+    weekOf: 'Week {n}'
   },
   group: {
     title: 'Groups',

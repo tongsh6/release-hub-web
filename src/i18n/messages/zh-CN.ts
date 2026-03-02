@@ -460,7 +460,10 @@ export default {
   calendar: {
     title: '发布日历',
     today: '今天',
-    more: '更多'
+    more: '更多',
+    month: '月',
+    week: '周',
+    weekOf: '第{n}周'
   },
   group: {
     title: '分组设置',

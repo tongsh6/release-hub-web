@@ -156,20 +156,21 @@ function getWeekNumber(date: Date): number {
 const currentMonthLabel = computed(() => {
   const year = currentDate.value.getFullYear()
   const month = currentDate.value.getMonth()
+  
+  let baseStr = ''
+  if (locale.value === 'zh-CN') {
+    baseStr = `${year}年${month + 1}月`
+  } else {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December']
+    baseStr = `${monthNames[month]} ${year}`
+  }
+
   if (viewMode.value === 'week') {
     const weekNum = getWeekNumber(currentDate.value)
-    if (locale.value === 'zh-CN') {
-      return `${year}年${month + 1}月 第${weekNum}周`
-    }
-    return `${['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'][month]} ${year} Week ${weekNum}`
+    return `${baseStr} ${t('calendar.weekOf', { n: weekNum })}`
   }
-  if (locale.value === 'zh-CN') {
-    return `${year}年${month + 1}月`
-  }
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December']
-  return `${monthNames[month]} ${year}`
+  return baseStr
 })
 
 // 月视图格子数据

@@ -13,7 +13,7 @@
     style="width: 100%"
     @change="handleChange"
   >
-    <template #default="{ node, data }">
+    <template #default="{ data }">
       <span class="tree-node">
         <span>{{ data.name }}</span>
         <span v-if="showCode" class="tree-node-code">({{ data.code }})</span>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { groupApi, type GroupNode } from '@/api/modules/group'
 
@@ -46,6 +46,7 @@ const props = withDefaults(defineProps<{
   showCode?: boolean
 }>(), {
   modelValue: undefined,
+  placeholder: '',
   clearable: true,
   disabled: false,
   leafOnly: true,

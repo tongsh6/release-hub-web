@@ -500,6 +500,30 @@ export default {
       codeImmutable: '编码不可修改'
     }
   },
+  conflict: {
+    title: '冲突检测',
+    notScanned: '尚未扫描',
+    notScannedHint: '请点击「重新扫描」执行冲突检测',
+    hasConflicts: '检测到 {count} 个冲突，请先解决所有冲突后再执行操作',
+    noConflicts: '无冲突，可以安全执行',
+    rescan: '重新扫描',
+    lastScanAt: '上次扫描时间',
+    repoName: '仓库',
+    iteration: '迭代',
+    type: '冲突类型',
+    branches: '分支 / 版本',
+    message: '描述',
+    resolveBeforeExecute: '存在未解决的冲突，请先解决所有冲突',
+    types: {
+      MISMATCH: '版本不一致',
+      REPO_AHEAD: '仓库版本较新',
+      SYSTEM_AHEAD: '系统版本较新',
+      BRANCH_EXISTS: '分支已存在',
+      BRANCH_NONCOMPLIANT: '分支名不合规',
+      CROSS_REPO_VERSION_MISMATCH: '跨仓库版本不一致',
+      MERGE_CONFLICT: '合并冲突'
+    }
+  },
   orchestration: {
     title: '发布编排',
     status: {

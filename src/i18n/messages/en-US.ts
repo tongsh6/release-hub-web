@@ -459,6 +459,30 @@ export default {
       codeImmutable: 'Code cannot be changed'
     }
   },
+  conflict: {
+    title: 'Conflicts',
+    notScanned: 'Not scanned',
+    notScannedHint: 'Click "Rescan" to run conflict detection',
+    hasConflicts: '{count} conflict(s) detected, resolve all before execution',
+    noConflicts: 'No conflicts, safe to proceed',
+    rescan: 'Rescan',
+    lastScanAt: 'Last scan',
+    repoName: 'Repository',
+    iteration: 'Iteration',
+    type: 'Conflict Type',
+    branches: 'Branches / Versions',
+    message: 'Description',
+    resolveBeforeExecute: 'Unresolved conflicts exist, please resolve all conflicts first',
+    types: {
+      MISMATCH: 'Version Mismatch',
+      REPO_AHEAD: 'Repo Ahead',
+      SYSTEM_AHEAD: 'System Ahead',
+      BRANCH_EXISTS: 'Branch Exists',
+      BRANCH_NONCOMPLIANT: 'Noncompliant Name',
+      CROSS_REPO_VERSION_MISMATCH: 'Cross-repo Mismatch',
+      MERGE_CONFLICT: 'Merge Conflict'
+    }
+  },
   orchestration: {
     title: 'Release Orchestration',
     status: {

@@ -99,7 +99,7 @@
 import { ref, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { releaseWindowApi, type VersionUpdateRequest } from '@/api/modules/releaseWindow'
+import { releaseWindowApi, getConflicts, type VersionUpdateRequest } from '@/api/modules/releaseWindow'
 import { repositoryApi, type Repository } from '@/api/repositoryApi'
 import { handleError } from '@/utils/error'
 import type { BuildTool } from '@/types/dto'
@@ -169,6 +169,13 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid) => {
     if (!valid) {
       ElMessage.warning(t('releaseWindow.versionUpdate.validationFailed'))
+      return
+    }
+
+    // 执行前冲突检测
+    const conflictsReport = await getConflicts(windowId)
+    if (conflictsReport.hasConflicts) {
+      ElMessage.warning(t('conflict.resolveBeforeExecute'))
       return
     }
 

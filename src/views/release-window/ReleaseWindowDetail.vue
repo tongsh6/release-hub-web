@@ -164,6 +164,13 @@
       :window-id="form.id"
     />
 
+    <!-- 冲突检测面板 -->
+    <ConflictPanel
+      v-if="form.id && iterations.length > 0"
+      ref="conflictPanelRef"
+      :window-id="form.id"
+    />
+
     <AttachIterationsDialog ref="attachDialogRef" @success="handleAttachSuccess" />
     <CodeMergeDialog ref="codeMergeDialogRef" />
     <VersionUpdateDialog ref="versionUpdateDialogRef" @success="handleRefresh" />
@@ -187,6 +194,7 @@ import CodeMergeDialog from './CodeMergeDialog.vue'
 import OrchestrationPanel from './OrchestrationPanel.vue'
 import VersionUpdateDialog from './VersionUpdateDialog.vue'
 import BranchStatusPanel from './BranchStatusPanel.vue'
+import ConflictPanel from './ConflictPanel.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -198,6 +206,7 @@ const form = ref<Partial<ReleaseWindow>>({})
 const attachDialogRef = ref<InstanceType<typeof AttachIterationsDialog>>()
 const codeMergeDialogRef = ref<InstanceType<typeof CodeMergeDialog>>()
 const versionUpdateDialogRef = ref<InstanceType<typeof VersionUpdateDialog>>()
+const conflictPanelRef = ref()
 
 // 迭代信息（包含仓库详情）
 interface IterationWithRepos {

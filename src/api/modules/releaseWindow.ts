@@ -178,6 +178,37 @@ export function getBranchStatus(id: string): Promise<BranchStatusView> {
   return apiGet<BranchStatusView>(`${BASE}/release-windows/${id}/branch-status`)
 }
 
+// --- 冲突检测相关 ---
+
+export interface ConflictItemView {
+  repoId: string
+  repoName: string
+  iterationKey: string
+  conflictType: 'MISMATCH' | 'REPO_AHEAD' | 'SYSTEM_AHEAD' | 'BRANCH_EXISTS' | 'BRANCH_NONCOMPLIANT' | 'CROSS_REPO_VERSION_MISMATCH' | 'MERGE_CONFLICT'
+  sourceBranch?: string
+  targetBranch?: string
+  systemVersion?: string
+  repoVersion?: string
+  message: string
+  suggestion: string
+}
+
+export interface ConflictReportView {
+  windowId: string
+  checkedAt: string
+  hasConflicts: boolean
+  totalCount: number
+  conflicts: ConflictItemView[]
+}
+
+export function checkConflicts(windowId: string): Promise<ConflictReportView> {
+  return apiPost<ConflictReportView>(`${BASE}/release-windows/${windowId}/conflicts/check`, {})
+}
+
+export function getConflicts(windowId: string): Promise<ConflictReportView> {
+  return apiGet<ConflictReportView>(`${BASE}/release-windows/${windowId}/conflicts`)
+}
+
 // Alias for compatibility if needed, or prefer using explicit names above
 export const releaseWindowApi = {
   list,
@@ -196,5 +227,7 @@ export const releaseWindowApi = {
   executeVersionUpdate,
   mergeIteration,
   mergeAll,
-  getBranchStatus
+  getBranchStatus,
+  checkConflicts,
+  getConflicts
 }

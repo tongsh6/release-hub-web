@@ -473,6 +473,11 @@ export default {
     branches: 'Branches / Versions',
     message: 'Description',
     resolveBeforeExecute: 'Unresolved conflicts exist, please resolve all conflicts first',
+    filterAll: 'All',
+    action: 'Action',
+    resolveVersion: 'Sync Version',
+    resolveInGit: 'Resolve in Git',
+    resolveBranch: 'Resolve Branch',
     types: {
       MISMATCH: 'Version Mismatch',
       REPO_AHEAD: 'Repo Ahead',

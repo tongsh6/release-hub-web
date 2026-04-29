@@ -87,6 +87,8 @@
       <el-button
         type="primary"
         :loading="submitting"
+        :disabled="conflictBlocked"
+        :title="conflictBlocked ? t('conflict.resolveBeforeExecute') : ''"
         @click="handleSubmit"
       >
         {{ t('common.confirm') }}
@@ -112,6 +114,7 @@ const emit = defineEmits<{
 
 const visible = ref(false)
 const submitting = ref(false)
+const conflictBlocked = ref(false)
 const formRef = ref<FormInstance>()
 const repositories = ref<Repository[]>([])
 
@@ -203,9 +206,19 @@ const handleSubmit = async () => {
   })
 }
 
-const open = (id: string) => {
+const open = async (id: string) => {
   windowId = id
   visible.value = true
+  conflictBlocked.value = false
+
+  // 打开时预检冲突
+  try {
+    const conflictsReport = await getConflicts(id)
+    conflictBlocked.value = conflictsReport.hasConflicts
+  } catch {
+    conflictBlocked.value = false
+  }
+
   loadRepositories()
 }
 

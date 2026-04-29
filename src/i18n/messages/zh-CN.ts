@@ -514,6 +514,11 @@ export default {
     branches: '分支 / 版本',
     message: '描述',
     resolveBeforeExecute: '存在未解决的冲突，请先解决所有冲突',
+    filterAll: '全部',
+    action: '操作',
+    resolveVersion: '同步版本',
+    resolveInGit: '请到 Git 平台解决',
+    resolveBranch: '请处理此分支',
     types: {
       MISMATCH: '版本不一致',
       REPO_AHEAD: '仓库版本较新',

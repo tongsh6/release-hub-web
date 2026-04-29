@@ -152,6 +152,7 @@ runner.test('仓库列表数据字段显示正确', async () => {
   const { rowCount } = await verifyTableRowData()
   
   if (rowCount > 0) {
+    const page = runner.getContext().getPage()
     // 验证第一行的具体字段
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {
@@ -190,11 +191,12 @@ runner.test('仓库列表数据字段显示正确', async () => {
 // 测试：仓库搜索功能
 runner.test('仓库搜索功能正常工作', async () => {
   await ensureLoggedIn()
-  
+
   const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
   await helper.navigate('/repositories')
   await delay(1000)
-  
+
   // 查找搜索输入框
   const searchInput = await page.$('.el-input__inner')
   if (searchInput) {
@@ -225,7 +227,8 @@ runner.test('仓库详情字段显示正确', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     // 点击详情按钮
     const viewButtons = await page.$$('.el-table .el-button')
     for (const btn of viewButtons) {
@@ -276,12 +279,13 @@ runner.test('仓库详情字段显示正确', async () => {
 // 测试：创建/同步仓库对话框字段
 runner.test('创建仓库对话框字段显示正确', async () => {
   await ensureLoggedIn()
-  
+
   const helper = runner.getHelper()
-  
+  const page = runner.getContext().getPage()
+
   await helper.navigate('/repositories')
   await delay(1000)
-  
+
   // 点击创建按钮
   const buttons = await page.$$('.el-button--primary')
   for (const btn of buttons) {
@@ -319,11 +323,16 @@ runner.test('创建仓库对话框字段显示正确', async () => {
   console.log('Form labels:', labels)
   
   await helper.screenshot('repository-create-dialog')
-  
-  // 关闭对话框
-  const closeBtn = await page.$('.el-dialog__headerbtn, .el-drawer__close-btn')
-  if (closeBtn) {
-    await closeBtn.click()
+
+  // 关闭对话框（容错处理）
+  try {
+    const closeBtn = await page.$('.el-dialog__headerbtn, .el-drawer__close-btn')
+    if (closeBtn) {
+      await closeBtn.click()
+      await delay(300)
+    }
+  } catch {
+    // 对话框可能已经被关闭或者点击目标被遮挡，忽略
   }
 })
 
@@ -338,7 +347,8 @@ runner.test('仓库健康状态标签显示正确', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     // 查找健康状态标签
     const healthTags = await page.$$('.el-table .el-tag')
     console.log(`Found ${healthTags.length} health tags`)
@@ -374,7 +384,8 @@ runner.test('仓库列表操作按钮完整', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {
       const buttons = await firstRow.$$('.el-button')
@@ -414,7 +425,8 @@ runner.test('仓库分支MR摘要显示正确', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     // 检查健康列的附加信息（B:x/x | MR:x）
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {

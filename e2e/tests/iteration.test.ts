@@ -152,6 +152,7 @@ runner.test('迭代列表数据字段显示正确', async () => {
   const { rowCount } = await verifyTableRowData()
   
   if (rowCount > 0) {
+    const page = runner.getContext().getPage()
     // 验证第一行的具体字段
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {
@@ -183,11 +184,12 @@ runner.test('迭代列表数据字段显示正确', async () => {
 // 测试：创建迭代对话框字段
 runner.test('创建迭代对话框字段显示正确', async () => {
   await ensureLoggedIn()
-  
+
   const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
   await helper.navigate('/iterations')
   await delay(1000)
-  
+
   // 点击创建按钮
   const buttons = await page.$$('.el-button--primary')
   for (const btn of buttons) {
@@ -247,7 +249,8 @@ runner.test('迭代详情字段显示正确', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     // 点击详情按钮
     const viewButtons = await page.$$('.el-table .el-button')
     for (const btn of viewButtons) {
@@ -299,7 +302,8 @@ runner.test('迭代关联仓库字段显示正确', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     // 验证仓库数列
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {
@@ -350,7 +354,8 @@ runner.test('迭代列表操作按钮完整', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {
       const buttons = await firstRow.$$('.el-button')

@@ -124,19 +124,33 @@ runner.test('成功登录后跳转到首页', async () => {
 runner.test('Enter 键可以提交表单', async () => {
   const helper = runner.getHelper()
   const page = runner.getContext().getPage()
-  
+
   await helper.navigate('/login')
-  
+  await delay(500)
+
+  // 如果已登录（前一个测试），先清除登录状态
+  if (!page.url().includes('/login')) {
+    await page.evaluate(() => {
+      localStorage.clear()
+      sessionStorage.clear()
+    })
+    await helper.navigate('/login')
+    await delay(500)
+  }
+
+  // 等待登录表单加载
+  await page.waitForSelector('.el-form-item:nth-child(1) .el-input__inner', { visible: true, timeout: 5000 })
+
   // 输入凭据
   await helper.typeText('.el-form-item:nth-child(1) .el-input__inner', config.testUser.username)
   await helper.typeText('.el-form-item:nth-child(2) .el-input__inner', config.testUser.password)
-  
+
   // 按 Enter 键
   await page.keyboard.press('Enter')
-  
+
   // 等待响应
   await delay(2000)
-  
+
   await helper.screenshot('login-enter-submit')
 })
 

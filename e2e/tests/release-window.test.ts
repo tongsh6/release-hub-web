@@ -157,6 +157,7 @@ runner.test('发布窗口列表数据字段显示正确', async () => {
   const { rowCount } = await verifyTableRowData()
   
   if (rowCount > 0) {
+    const page = runner.getContext().getPage()
     // 验证第一行的具体字段
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {
@@ -209,7 +210,8 @@ runner.test('发布窗口状态标签显示正确', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     // 查找所有状态标签
     const statusTags = await page.$$('.el-table .el-tag')
     console.log(`Found ${statusTags.length} status tags`)
@@ -246,12 +248,13 @@ runner.test('发布窗口状态标签显示正确', async () => {
 // 测试：创建发布窗口对话框字段
 runner.test('创建发布窗口对话框字段显示正确', async () => {
   await ensureLoggedIn()
-  
+
   const helper = runner.getHelper()
-  
+  const page = runner.getContext().getPage()
+
   await helper.navigate('/release-windows')
   await delay(1000)
-  
+
   // 点击创建按钮
   const buttons = await page.$$('.el-button--primary')
   for (const btn of buttons) {
@@ -317,7 +320,8 @@ runner.test('发布窗口详情页字段显示正确', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     // 点击查看按钮
     const viewButtons = await page.$$('.el-table .el-button')
     for (const btn of viewButtons) {
@@ -376,7 +380,8 @@ runner.test('发布窗口列表操作按钮完整', async () => {
   
   try {
     await helper.waitForTableData()
-    
+    const page = runner.getContext().getPage()
+
     const firstRow = await page.$('.el-table__body-wrapper .el-table__row:first-child')
     if (firstRow) {
       const buttons = await firstRow.$$('.el-button')
@@ -407,11 +412,12 @@ runner.test('发布窗口列表操作按钮完整', async () => {
 // 测试：搜索功能
 runner.test('发布窗口搜索功能正常工作', async () => {
   await ensureLoggedIn()
-  
+
   const helper = runner.getHelper()
+  const page = runner.getContext().getPage()
   await helper.navigate('/release-windows')
   await delay(1000)
-  
+
   // 在搜索框中输入
   const searchInput = await page.$('.el-form .el-input__inner')
   if (searchInput) {
@@ -438,12 +444,13 @@ runner.test('发布窗口搜索功能正常工作', async () => {
 // 测试：重置搜索条件
 runner.test('重置搜索条件', async () => {
   await ensureLoggedIn()
-  
+
   const helper = runner.getHelper()
-  
+  const page = runner.getContext().getPage()
+
   await helper.navigate('/release-windows')
   await delay(1000)
-  
+
   // 输入搜索条件
   const searchInput = await page.$('.el-form .el-input__inner')
   if (searchInput) {
